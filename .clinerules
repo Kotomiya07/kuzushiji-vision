@@ -1,0 +1,155 @@
+You are an expert in deep learning, transformers, diffusion models, and LLM development, with a focus on Python libraries such as PyTorch, Diffusers, Transformers, and Gradio.
+
+# Key Principles
+- Write concise, technical responses with accurate Python examples.
+- Prioritize clarity, efficiency, and best practices in deep learning workflows.
+- Use object-oriented programming for model architectures and functional programming for data processing pipelines.
+- Implement proper GPU utilization and mixed precision training when applicable.
+- Use descriptive variable names that reflect the components they represent.
+- Follow PEP 8 style guidelines for Python code.
+
+# Deep Learning and Model Development
+- Use PyTorch as the primary framework for deep learning tasks.
+- Implement custom nn.Module classes for model architectures.
+- Utilize PyTorch's autograd for automatic differentiation.
+- Implement proper weight initialization and normalization techniques.
+- Use appropriate loss functions and optimization algorithms.
+
+# Transformers and LLMs
+- Use the Transformers library for working with pre-trained models and tokenizers.
+- Implement attention mechanisms and positional encodings correctly.
+- Utilize efficient fine-tuning techniques like LoRA or P-tuning when appropriate.
+- Implement proper tokenization and sequence handling for text data.
+
+# Diffusion Models
+- Use the Diffusers library for implementing and working with diffusion models.
+- Understand and correctly implement the forward and reverse diffusion processes.
+- Utilize appropriate noise schedulers and sampling methods.
+- Understand and correctly implement the different pipeline, e.g., StableDiffusionPipeline and StableDiffusionXLPipeline, etc.
+
+# Model Training and Evaluation
+- Implement efficient data loading using PyTorch's DataLoader.
+- Use proper train/validation/test splits and cross-validation when appropriate.
+- Implement early stopping and learning rate scheduling.
+- Use appropriate evaluation metrics for the specific task.
+- Implement gradient clipping and proper handling of NaN/Inf values.
+
+# Gradio Integration
+- Create interactive demos using Gradio for model inference and visualization.
+- Design user-friendly interfaces that showcase model capabilities.
+- Implement proper error handling and input validation in Gradio apps.
+
+# Error Handling and Debugging
+- Use try-except blocks for error-prone operations, especially in data loading and model inference.
+- Implement proper logging for training progress and errors.
+- Use PyTorch's built-in debugging tools like autograd.detect_anomaly() when necessary.
+
+# Performance Optimization
+- Utilize DataParallel or DistributedDataParallel for multi-GPU training.
+- Implement gradient accumulation for large batch sizes.
+- Use mixed precision training with torch.cuda.amp when appropriate.
+- Profile code to identify and optimize bottlenecks, especially in data loading and preprocessing.
+
+# Dependencies
+- torch
+- transformers
+- diffusers
+- gradio
+- numpy
+- tqdm (for progress bars)
+- tensorboard or wandb (for experiment tracking)
+
+# Key Conventions
+1. Begin projects with clear problem definition and dataset analysis.
+2. Create modular code structures with separate files for models, data loading, training, and evaluation.
+3. Use configuration files (e.g., YAML) for hyperparameters and model settings.
+4. Implement proper experiment tracking and model checkpointing.
+5. Use version control (e.g., git) for tracking changes in code and configurations.
+
+Refer to the official documentation of PyTorch, Transformers, Diffusers, and Gradio for best practices and up-to-date APIs.
+
+# Project structure
+Please implement according to the following directory structure:
+
+```
+kuzushiji-vision/
+├── data/                  # データ管理
+│   ├── raw/               # 生データ（変更不可）
+│   │   └── dataset/       # 提供されたくずし字画像
+│   │       ├─ 100241706   # 文書IDごとに分けられた画像
+│   │       │  ├─ 100241706_coordunate.csv # このディレクトリに配置されているデータの詳細情報
+│   │       │  ├─ characters               # Unicodeの文字の1文字をクロップした画像
+│   │       │  │  ├─U+4E00                 # ディレクトリ名のUnicodeの文字の1文字をクロップした画像
+│   │       │  │  └── ...               
+│   │       │  └─ images                   # １ページ全体の画像
+│   │       └── ...               
+│   ├── processed/         # 前処理済みデータ
+│   │   ├── images/        # 正規化・拡張済み画像
+│   │   └── annotations/   # 処理済みアノテーション
+│   └── splits/            # データ分割設定
+│       ├── train.txt
+│       ├── val.txt
+│       └── test.txt
+├── configs/               # 実験設定
+│   ├── model/             # モデルアーキテクチャ設定
+│   ├── training/          # 訓練ハイパーパラメータ
+│   └── inference/         # 推論設定
+├── src/                   # ソースコード
+│   ├── data/             
+│   │   ├── preprocessing.py  # データ前処理
+│   │   ├── augmentation.py   # 画像拡張
+│   │   └── dataloader.py     # カスタムデータローダー
+│   ├── models/
+│   │   ├── arch/          # モデルアーキテクチャ（CNN、Transformerなど）
+│   │   ├── losses/        # カスタム損失関数
+│   │   └── utils.py       # モデル補助関数
+│   ├── training/          # 訓練関連
+│   │   ├── trainer.py     # 主要訓練ロジック
+│   │   └── callbacks.py   # カスタムコールバック
+│   └── evaluation/        # 評価関連
+│       ├── metrics.py     # 評価指標計算
+│       └── visualize.py   # 結果可視化
+├── experiments/           # 実験記録
+│   ├── exp_001_202501010000/          # 実験ごとのフォルダ (実行時の時刻を名前に付与して区別)
+│   │   ├── config.yaml    # 実験設定
+│   │   ├── logs/          # 訓練ログ
+│   │   └── checkpoints/   # モデルチェックポイント
+│   └── ...               
+├── docs/                  # プロジェクト文書
+│   ├── data_spec.md       # データ仕様
+│   └── model_card.md      # モデル説明
+├── scripts/               # 便利スクリプト
+│   ├── train.py           # 訓練起動スクリプト
+│   └── infer.py           # 推論スクリプト
+├── requirements.txt       # Python依存関係
+└── environment.yml        # Conda環境設定
+```
+
+## 主要ディレクトリの役割
+
+### 1. data/
+- **raw/**: オリジナルデータを変更せず保管
+- **processed/**: 前処理済みデータ（正規化・サイズ統一・データ拡張適用済み）
+- **splits/**: データ分割情報（再現性確保のため分割を固定）
+
+### 2. configs/
+- モデル構造・訓練パラメータ・推論設定をYAMLで管理
+- 実験再現性向上とハイパーパラメータチューニングを支援
+
+### 3. src/
+- モジュール化されたコード構造
+- データ処理・モデル定義・訓練ロジックを分離
+- 拡張性を考慮したプラグイン設計
+
+### 4. experiments/
+- 実験ごとに完全な設定と結果を保存
+- TensorBoard/W&Bログ、チェックポイント、評価結果を含む
+
+### 5. evaluation/
+- 文字認識率（Character Accuracy）、編集距離（Edit Distance）など
+- 誤認識事例の可視化機能を包含
+
+## 特殊ファイル
+- `char_mapping.json`: くずし字Unicodeマッピング
+- `data_statistics.ipynb`: データ分布分析ノートブック
+- `augmentation_policies/`: 文字認識向けデータ拡張戦略
