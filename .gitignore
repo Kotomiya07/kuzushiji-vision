@@ -94,3 +94,8 @@ target/
 
 # Sphinx documentation
 docs/_build/
+
+# Rye
+.python-version
+requirements.lock
+requirements-dev.lock
