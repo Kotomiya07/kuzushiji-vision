@@ -108,11 +108,7 @@ kuzushiji-vision/
 
 ## 実験結果
 
-| モデル | 文字認識率 | 編集距離 |
-|--------|------------|----------|
-| ベースライン | 85.3% | 0.234 |
-| マルチスケール | 87.1% | 0.215 |
-| アンサンブル | 88.5% | 0.198 |
+後日追加予定
 
 ## 開発者向け情報
 
@@ -138,10 +134,10 @@ pylint src/
 
 ```bibtex
 @software{kuzushiji_vision2025,
-  author = {Your Name},
+  author = {Kotomiya07},
   title = {Kuzushiji Vision: Deep Learning Model for Classical Japanese Character Recognition},
   year = {2025},
-  url = {https://github.com/yourusername/kuzushiji-vision}
+  url = {https://github.com/Kotomiya07/kuzushiji-vision}
 }
 ```
 
@@ -164,9 +160,10 @@ pylint src/
 5. プルリクエストを作成
 
 ## 更新履歴
-
-- **v1.0.1** (2025-02-04)
+- **v1.0.0** (2025-01-29)
   - 初回リリース
   - 基本的なモデルアーキテクチャの実装
-  - データ前処理パイプラインの追加
   - 訓練・評価スクリプトの追加
+
+- **v1.0.1** (2025-02-04)
+  - データ前処理パイプラインの追加
