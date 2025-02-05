@@ -46,17 +46,24 @@ source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 ```
 
-## 使用方法
+## データセットの準備と前処理
 
-### データセットの準備
+### 1. データセットの配置
+生のくずし字データセットを `data/raw/dataset` に配置してください。
 
-1. くずし字データセットを `data/raw/dataset` に配置
-2. データの前処理を実行:
+### 2. データの前処理
+前処理スクリプトを実行して、データセットの準備を行います：
+
 ```bash
-python scripts/preprocess_data.py
+python scripts/preprocess_data.py \
+    --config configs/model/kuzushiji_recognizer.yaml \
+    --data-dir data/raw/dataset \
+    --output-dir data
 ```
 
-### 学習の実行
+前処理の詳細については [docs/data_preprocessing.md](docs/data_preprocessing.md) を参照してください。
+
+## モデルの学習
 
 ```bash
 python src/training/trainer.py \
@@ -66,7 +73,7 @@ python src/training/trainer.py \
     --max-epochs 100
 ```
 
-### 推論の実行
+## 推論の実行
 
 ```bash
 python scripts/infer.py \
@@ -94,21 +101,45 @@ kuzushiji-vision/
 └── scripts/              # 実行スクリプト
 ```
 
-詳細なディレクトリ構造は [project_structure_ja.md](project_structure_ja.md) を参照してください。
-
-## モデルアーキテクチャ
-
-![モデルアーキテクチャ](docs/images/model_architecture.png)
-
-モデルの詳細な説明は [docs/model_architecture.md](docs/model_architecture.md) を参照してください。
+詳細な説明は以下のドキュメントを参照してください：
+- [プロジェクト構造の詳細](project_structure_ja.md)
+- [モデルアーキテクチャの詳細](docs/model_architecture.md)
+- [データ前処理の詳細](docs/data_preprocessing.md)
 
 ## 実験結果
 
+後日追加予定
+
+## 開発者向け情報
+
+- コードの品質管理にはPylintを使用
+- コミット前に `pre-commit` フックでコードフォーマット
+- テストは `pytest` で実行
+
+```bash
+# テストの実行
+pytest tests/
+
+# コードの品質チェック
+pylint src/
+```
 
 ## ライセンス
 
 このプロジェクトはMITライセンスの下で公開されています。詳細は [LICENSE](LICENSE) ファイルを参照してください。
 
+## 引用
+
+このプロジェクトを研究で使用する場合は、以下の形式で引用してください：
+
+```bibtex
+@software{kuzushiji_vision2025,
+  author = {Kotomiya07},
+  title = {Kuzushiji Vision: Deep Learning Model for Classical Japanese Character Recognition},
+  year = {2025},
+  url = {https://github.com/Kotomiya07/kuzushiji-vision}
+}
+```
 
 ## 謝辞
 
@@ -129,8 +160,10 @@ kuzushiji-vision/
 5. プルリクエストを作成
 
 ## 更新履歴
-
 - **v1.0.0** (2025-01-29)
   - 初回リリース
   - 基本的なモデルアーキテクチャの実装
   - 訓練・評価スクリプトの追加
+
+- **v1.0.1** (2025-02-04)
+  - データ前処理パイプラインの追加
