@@ -46,17 +46,24 @@ source venv/bin/activate  # Linux/Mac
 pip install -r requirements.txt
 ```
 
-## Usage
+## Dataset Preparation and Preprocessing
 
-### Dataset Preparation
+### 1. Place Dataset
+Place the raw Kuzushiji dataset in `data/raw/dataset`.
 
-1. Place the Kuzushiji dataset in `data/raw/dataset`
-2. Run data preprocessing:
+### 2. Preprocess Data
+Run the preprocessing script to prepare the dataset:
+
 ```bash
-python scripts/preprocess_data.py
+python scripts/preprocess_data.py \
+    --config configs/model/kuzushiji_recognizer.yaml \
+    --data-dir data/raw/dataset \
+    --output-dir data
 ```
 
-### Training
+For detailed information about preprocessing, refer to [docs/data_preprocessing.md](docs/data_preprocessing.md).
+
+## Training the Model
 
 ```bash
 python src/training/trainer.py \
@@ -66,7 +73,7 @@ python src/training/trainer.py \
     --max-epochs 100
 ```
 
-### Inference
+## Running Inference
 
 ```bash
 python scripts/infer.py \
@@ -94,13 +101,10 @@ kuzushiji-vision/
 └── scripts/             # Execution scripts
 ```
 
-For detailed directory structure, see [project_structure_ja.md](project_structure_ja.md).
-
-## Model Architecture
-
-![Model Architecture](docs/images/model_architecture.png)
-
-For detailed model explanation, see [docs/model_architecture.md](docs/model_architecture.md).
+For detailed documentation, refer to:
+- [Project Structure Details](project_structure_ja.md)
+- [Model Architecture Details](docs/model_architecture.md)
+- [Data Preprocessing Details](docs/data_preprocessing.md)
 
 ## Experimental Results
 
@@ -171,7 +175,8 @@ If you use this project in your research, please cite it as follows:
 
 ## Changelog
 
-- **v1.0.0** (2025-01-29)
+- **v1.0.0** (2025-02-04)
   - Initial release
   - Basic model architecture implementation
+  - Data preprocessing pipeline added
   - Training and evaluation scripts
