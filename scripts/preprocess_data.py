@@ -5,31 +5,28 @@ import os
 import sys
 import argparse
 import logging
+import json
+import pickle
 from pathlib import Path
 from typing import List, Dict, Tuple
-import json
-import shutil
+import csv
 
 import numpy as np
-import pandas as pd
 from PIL import Image
-from tqdm import tqdm
+import lmdb
 import yaml
-from sklearn.model_selection import train_test_split
+from tqdm import tqdm
+from sklearn.model_selection import GroupShuffleSplit
 
 def setup_logger(log_dir: str) -> logging.Logger:
     """ロガーの設定"""
     logger = logging.getLogger("preprocess")
     logger.setLevel(logging.INFO)
     
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
+    os.makedirs(log_dir, exist_ok=True)
     
     fh = logging.FileHandler(os.path.join(log_dir, "preprocess.log"))
-    fh.setLevel(logging.INFO)
-    
     ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
     
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
@@ -40,217 +37,226 @@ def setup_logger(log_dir: str) -> logging.Logger:
     
     return logger
 
-class DataPreprocessor:
-    """くずし字データセットの前処理クラス"""
+def save_to_lmdb(samples: List[Dict], output_path: Path, logger: logging.Logger, split: str) -> List[Dict]:
+    """データをLMDBに保存"""
+    logger.info(f"{split}用のLMDBデータセットを作成")
     
-    def __init__(
-        self,
-        config_path: str,
-        data_dir: str,
-        output_dir: str,
-        logger: logging.Logger
-    ):
-        self.logger = logger
-        
-        # 設定の読み込み
-        with open(config_path) as f:
-            self.config = yaml.safe_load(f)
-        
-        # パスの設定
+    env = lmdb.open(str(output_path), map_size=1099511627776)  # 1TB
+    metadata = []
+    
+    with env.begin(write=True) as txn:
+        for idx, sample in enumerate(tqdm(samples, desc=f"Creating {split} LMDB")):
+            # 画像の読み込みと保存
+            image = np.array(Image.open(sample['image_path']).convert('RGB'))
+            image_key = f"image_{idx}".encode()
+            txn.put(image_key, pickle.dumps(image))
+            
+            # メタデータの作成
+            metadata.append({
+                'image_key': f"image_{idx}",
+                'doc_id': sample['doc_id'],
+                'chars': sample['chars'],
+                'width': sample['width'],
+                'height': sample['height']
+            })
+    
+    return metadata
+
+class DatasetPreprocessor:
+    """くずし字データセットの前処理クラス"""
+    def __init__(self, config: Dict, data_dir: str, output_dir: str, logger: logging.Logger):
+        self.config = config
         self.data_dir = Path(data_dir)
         self.output_dir = Path(output_dir)
-        self.processed_dir = self.output_dir / "processed"
-        self.splits_dir = self.output_dir / "splits"
+        self.logger = logger
         
         # 出力ディレクトリの作成
-        self.processed_dir.mkdir(parents=True, exist_ok=True)
-        self.splits_dir.mkdir(parents=True, exist_ok=True)
+        self.processed_dir = self.output_dir / "processed"
+        self.splits_dir = self.output_dir / "splits"
+        self.lmdb_dir = self.output_dir / "lmdb"
         
-        # 画像サイズの設定
-        self.image_size = tuple(self.config["input"]["size"])
+        for dir_path in [self.processed_dir, self.splits_dir, self.lmdb_dir]:
+            dir_path.mkdir(parents=True, exist_ok=True)
         
-        # 文字クラスの管理
+        # 文字マッピングの初期化
         self.char_to_idx = {}
         self.idx_to_char = {}
     
-    def load_and_verify_data(self) -> List[Dict]:
-        """データの読み込みと検証"""
-        self.logger.info("データの読み込みと検証を開始")
-        
-        samples = []
-        doc_dirs = list(self.data_dir.glob("*/"))
-        
-        for doc_dir in tqdm(doc_dirs, desc="Loading documents"):
-            if not doc_dir.is_dir():
-                continue
-            
-            coord_file = doc_dir / f"{doc_dir.name}_coordinate.csv"
-            if not coord_file.exists():
-                self.logger.warning(f"座標ファイルが見つかりません: {coord_file}")
-                continue
-            
-            char_dir = doc_dir / "characters"
-            if not char_dir.exists():
-                self.logger.warning(f"charactersディレクトリが見つかりません: {char_dir}")
-                continue
-            
-            for unicode_dir in char_dir.glob("*/"):
-                if not unicode_dir.is_dir():
-                    continue
-                
-                char = chr(int(unicode_dir.name[2:], 16))
-                if char not in self.char_to_idx:
+    def process_coordinate_file(self, coord_file: Path) -> List[Dict]:
+        """座標ファイルの処理"""
+        chars = []
+        with open(coord_file, newline='', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                unicode_value = row['Unicode']
+                if unicode_value not in self.char_to_idx:
                     idx = len(self.char_to_idx)
-                    self.char_to_idx[char] = idx
-                    self.idx_to_char[idx] = char
+                    self.char_to_idx[unicode_value] = idx
+                    self.idx_to_char[idx] = unicode_value
                 
-                for img_path in unicode_dir.glob("*.jpg"):
-                    samples.append({
-                        "image_path": str(img_path),
-                        "char": char,
-                        "label": self.char_to_idx[char],
-                        "doc_id": doc_dir.name
-                    })
+                chars.append({
+                    'unicode': unicode_value,
+                    'image_name': row['Image'],
+                    'x': float(row['X']),
+                    'y': float(row['Y']),
+                    'width': float(row['Width']),
+                    'height': float(row['Height']),
+                    'block_id': row['Block ID'],
+                    'char_id': row['Char ID']
+                })
+        return chars
+    
+    def load_document(self, doc_dir: Path) -> List[Dict]:
+        """1つの文書からデータを読み込む"""
+        samples = []
         
-        self.logger.info(f"読み込んだサンプル数: {len(samples)}")
-        self.logger.info(f"文字クラス数: {len(self.char_to_idx)}")
+        # ファイルの存在確認
+        coord_file = doc_dir / f"{doc_dir.name}_coordinate.csv"
+        image_dir = doc_dir / "images"
+        if not coord_file.exists() or not image_dir.exists():
+            self.logger.warning(f"必要なファイルが見つかりません: {doc_dir}")
+            return samples
+        
+        # 座標情報の読み込み
+        chars = self.process_coordinate_file(coord_file)
+        
+        # 画像ごとにグループ化
+        char_groups = {}
+        for char in chars:
+            image_name = char['image_name']
+            if image_name not in char_groups:
+                char_groups[image_name] = []
+            char_groups[image_name].append(char)
+        
+        # サンプルの作成
+        for image_name, page_chars in char_groups.items():
+            image_path = image_dir / f"{image_name}.jpg"
+            if not image_path.exists():
+                continue
+            
+            # 画像サイズの取得と座標の正規化
+            with Image.open(image_path) as img:
+                W, H = img.size
+                normalized_chars = []
+                for char in page_chars:
+                    normalized_chars.append({
+                        'unicode': char['unicode'],
+                        'x': char['x'] / W,
+                        'y': char['y'] / H,
+                        'width': char['width'] / W,
+                        'height': char['height'] / H,
+                        'block_id': char['block_id'],
+                        'char_id': char['char_id']
+                    })
+            
+            # 右から左、上から下の順にソート
+            normalized_chars.sort(key=lambda x: (-x['x'], x['y']))
+            
+            samples.append({
+                'image_path': str(image_path),
+                'doc_id': doc_dir.name,
+                'chars': normalized_chars,
+                'width': W,
+                'height': H
+            })
         
         return samples
     
-    def preprocess_image(self, image_path: str) -> np.ndarray:
-        """画像の前処理"""
-        image = Image.open(image_path).convert("RGB")
-        image = image.resize(self.image_size, Image.LANCZOS)
-        
-        image = np.array(image)
-        image = image.astype(np.float32) / 255.0
-        
-        mean = np.array(self.config["input"]["normalize"]["mean"])
-        std = np.array(self.config["input"]["normalize"]["std"])
-        image = (image - mean) / std
-        
-        return image
-    
-    def split_dataset(
-        self,
-        samples: List[Dict],
-        val_size: float = 0.1,
-        test_size: float = 0.1,
-        random_state: int = 42
-    ) -> Tuple[List[Dict], List[Dict], List[Dict]]:
+    def split_dataset(self, samples: List[Dict]) -> Tuple[List[Dict], List[Dict], List[Dict]]:
         """データセットの分割"""
         self.logger.info("データセットの分割を開始")
         
-        doc_ids = list(set(s["doc_id"] for s in samples))
+        # 文書IDの抽出
+        doc_ids = [sample['doc_id'] for sample in samples]
         
-        train_docs, temp_docs = train_test_split(
-            doc_ids,
-            test_size=(val_size + test_size),
-            random_state=random_state
-        )
+        # 訓練データとその他のデータに分割
+        train_splitter = GroupShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
+        train_idx, temp_idx = next(train_splitter.split(samples, groups=doc_ids))
         
-        val_docs, test_docs = train_test_split(
-            temp_docs,
-            test_size=test_size/(val_size + test_size),
-            random_state=random_state
-        )
+        # 検証データとテストデータに分割
+        val_test_samples = [samples[i] for i in temp_idx]
+        val_test_doc_ids = [doc_ids[i] for i in temp_idx]
         
-        train_samples = [s for s in samples if s["doc_id"] in train_docs]
-        val_samples = [s for s in samples if s["doc_id"] in val_docs]
-        test_samples = [s for s in samples if s["doc_id"] in test_docs]
+        val_splitter = GroupShuffleSplit(n_splits=1, test_size=0.5, random_state=42)
+        val_idx, test_idx = next(val_splitter.split(val_test_samples, groups=val_test_doc_ids))
         
-        self.logger.info(f"訓練サンプル数: {len(train_samples)}")
-        self.logger.info(f"検証サンプル数: {len(val_samples)}")
-        self.logger.info(f"テストサンプル数: {len(test_samples)}")
+        # データセットの分割
+        train_samples = [samples[i] for i in train_idx]
+        val_samples = [val_test_samples[i] for i in val_idx]
+        test_samples = [val_test_samples[i] for i in test_idx]
+        
+        self.logger.info(f"訓練データ: {len(train_samples)}ページ")
+        self.logger.info(f"検証データ: {len(val_samples)}ページ")
+        self.logger.info(f"テストデータ: {len(test_samples)}ページ")
         
         return train_samples, val_samples, test_samples
-    
-    def save_processed_data(
-        self,
-        split_name: str,
-        samples: List[Dict]
-    ) -> None:
-        """前処理済みデータの保存"""
-        output_images_dir = self.processed_dir / "images" / split_name
-        output_images_dir.mkdir(parents=True, exist_ok=True)
-        
-        processed_samples = []
-        for sample in tqdm(samples, desc=f"Processing {split_name}"):
-            image = self.preprocess_image(sample["image_path"])
-            image_filename = f"{len(processed_samples):08d}.npy"
-            image_path = output_images_dir / image_filename
-            np.save(str(image_path), image)
-            
-            processed_sample = {
-                "processed_image_path": str(image_path),
-                "original_image_path": sample["image_path"],
-                "char": sample["char"],
-                "label": sample["label"],
-                "doc_id": sample["doc_id"]
-            }
-            processed_samples.append(processed_sample)
-        
-        metadata_path = self.splits_dir / f"{split_name}.json"
-        with open(metadata_path, "w", encoding="utf-8") as f:
-            json.dump(processed_samples, f, ensure_ascii=False, indent=2)
     
     def save_char_mapping(self) -> None:
         """文字マッピングの保存"""
         mapping_path = self.processed_dir / "char_mapping.json"
-        mapping = {
-            "char_to_idx": self.char_to_idx,
-            "idx_to_char": self.idx_to_char
-        }
-        with open(mapping_path, "w", encoding="utf-8") as f:
-            json.dump(mapping, f, ensure_ascii=False, indent=2)
+        with open(mapping_path, 'w', encoding='utf-8') as f:
+            json.dump({
+                'char_to_idx': self.char_to_idx,
+                'idx_to_char': self.idx_to_char
+            }, f, ensure_ascii=False, indent=2)
     
     def run(self) -> None:
         """前処理の実行"""
         try:
-            samples = self.load_and_verify_data()
+            # 全データの読み込み
+            self.logger.info("データの読み込みを開始")
+            samples = []
+            dataset_dir = self.data_dir / "dataset"
+            
+            for doc_dir in tqdm(list(dataset_dir.glob("*")), desc="Loading documents"):
+                if doc_dir.is_dir():
+                    samples.extend(self.load_document(doc_dir))
+            
+            self.logger.info(f"合計{len(samples)}ページを読み込みました")
+            self.logger.info(f"文字クラス数: {len(self.char_to_idx)}")
+            
+            # データセットの分割とLMDB作成
             train_samples, val_samples, test_samples = self.split_dataset(samples)
             
-            self.save_processed_data("train", train_samples)
-            self.save_processed_data("val", val_samples)
-            self.save_processed_data("test", test_samples)
+            # LMDBデータセットの作成
+            splits = [
+                ("train", train_samples),
+                ("val", val_samples),
+                ("test", test_samples)
+            ]
+            
+            for split_name, split_samples in splits:
+                # LMDBの作成
+                lmdb_path = self.lmdb_dir / f"lmdb_{split_name}"
+                metadata = save_to_lmdb(split_samples, lmdb_path, self.logger, split_name)
+                
+                # メタデータの保存
+                metadata_path = self.splits_dir / f"{split_name}_metadata.json"
+                with open(metadata_path, 'w', encoding='utf-8') as f:
+                    json.dump(metadata, f, ensure_ascii=False, indent=2)
+            
+            # 文字マッピングの保存
             self.save_char_mapping()
             
             self.logger.info("前処理が完了しました")
-        
+            
         except Exception as e:
             self.logger.error(f"前処理中にエラーが発生しました: {e}")
             raise
 
 def main():
     parser = argparse.ArgumentParser(description="くずし字データセットの前処理")
-    parser.add_argument(
-        "--config",
-        type=str,
-        required=True,
-        help="設定ファイルのパス"
-    )
-    parser.add_argument(
-        "--data-dir",
-        type=str,
-        required=True,
-        help="生データのディレクトリ"
-    )
-    parser.add_argument(
-        "--output-dir",
-        type=str,
-        required=True,
-        help="出力ディレクトリ"
-    )
+    parser.add_argument("--config", type=str, required=True, help="設定ファイルのパス")
+    parser.add_argument("--data-dir", type=str, required=True, help="生データのディレクトリ")
+    parser.add_argument("--output-dir", type=str, required=True, help="出力ディレクトリ")
     
     args = parser.parse_args()
-    logger = setup_logger(args.output_dir)
     
-    preprocessor = DataPreprocessor(
-        config_path=args.config,
-        data_dir=args.data_dir,
-        output_dir=args.output_dir,
-        logger=logger
-    )
+    with open(args.config) as f:
+        config = yaml.safe_load(f)
+    
+    logger = setup_logger(args.output_dir)
+    preprocessor = DatasetPreprocessor(config, args.data_dir, args.output_dir, logger)
     preprocessor.run()
 
 if __name__ == "__main__":
