@@ -126,7 +126,7 @@
 ## コミットメッセージ
 
 ### フォーマット
-Semantic Commit Messageを採用してください。
+Semantic Commit Messageを採用してください。日本語を使用してください。
 
 - フォーマット: <Type>: <Emoji> #<Issue Number> <Title>
 - 例: feat: ✨ #123 ログイン機能の実装をする
