@@ -1,0 +1,37 @@
+model:
+  name: "llm_correction"
+  type: "roberta"
+  model_size: "base"
+  vocab_size: 32000  # 日本語くずし字用に調整
+  max_position_embeddings: 512
+  hidden_size: 768
+  num_attention_heads: 12
+  num_hidden_layers: 12
+  intermediate_size: 3072
+  hidden_dropout_prob: 0.1
+  attention_probs_dropout_prob: 0.1
+  
+training:
+  batch_size: 32
+  learning_rate: 0.00001
+  optimizer: "adamW"
+  weight_decay: 0.01
+  scheduler:
+    type: "linear"
+    warmup_steps: 1000
+    total_steps: 50000
+  
+tokenizer:
+  type: "sentencepiece"
+  vocab_size: 32000
+  special_tokens:
+    pad: "[PAD]"
+    unk: "[UNK]"
+    bos: "[BOS]"
+    eos: "[EOS]"
+    mask: "[MASK]"
+  
+task_specific:
+  max_seq_length: 512
+  mask_probability: 0.15
+  context_window: 5  # 前後の文字をどれだけ参照するか 

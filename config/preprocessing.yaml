@@ -1,0 +1,29 @@
+data_dir: "data"
+target_size: 640  # 列検出モデルの入力サイズ
+column_width: 192   # 文字検出モデルの入力幅
+
+# 前処理のパラメータ
+preprocessing:
+  # 画像の正規化
+  normalize:
+    mean: [0.485, 0.456, 0.406]  # ImageNetの平均値
+    std: [0.229, 0.224, 0.225]   # ImageNetの標準偏差
+  
+  # 列の抽出
+  column_extraction:
+    min_column_height: 20  # 最小の列の高さ（ピクセル）
+    max_column_height: 200 # 最大の列の高さ（ピクセル）
+    overlap_threshold: 0.5  # 列の重複を判定するためのIoUしきい値
+  
+  # 文字の抽出
+  character_extraction:
+    min_char_size: 10  # 最小の文字サイズ（ピクセル）
+    max_char_size: 100 # 最大の文字サイズ（ピクセル）
+    overlap_threshold: 0.5  # 文字の重複を判定するためのIoUしきい値
+
+# データ分割の設定
+split:
+  train_ratio: 0.8
+  val_ratio: 0.1
+  test_ratio: 0.1
+  random_seed: 42 

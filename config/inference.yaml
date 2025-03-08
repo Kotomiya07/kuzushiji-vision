@@ -1,0 +1,20 @@
+# 入出力の設定
+input_dir: "data/raw/test/images"  # 入力画像のディレクトリ
+output_dir: "experiments/inference/results"  # 出力結果の保存ディレクトリ
+
+# 列検出モデルの設定
+column_detection:
+  weights_path: "experiments/column_detection/best.pt"  # モデルの重みファイル
+
+# 文字検出モデルの設定
+character_detection:
+  weights_path: "experiments/character_detection/best.pt"  # モデルの重みファイル
+
+# 可視化の設定
+visualization:
+  enabled: true  # 可視化を有効にするかどうか
+  confidence_threshold: 0.5  # 可視化する検出結果の信頼度しきい値
+  column_color: [255, 0, 0]  # 列のバウンディングボックスの色（RGB）
+  char_color: [0, 255, 0]  # 文字のバウンディングボックスの色（RGB）
+  font_size: 12  # 文字ラベルのフォントサイズ
+  column_thickness: 2  # バウンディングボックスの線の太さ 

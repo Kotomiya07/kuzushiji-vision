@@ -1,0 +1,26 @@
+# 評価対象の選択
+evaluate_column_detection: true
+evaluate_character_detection: true
+
+# 評価の共通設定
+evaluation:
+  iou_threshold: 0.5  # IoUの評価しきい値
+  batch_size: 32      # 評価時のバッチサイズ
+
+# 列検出モデルの評価設定
+column_detection:
+  weights_path: "experiments/column_detection/best.pt"  # モデルの重みファイル
+  image_dir: "data/processed/test/images"            # テスト画像のディレクトリ
+  annotation_file: "data/processed/test/column_annotations.csv"  # アノテーションファイル
+
+# 文字検出モデルの評価設定
+character_detection:
+  weights_path: "experiments/character_detection/best.pt"  # モデルの重みファイル
+  image_dir: "data/processed/test/column_images"            # テスト用の列画像のディレクトリ
+  annotation_file: "data/processed/test/char_annotations.csv"  # アノテーションファイル
+
+# 可視化の設定
+visualization:
+  save_dir: "experiments/evaluation/visualizations"  # 可視化結果の保存ディレクトリ
+  max_samples: 100  # 可視化するサンプル数
+  confidence_threshold: 0.5  # 可視化する検出結果の信頼度しきい値 
