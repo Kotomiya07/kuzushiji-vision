@@ -1,0 +1,31 @@
+model:
+  name: "column_extraction"
+  type: "yolo"
+  backbone: "yolov8"
+  input_size: [640, 640]  # 長辺を640にリサイズ（アスペクト比保持）
+  num_classes: 1  # 列領域の検出のみ
+  anchors: 
+    - [10, 13]
+    - [16, 30]
+    - [33, 23]
+  confidence_threshold: 0.5
+  nms_threshold: 0.4
+  
+training:
+  batch_size: 32
+  learning_rate: 0.001
+  optimizer: "adamW"
+  weight_decay: 0.0001
+  scheduler:
+    type: "cosine"
+    warmup_epochs: 3
+    total_epochs: 100
+  
+augmentation:
+  horizontal_flip: false  # 日本語の文書なので水平方向の反転は不要
+  vertical_flip: false   # 垂直方向の反転も不要
+  rotation: [-5, 5]      # 小さな回転のみ許可
+  scale: [0.8, 1.2]     # スケール変更の範囲
+  brightness: 0.2
+  contrast: 0.2
+  gaussian_noise: 0.1 

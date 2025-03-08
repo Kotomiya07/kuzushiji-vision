@@ -1,0 +1,33 @@
+model:
+  name: "character_detection"
+  type: "vision_transformer"
+  backbone: "vit_base"
+  input_size: [192, null]  # 横幅192にリサイズ（アスペクト比保持）
+  patch_size: 16
+  num_heads: 12
+  num_layers: 12
+  hidden_size: 768
+  mlp_ratio: 4
+  dropout: 0.1
+  attention_dropout: 0.1
+  num_classes: -1  # くずし字の文字クラス数（後で設定）
+  
+training:
+  batch_size: 64
+  learning_rate: 0.0001
+  optimizer: "adamW"
+  weight_decay: 0.05
+  scheduler:
+    type: "cosine"
+    warmup_epochs: 5
+    total_epochs: 200
+  
+augmentation:
+  horizontal_flip: false  # 日本語の文字なので水平反転は不要
+  vertical_flip: false   # 垂直反転も不要
+  rotation: [-10, 10]    # 小さな回転のみ許可
+  scale: [0.9, 1.1]     # スケール変更の範囲
+  brightness: 0.1
+  contrast: 0.1
+  gaussian_noise: 0.05
+  random_erase: 0.1     # ランダムな領域を消去（ロバスト性向上） 
