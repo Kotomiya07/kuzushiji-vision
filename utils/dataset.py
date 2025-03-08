@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 import pandas as pd
-from typing import Tuple, Dict, List
+from typing import Dict
 from torch.utils.data import Dataset
 from .image_processing import resize_keeping_aspect_ratio, normalize_image
 

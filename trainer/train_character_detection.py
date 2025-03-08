@@ -1,4 +1,3 @@
-import os
 import yaml
 import torch
 import torch.nn as nn
@@ -13,6 +12,7 @@ from models.character_detection.model import CharacterDetectionModel
 from utils.dataset import CharacterDetectionDataset
 from utils.augmentation import get_character_detection_transforms
 from utils.metrics import compute_map, compute_character_accuracy
+from typing import Tuple
 
 def train_epoch(
     model: nn.Module,
@@ -233,7 +233,7 @@ def main():
                 checkpoint,
                 exp_dir / 'best.pt'
             )
-            print(f'New best model saved!')
+            print('New best model saved!')
             print(f'mAP: {best_map:.4f}, Accuracy: {best_accuracy:.4f}')
 
 if __name__ == '__main__':

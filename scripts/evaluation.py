@@ -1,16 +1,12 @@
-import os
 import yaml
 import torch
-import numpy as np
 from tqdm import tqdm
-from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, Tuple
 
 from models.column_extraction.model import ColumnDetectionModel
 from models.character_detection.model import CharacterDetectionModel
 from utils.dataset import ColumnDetectionDataset, CharacterDetectionDataset
 from utils.metrics import compute_map, compute_character_accuracy
-from utils.augmentation import get_column_detection_transforms, get_character_detection_transforms
 
 def evaluate_column_detection(
     model: ColumnDetectionModel,

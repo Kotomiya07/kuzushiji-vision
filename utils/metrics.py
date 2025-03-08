@@ -50,8 +50,8 @@ def _compute_iou_torch(box1: torch.Tensor, box2: torch.Tensor) -> torch.Tensor:
 
 def _compute_iou_numpy(box1: np.ndarray, box2: np.ndarray) -> np.ndarray:
     """NumPy版のIoU計算"""
-    N = box1.shape[0]
-    M = box2.shape[0]
+    # N = box1.shape[0]
+    # M = box2.shape[0]
     
     # 座標の展開
     box1 = np.expand_dims(box1, axis=1)  # [N, 1, 4]
