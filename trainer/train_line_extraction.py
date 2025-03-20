@@ -41,7 +41,7 @@ def main():
         "batch": config["training"]["batch_size"],
         "imgsz": config["model"]["input_size"][0],
         "device": 0,
-        "workers": 8,
+        "workers": 24,
         "project": "experiments/line_extraction",
         "name": timestamp,
         "exist_ok": True,
@@ -62,10 +62,10 @@ def main():
         "hsv_h": 0.0,  # 色相の変更なし
         "hsv_s": 0.0,  # 彩度の変更なし
         "hsv_v": config["augmentation"]["brightness"],  # 明度の変更
-        "single_cls": True,
-        "cache": True,
-        "multi_scale": True,
-        "profile": True,
+        "single_cls": False,
+        "cache": False,
+        "multi_scale": False,
+        "profile": False,
         "plots": True,
     }
 
