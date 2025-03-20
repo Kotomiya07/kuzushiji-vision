@@ -1,0 +1,17 @@
+path: /home/ryo/project/kuzushiji-vision/data/processed  # データセットのルートディレクトリ
+train: train/images  # 訓練画像のディレクトリ
+val: val/images      # 検証画像のディレクトリ
+nc: 1
+# クラス名
+names:
+  0: line  # 列領域のクラス
+
+# データセットの形式
+task: detect  # 物体検出タスク 
+
+# 実験結果の保存設定
+experiment:
+  save_dir: experiments/line_extraction/%Y%m%d_%H%M%S  # 実験結果を保存するディレクトリ（日時フォーマット）
+  log_dir: logs  # ログファイルを保存するサブディレクトリ
+  checkpoint_dir: checkpoints  # モデルのチェックポイントを保存するサブディレクトリ
+  eval_dir: evaluation  # 評価結果を保存するサブディレクトリ 

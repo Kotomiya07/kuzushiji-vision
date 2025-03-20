@@ -36,7 +36,7 @@ class CharacterBox:
 
 
 def detect_text_columns(
-    char_boxes: List[CharacterBox], eps_ratio: float = 0.1, min_samples: int = 1
+    char_boxes: List[CharacterBox], eps_ratio: float = 0.2, min_samples: int = 1
 ) -> List[List[CharacterBox]]:
     """DBSCANを使用して文字を列ごとにクラスタリング
 

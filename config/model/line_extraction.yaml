@@ -1,7 +1,7 @@
 model:
-  name: "column_extraction"
+  name: "line_extraction"
   type: "yolo"
-  backbone: "yolov8"
+  backbone: "yolov8n"
   input_size: [640, 640]  # 長辺を640にリサイズ（アスペクト比保持）
   num_classes: 1  # 列領域の検出のみ
   anchors: 
@@ -19,13 +19,13 @@ training:
   scheduler:
     type: "cosine"
     warmup_epochs: 3
-    total_epochs: 100
+    total_epochs: 1000
   
 augmentation:
   horizontal_flip: false  # 日本語の文書なので水平方向の反転は不要
   vertical_flip: false   # 垂直方向の反転も不要
-  rotation: [-5, 5]      # 小さな回転のみ許可
-  scale: [0.8, 1.2]     # スケール変更の範囲
+  rotation: [0, 0]      # なし
+  scale: 0.2            # スケール変更の範囲（±20%）
   brightness: 0.2
   contrast: 0.2
   gaussian_noise: 0.1 
