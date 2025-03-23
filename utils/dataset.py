@@ -6,11 +6,10 @@ from typing import Dict
 from torch.utils.data import Dataset
 from .image_processing import resize_keeping_aspect_ratio, normalize_image
 import torch
-from pathlib import Path
 from PIL import Image
 import ast
 import torchvision.transforms as T
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 
 class ColumnDetectionDataset(Dataset):

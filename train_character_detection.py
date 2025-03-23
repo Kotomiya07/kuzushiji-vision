@@ -14,10 +14,6 @@ from accelerate.utils import set_seed
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
-from PIL import Image
-import torchvision.transforms as T
-import pandas as pd
-from sklearn.model_selection import train_test_split
 
 from models.character_detection.model import CharacterDetectionModel
 from utils.dataset import CharacterDetectionDataset

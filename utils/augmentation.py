@@ -1,9 +1,7 @@
 import albumentations as A
 import torchvision.transforms as T
-from typing import Dict, Optional
-import numpy as np
+from typing import Dict
 import torch
-from PIL import Image
 
 
 class AlbumentationsToTorchTransform:

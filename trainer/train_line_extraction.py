@@ -1,7 +1,5 @@
 import os
-import sys
 import yaml
-import torch
 from pathlib import Path
 from datetime import datetime
 from ultralytics import YOLO
