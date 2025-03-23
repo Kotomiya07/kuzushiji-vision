@@ -115,7 +115,7 @@ def visualize_predictions(
     save_path: Path,
     score_threshold: float = 0.5,
 ) -> None:
-    """推論結果を可視化して保存
+    """予測結果を可視化して保存
 
     Args:
         image (torch.Tensor): 入力画像 [C, H, W]
@@ -139,61 +139,77 @@ def visualize_predictions(
     ax.imshow(image)
 
     # 予測結果の描画
-    for box, label, score in zip(pred_boxes, pred_labels, pred_scores):
-        if score < score_threshold:
-            continue
-        
-        box = box.cpu().numpy()
-        x1, y1, x2, y2 = box
-        w = x2 - x1
-        h = y2 - y1
-        
-        # バウンディングボックスを描画（赤色）
-        rect = patches.Rectangle(
-            (x1, y1), w, h,
-            linewidth=2,
-            edgecolor='r',
-            facecolor='none'
-        )
-        ax.add_patch(rect)
-        
-        # ラベルとスコアを表示
-        ax.text(
-            x1, y1 - 5,
-            f'Pred: {label.item()}\n{score:.2f}',
-            color='red',
-            fontsize=8,
-            bbox=dict(facecolor='white', alpha=0.8)
-        )
+    if len(pred_boxes) > 0 and pred_boxes[0].numel() > 0:  # 予測結果が存在し、空でない場合のみ処理
+        for box, label, score in zip(pred_boxes, pred_labels, pred_scores):
+            if score.numel() == 0:  # スコアが空の場合はスキップ
+                continue
+            
+            score_value = score.item() if isinstance(score, torch.Tensor) else score
+            if score_value < score_threshold:
+                continue
+            
+            if isinstance(box, torch.Tensor):
+                box = box.cpu().numpy()
+            x1, y1, x2, y2 = box
+            w = x2 - x1
+            h = y2 - y1
+            
+            # バウンディングボックスを描画（赤色）
+            rect = patches.Rectangle(
+                (x1, y1), w, h,
+                linewidth=2,
+                edgecolor='r',
+                facecolor='none'
+            )
+            ax.add_patch(rect)
+            
+            # ラベルとスコアを表示
+            label_value = label.item() if isinstance(label, torch.Tensor) else label
+            ax.text(
+                x1, y1 - 5,
+                f"{label_value} ({score_value:.2f})",
+                color='r',
+                fontsize=10,
+                bbox=dict(facecolor='white', alpha=0.8)
+            )
 
     # 正解の描画
-    for box, label in zip(gt_boxes, gt_labels):
-        box = box.cpu().numpy()
-        x1, y1, x2, y2 = box
-        w = x2 - x1
-        h = y2 - y1
-        
-        # バウンディングボックスを描画（緑色）
-        rect = patches.Rectangle(
-            (x1, y1), w, h,
-            linewidth=2,
-            edgecolor='g',
-            facecolor='none'
-        )
-        ax.add_patch(rect)
-        
-        # ラベルを表示
-        ax.text(
-            x1, y2 + 5,
-            f'GT: {label.item()}',
-            color='green',
-            fontsize=8,
-            bbox=dict(facecolor='white', alpha=0.8)
-        )
+    if len(gt_boxes) > 0 and gt_boxes[0].numel() > 0:  # 正解が存在し、空でない場合のみ処理
+        for box, label in zip(gt_boxes, gt_labels):
+            if box.numel() == 0:  # ボックスが空の場合はスキップ
+                continue
+            
+            if isinstance(box, torch.Tensor):
+                box = box.cpu().numpy()
+            x1, y1, x2, y2 = box
+            w = x2 - x1
+            h = y2 - y1
+            
+            # バウンディングボックスを描画（緑色）
+            rect = patches.Rectangle(
+                (x1, y1), w, h,
+                linewidth=2,
+                edgecolor='g',
+                facecolor='none'
+            )
+            ax.add_patch(rect)
+            
+            # ラベルを表示
+            label_value = label.item() if isinstance(label, torch.Tensor) else label
+            ax.text(
+                x1, y1 - 5,
+                f"{label_value}",
+                color='g',
+                fontsize=10,
+                bbox=dict(facecolor='white', alpha=0.8)
+            )
 
-    # 軸を消して保存
-    plt.axis('off')
-    plt.savefig(save_path, bbox_inches='tight', pad_inches=0)
+    # 軸の設定
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    # 保存
+    plt.savefig(save_path)
     plt.close()
 
 @torch.no_grad()
