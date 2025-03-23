@@ -18,7 +18,7 @@ class CharacterDetectionModel(nn.Module):
 
         # ViTの設定
         vit_config = ViTConfig(
-            image_size=(config["model"]["input_size"][0], None),  # 高さは可変
+            image_size=config["model"]["input_size"][0],  # パッチ分割の基準サイズ
             patch_size=config["model"]["patch_size"],
             num_channels=3,
             num_attention_heads=config["model"]["num_heads"],
@@ -27,6 +27,8 @@ class CharacterDetectionModel(nn.Module):
             mlp_ratio=config["model"]["mlp_ratio"],
             hidden_dropout_prob=config["model"]["dropout"],
             attention_probs_dropout_prob=config["model"]["attention_dropout"],
+            use_relative_position_bias=True,  # 相対位置エンコーディングを使用
+            interpolate_pos_encoding=True,  # 位置エンコーディングを補間
         )
 
         # ViTモデルの初期化
@@ -65,8 +67,8 @@ class CharacterDetectionModel(nn.Module):
                 学習時: 損失の辞書
                 推論時: 検出結果の辞書
         """
-        # ViTによる特徴抽出
-        features = self.backbone(images, return_dict=True).last_hidden_state  # [B, N, D]
+        # ViTによる特徴抽出（interpolate_pos_encodingを有効化）
+        features = self.backbone(images, interpolate_pos_encoding=True, return_dict=True).last_hidden_state  # [B, N, D]
 
         # パッチごとの予測
         detection = self.detection_head(features)  # [B, N, 5]
@@ -75,7 +77,11 @@ class CharacterDetectionModel(nn.Module):
         if self.training and targets is not None:
             # 学習時の損失計算
             detection_loss = self._compute_detection_loss(detection, targets["boxes"])
-            classification_loss = self._compute_classification_loss(classification, targets["labels"])
+            classification_loss = self._compute_classification_loss(
+                classification=classification,
+                detection=detection,
+                targets=targets
+            )
 
             return {
                 "detection_loss": detection_loss,
@@ -92,45 +98,124 @@ class CharacterDetectionModel(nn.Module):
                 "labels": labels,  # List[Tensor[N]]
             }
 
-    def _compute_detection_loss(self, predictions: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+    def _compute_detection_loss(self, predictions: torch.Tensor, targets: list) -> torch.Tensor:
         """検出の損失を計算
 
         Args:
             predictions (torch.Tensor): 予測値 [B, N, 5]
-            targets (torch.Tensor): 正解値 [B, M, 4]
+            targets (list): バッチ内の各画像のバウンディングボックスのリスト
+                          各要素は [M, 4] のTensor
 
         Returns:
             torch.Tensor: 損失値
         """
+        batch_size = predictions.size(0)
+        device = predictions.device
         pred_boxes = predictions[..., :4]
         pred_conf = predictions[..., 4]
 
-        # IoUの計算
-        ious = self._compute_iou(pred_boxes, targets)  # [B, N, M]
+        total_pos_loss = 0
+        total_conf_loss = 0
+        valid_samples = 0
 
-        # 各予測に対する最適なターゲットの割り当て
-        max_ious, target_indices = ious.max(dim=2)  # [B, N]
+        for i in range(batch_size):
+            if len(targets[i]) == 0:
+                # ターゲットが存在しない場合
+                conf_loss = F.binary_cross_entropy_with_logits(
+                    pred_conf[i],
+                    torch.zeros_like(pred_conf[i]),
+                    reduction="mean"
+                )
+                total_conf_loss += conf_loss
+                continue
 
-        # 位置の損失（L1損失）
-        pos_mask = max_ious > 0.5
-        pos_loss = F.l1_loss(pred_boxes[pos_mask], targets[pos_mask], reduction="none").mean()
+            # ターゲットをTensorに変換
+            target_boxes = targets[i].to(device)  # [M, 4]
 
-        # 信頼度の損失（バイナリクロスエントロピー）
-        conf_loss = F.binary_cross_entropy_with_logits(pred_conf, (max_ious > 0.5).float())
+            # IoUの計算
+            ious = self._compute_iou(
+                pred_boxes[i].unsqueeze(0),  # [1, N, 4]
+                target_boxes.unsqueeze(0)     # [1, M, 4]
+            ).squeeze(0)  # [N, M]
 
-        return pos_loss + conf_loss
+            # 各予測に対する最適なターゲットの割り当て
+            max_ious, target_indices = ious.max(dim=1)  # [N]
 
-    def _compute_classification_loss(self, predictions: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+            # 位置の損失（L1損失）
+            pos_mask = max_ious > 0.5
+            if pos_mask.sum() > 0:
+                matched_targets = target_boxes[target_indices[pos_mask]]
+                pos_loss = F.l1_loss(
+                    pred_boxes[i][pos_mask],
+                    matched_targets,
+                    reduction="mean"
+                )
+                total_pos_loss += pos_loss
+                valid_samples += 1
+
+            # 信頼度の損失（バイナリクロスエントロピー）
+            conf_loss = F.binary_cross_entropy_with_logits(
+                pred_conf[i],
+                (max_ious > 0.5).float(),
+                reduction="mean"
+            )
+            total_conf_loss += conf_loss
+
+        # 最終的な損失の計算
+        avg_conf_loss = total_conf_loss / batch_size
+        avg_pos_loss = total_pos_loss / max(valid_samples, 1)
+
+        return avg_pos_loss + avg_conf_loss
+
+    def _compute_classification_loss(self, classification: torch.Tensor, detection: torch.Tensor, targets: Dict[str, list]) -> torch.Tensor:
         """分類の損失を計算
 
         Args:
-            predictions (torch.Tensor): 予測値 [B, N, C]
-            targets (torch.Tensor): 正解値 [B, M]
+            classification (torch.Tensor): 分類の予測値 [B, N, C]
+            detection (torch.Tensor): 検出の予測値 [B, N, 5]
+            targets (Dict[str, list]): ターゲット情報
+                - boxes: バウンディングボックスのリスト
+                - labels: ラベルのリスト
 
         Returns:
             torch.Tensor: 損失値
         """
-        return F.cross_entropy(predictions.view(-1, predictions.size(-1)), targets.view(-1))
+        batch_size = classification.size(0)
+        device = classification.device
+        total_loss = 0
+        valid_samples = 0
+
+        for i in range(batch_size):
+            if len(targets["boxes"][i]) == 0:
+                continue
+
+            # IoUの計算
+            pred_boxes = detection[i, :, :4]  # [N, 4]
+            target_boxes = targets["boxes"][i].to(device)  # [M, 4]
+
+            ious = self._compute_iou(
+                pred_boxes.unsqueeze(0),  # [1, N, 4]
+                target_boxes.unsqueeze(0)  # [1, M, 4]
+            ).squeeze(0)  # [N, M]
+
+            # 各予測に対する最適なターゲットの割り当て
+            max_ious, target_indices = ious.max(dim=1)  # [N]
+            pos_mask = max_ious > 0.5
+
+            if pos_mask.sum() > 0:
+                # 分類の損失を計算（正例のみ）
+                matched_labels = targets["labels"][i][target_indices[pos_mask]]
+                pred_labels = classification[i, pos_mask]
+                loss = F.cross_entropy(
+                    pred_labels,
+                    matched_labels,
+                    reduction="mean"
+                )
+                total_loss += loss
+                valid_samples += 1
+
+        # 最終的な損失の計算
+        return total_loss / max(valid_samples, 1)
 
     @staticmethod
     def _compute_iou(boxes1: torch.Tensor, boxes2: torch.Tensor) -> torch.Tensor:

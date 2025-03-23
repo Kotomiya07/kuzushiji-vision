@@ -165,6 +165,7 @@ experiments/*/
 logs/
 *.ckpt
 *.pth
+*.pt
 wandb/
 tensorboard/
 *.lock
