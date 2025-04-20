@@ -1,0 +1,40 @@
+# .github/workflows/format_on_merge.yml
+name: Format code with Ruff on merge
+
+on:
+  push:
+    branches:
+      - main # mainブランチへのpush（マージ含む）時に実行
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # 自動コミットのためにトークンが必要
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10' # プロジェクトで使用しているPythonバージョンに合わせてください
+
+      - name: Install Ruff
+        run: pip install ruff
+
+      - name: Run Ruff Formatter
+        run: ruff format .
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: auto format code with ruff"
+          branch: main
+          commit_options: '--no-verify --signoff' # オプション: GPG署名など不要な場合
+          file_pattern: '*.py' # Pythonファイルのみを対象とする場合
+          repository: .
+          commit_user_name: github-actions[bot]
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
