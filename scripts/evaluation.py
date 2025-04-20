@@ -1,17 +1,17 @@
-import yaml
 import torch
+import yaml
 from tqdm import tqdm
-from typing import Dict, Tuple
 
-from models.column_extraction.model import ColumnDetectionModel
 from models.character_detection.model import CharacterDetectionModel
-from utils.dataset import ColumnDetectionDataset, CharacterDetectionDataset
-from utils.metrics import compute_map, compute_character_accuracy
+from models.column_extraction.model import ColumnDetectionModel
+from utils.dataset import CharacterDetectionDataset, ColumnDetectionDataset
+from utils.metrics import compute_character_accuracy, compute_map
+from utils.util import EasyDict
 
 
 def evaluate_column_detection(
-    model: ColumnDetectionModel, dataset: ColumnDetectionDataset, config: Dict
-) -> Tuple[float, Dict[int, float]]:
+    model: ColumnDetectionModel, dataset: ColumnDetectionDataset, config: dict
+) -> tuple[float, dict[int, float]]:
     """列検出モデルの評価
 
     Args:
@@ -63,8 +63,8 @@ def evaluate_column_detection(
 
 
 def evaluate_character_detection(
-    model: CharacterDetectionModel, dataset: CharacterDetectionDataset, config: Dict
-) -> Tuple[float, Dict[int, float], float, Dict[int, float]]:
+    model: CharacterDetectionModel, dataset: CharacterDetectionDataset, config: dict
+) -> tuple[float, dict[int, float], float, dict[int, float]]:
     """文字検出モデルの評価
 
     Args:
@@ -112,12 +112,12 @@ def evaluate_character_detection(
         pred_labels_list,
         gt_boxes_list,
         gt_labels_list,
-        iou_threshold=config["evaluation"]["iou_threshold"],
+        iou_threshold=config.evaluation.iou_threshold,
     )
 
     # 文字認識精度の計算
     accuracy, class_accuracy = compute_character_accuracy(
-        pred_labels_list, gt_labels_list, pred_boxes_list, gt_boxes_list, iou_threshold=config["evaluation"]["iou_threshold"]
+        pred_labels_list, gt_labels_list, pred_boxes_list, gt_boxes_list, iou_threshold=config.evaluation.iou_threshold
     )
 
     return mAP, class_ap, accuracy, class_accuracy
@@ -125,29 +125,29 @@ def evaluate_character_detection(
 
 def main():
     # 設定の読み込み
-    with open("config/evaluation.yaml", "r") as f:
-        config = yaml.safe_load(f)
+    with open("config/evaluation.yaml") as f:
+        config = EasyDict(yaml.safe_load(f))  # EasyDictでラップ
 
     # デバイスの設定
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # 列検出モデルの評価
-    if config["evaluate_column_detection"]:
+    if config.evaluate_column_detection:
         print("Evaluating column detection model...")
 
         # モデルの読み込み
-        with open("config/model/column_extraction.yaml", "r") as f:
-            model_config = yaml.safe_load(f)
+        with open("config/model/column_extraction.yaml") as f:
+            model_config = EasyDict(yaml.safe_load(f))  # EasyDictでラップ
 
         model = ColumnDetectionModel(model_config)
-        model.load_pretrained(config["column_detection"]["weights_path"])
+        model.load_pretrained(config.column_detection.weights_path)
         model.to(device)
 
         # データセットの準備
         dataset = ColumnDetectionDataset(
-            image_dir=config["column_detection"]["image_dir"],
-            annotation_file=config["column_detection"]["annotation_file"],
-            target_size=model_config["model"]["input_size"][0],
+            image_dir=config.column_detection.image_dir,
+            annotation_file=config.column_detection.annotation_file,
+            target_size=model_config.model.input_size[0],
         )
 
         # 評価の実行
@@ -158,22 +158,22 @@ def main():
             print(f"Class {class_id} AP: {ap:.4f}")
 
     # 文字検出モデルの評価
-    if config["evaluate_character_detection"]:
+    if config.evaluate_character_detection:
         print("\nEvaluating character detection model...")
 
         # モデルの読み込み
-        with open("config/model/character_detection.yaml", "r") as f:
-            model_config = yaml.safe_load(f)
+        with open("config/model/character_detection.yaml") as f:
+            model_config = EasyDict(yaml.safe_load(f))  # EasyDictでラップ
 
         model = CharacterDetectionModel(model_config)
-        model.load_pretrained(config["character_detection"]["weights_path"])
+        model.load_pretrained(config.character_detection.weights_path)
         model.to(device)
 
         # データセットの準備
         dataset = CharacterDetectionDataset(
-            column_image_dir=config["character_detection"]["image_dir"],
-            annotation_file=config["character_detection"]["annotation_file"],
-            target_width=model_config["model"]["input_size"][0],
+            column_image_dir=config.character_detection.image_dir,
+            annotation_file=config.character_detection.annotation_file,
+            target_width=model_config.model.input_size[0],
         )
 
         # 評価の実行
