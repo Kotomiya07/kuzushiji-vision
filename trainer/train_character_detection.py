@@ -9,12 +9,11 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
+import wandb  # Import wandb
 import yaml
 from timm.scheduler import CosineLRScheduler  # Assuming timm is installed
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-
-import wandb  # Import wandb
 
 # Project specific imports
 from models.character_detection import CharacterDetectionModel
