@@ -29,7 +29,7 @@ jobs:
             -B main \
             -t '【本番反映】${{ steps.check_pr.outputs.message }}' \
             -a ${{ github.actor }}  \
-            -F ./.github/RELEASE_WORKFLOW_TEMPLATE.md
+            --body-file ./.github/RELEASE_WORKFLOW_TEMPLATE.md
       - name: Edit Release Pull Request
         if: ${{ steps.check_pr.outputs.count != 0 }}
         run: |
