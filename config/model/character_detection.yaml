@@ -1,42 +1,78 @@
+# Updated config/model/character_detection.yaml (for timm scheduler)
+seed: 42 # Global random seed
+
 model:
   name: "character_detection"
   type: "vision_transformer"
-  backbone: "vit_base"
-  input_size: [192, None]  # 192xNにリサイズ 可変サイズ
+  backbone: "google/vit-base-patch16-384"  # Pre-trained model
+  input_size: [192, None]  # Resize to 192xN (variable width)
   patch_size: 16
-  num_heads: 4
-  num_layers: 1
-  hidden_size: 256
-  mlp_ratio: 4
+  num_heads: 4 # Match pre-trained ViT-Base
+  num_layers: 12
+  hidden_size: 256 # Match pre-trained ViT-Base
   dropout: 0.1
   attention_dropout: 0.1
-  num_classes: -1  # くずし字の文字クラス数（後で設定）
-  confidence_threshold: 0.5  # 検出のスコアのしきい値
-  nms_threshold: 0.5  # NMSのIoUしきい値
-  
+  num_classes: 4328  # Number of Kuzushiji classes
+  confidence_threshold: 0.5  # Detection score threshold
+  nms_threshold: 0.5  # NMS IoU threshold
+  # IoU threshold settings for detection loss calculation
+  dynamic_iou_threshold: false # Use dynamic IoU threshold adjustment?
+  fixed_iou_threshold: 0.5   # Fixed IoU threshold if dynamic_iou_threshold is false
+  dynamic_iou_params:        # Parameters for dynamic adjustment (if enabled)
+    start: 0.3             # Starting IoU threshold
+    end: 0.5               # Ending IoU threshold
+    epochs: 50             # Number of epochs to reach the end threshold
+
 training:
-  batch_size: 32
-  learning_rate: 0.0001
+  batch_size: 8
+  learning_rate: 0.0001 # Initial learning rate for optimizer
   optimizer: "adamW"
   weight_decay: 0.05
+  num_workers: 4 # Number of data loader workers
+  early_stopping_patience: 10 # Patience for early stopping
   scheduler:
-    type: "cosine"
-    warmup_epochs: 5
-    total_epochs: 200
-  
+    # Settings for timm.scheduler.CosineLRScheduler
+    # type: "timm_cosine" # Optional: Indicate scheduler type
+    t_initial: 200      # Corresponds to total_epochs (since t_in_epochs=True)
+    lr_min: 1e-6        # Minimum learning rate (formerly eta_min)
+    warmup_t: 5         # Warmup epochs (formerly warmup_epochs)
+    warmup_lr_init: 1e-7 # Initial learning rate during warmup
+
 augmentation:
-  horizontal_flip: false  # 日本語の文字なので水平反転は不要
-  vertical_flip: false   # 垂直反転も不要
-  rotation: [-10, 10]    # 小さな回転のみ許可
-  scale: [0.9, 1.1]     # スケール変更の範囲
+  horizontal_flip: false
+  vertical_flip: false
+  rotation: [-10, 10]
+  scale: [0.9, 1.1]
   brightness: 0.1
   contrast: 0.1
   gaussian_noise: 0.05
-  random_erase: 0.1     # ランダムな領域を消去（ロバスト性向上）
+  random_erase: 0.1
 
-# 実験結果の保存設定
+data:
+  # Paths to annotation files
+  train_annotation: "data/column_dataset/train/train_column_info.csv"
+  val_annotation: "data/column_dataset/val/val_column_info.csv"
+  test_annotation: "data/column_dataset/test/test_column_info.csv"
+  # Paths to image directories
+  train_image_dir: "data/column_dataset/train/images/"
+  val_image_dir: "data/column_dataset/val/images/"
+  test_image_dir: "data/column_dataset/test/images/"
+  # Unicode dictionary for Kuzushiji characters
+  unicode_dict: "data/column_dataset/unicode_to_id.json"
+
+evaluation:
+  iou_threshold: 0.5 # IoU threshold for mAP and accuracy calculation
+  num_visualizations: 5 # Number of validation samples to visualize
+
+# Experiment tracking and saving settings
 experiment:
-  save_dir: experiments/character_detection/%Y%m%d_%H%M%S  # 実験結果を保存するディレクトリ（日時フォーマット）
-  log_dir: logs  # ログファイルを保存するサブディレクトリ
-  checkpoint_dir: checkpoints  # モデルのチェックポイントを保存するサブディレクトリ
-  eval_dir: evaluation  # 評価結果を保存するサブディレクトリ 
+  save_dir: "experiments/character_detection/%Y%m%d_%H%M%S"
+  log_dir: "logs"
+  checkpoint_dir: "checkpoints"
+  eval_dir: "evaluation"
+
+# Wandb settings
+wandb:
+  project: "kuzushiji-character-detection" # Wandb project name
+  entity: null # Optional: Wandb entity (username or team name)
+  name_format: "%Y%m%d_%H%M%S" # Optional: Wandb run name format

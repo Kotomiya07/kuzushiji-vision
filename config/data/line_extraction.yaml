@@ -1,6 +1,7 @@
-path: /home/ryo/project/kuzushiji-vision/data/processed  # データセットのルートディレクトリ
+path: ./data/yolo_dataset_page_images_by_book  # データセットのルートディレクトリ
 train: train/images  # 訓練画像のディレクトリ
 val: val/images      # 検証画像のディレクトリ
+test: test/images    # テスト画像のディレクトリ
 nc: 1
 # クラス名
 names:

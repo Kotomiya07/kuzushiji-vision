@@ -1,11 +1,10 @@
 import cv2
 import numpy as np
-from typing import Tuple, Optional
 
 
 def resize_keeping_aspect_ratio(
-    image: np.ndarray, target_size: int, target_width: Optional[int] = None, interpolation: int = cv2.INTER_LINEAR
-) -> Tuple[np.ndarray, float]:
+    image: np.ndarray, target_size: int, target_width: int | None = None, interpolation: int = cv2.INTER_LINEAR
+) -> tuple[np.ndarray, float]:
     """アスペクト比を保持したままリサイズを行う
 
     Args:

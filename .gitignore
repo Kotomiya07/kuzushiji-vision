@@ -158,8 +158,14 @@ Thumbs.db
 *.bak
 
 # Project-specific
+.cursurrules
+.roo/
+.roorules/
+memory-bank/
 data/raw/
 data/processed/
+data/column_dataset/
+data/yolo_dataset_page_images_by_book/
 data/*.zip
 experiments/*/
 !experiments/.gitkeep

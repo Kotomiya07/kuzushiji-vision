@@ -1,12 +1,12 @@
-import torch
-import numpy as np
-from typing import List, Dict, Tuple, Union
 from collections import defaultdict
 
+import numpy as np
+import torch
 
-def compute_iou(
-    box1: Union[torch.Tensor, np.ndarray], box2: Union[torch.Tensor, np.ndarray]
-) -> Union[torch.Tensor, np.ndarray]:
+from .util import EasyDict  # Import EasyDict
+
+
+def compute_iou(box1: torch.Tensor | np.ndarray, box2: torch.Tensor | np.ndarray) -> torch.Tensor | np.ndarray:
     """IoU（Intersection over Union）を計算
 
     Args:
@@ -79,13 +79,13 @@ def _compute_iou_numpy(box1: np.ndarray, box2: np.ndarray) -> np.ndarray:
 
 
 def compute_map(
-    pred_boxes: List[torch.Tensor],
-    pred_scores: List[torch.Tensor],
-    pred_labels: List[torch.Tensor],
-    gt_boxes: List[torch.Tensor],
-    gt_labels: List[torch.Tensor],
+    pred_boxes: list[torch.Tensor],
+    pred_scores: list[torch.Tensor],
+    pred_labels: list[torch.Tensor],
+    gt_boxes: list[torch.Tensor],
+    gt_labels: list[torch.Tensor],
     iou_threshold: float = 0.5,
-) -> Tuple[float, Dict[int, float]]:
+) -> tuple[float, dict[int, float]]:
     """mAP（mean Average Precision）を計算
 
     Args:
@@ -106,14 +106,16 @@ def compute_map(
     class_gts = defaultdict(list)
 
     # 各画像の予測と正解を処理
-    for pred_box, pred_score, pred_label, gt_box, gt_label in zip(pred_boxes, pred_scores, pred_labels, gt_boxes, gt_labels):
+    for pred_box, pred_score, pred_label, gt_box, gt_label in zip(
+        pred_boxes, pred_scores, pred_labels, gt_boxes, gt_labels, strict=False
+    ):
         # クラスごとに予測を収集
-        for box, score, label in zip(pred_box, pred_score, pred_label):
-            class_preds[label.item()].append({"box": box, "score": score})
+        for box, score, label in zip(pred_box, pred_score, pred_label, strict=False):
+            class_preds[label.item()].append(EasyDict({"box": box, "score": score}))
 
         # クラスごとに正解を収集
-        for box, label in zip(gt_box, gt_label):
-            class_gts[label.item()].append({"box": box, "matched": False})
+        for box, label in zip(gt_box, gt_label, strict=False):
+            class_gts[label.item()].append(EasyDict({"box": box, "matched": False}))
 
     # クラスごとのAPを計算
     aps = {}
@@ -127,7 +129,7 @@ def compute_map(
     return mAP, aps
 
 
-def compute_ap(predictions: List[Dict], ground_truths: List[Dict], iou_threshold: float) -> float:
+def compute_ap(predictions: list[dict], ground_truths: list[dict], iou_threshold: float) -> float:
     """クラスごとのAP（Average Precision）を計算
 
     Args:
@@ -139,7 +141,7 @@ def compute_ap(predictions: List[Dict], ground_truths: List[Dict], iou_threshold
         float: AP
     """
     # 予測をスコアでソート
-    predictions = sorted(predictions, key=lambda x: x["score"], reverse=True)
+    predictions = sorted(predictions, key=lambda x: x.score, reverse=True)
 
     # 適合率と再現率を計算
     precisions = []
@@ -153,8 +155,8 @@ def compute_ap(predictions: List[Dict], ground_truths: List[Dict], iou_threshold
         max_idx = -1
 
         for j, gt in enumerate(ground_truths):
-            if not gt["matched"]:
-                iou = compute_iou(pred["box"].unsqueeze(0), gt["box"].unsqueeze(0))[0, 0]
+            if not gt.matched:
+                iou = compute_iou(pred.box.unsqueeze(0), gt.box.unsqueeze(0))[0, 0]
                 if iou > max_iou:
                     max_iou = iou
                     max_idx = j
@@ -162,7 +164,7 @@ def compute_ap(predictions: List[Dict], ground_truths: List[Dict], iou_threshold
         # IoUがしきい値を超える場合は正解とみなす
         if max_iou >= iou_threshold:
             num_correct += 1
-            ground_truths[max_idx]["matched"] = True
+            ground_truths[max_idx].matched = True
 
         # 適合率と再現率を計算
         precision = num_correct / i
@@ -175,25 +177,30 @@ def compute_ap(predictions: List[Dict], ground_truths: List[Dict], iou_threshold
     if not precisions:
         return 0.0
 
+    # NumPy配列に変換
+    precisions = np.array(precisions)
+    recalls = np.array(recalls)
+
     # 11点補間によるAP計算
     ap = 0
     for t in np.arange(0, 1.1, 0.1):
-        if np.sum(recalls >= t) == 0:
+        mask = recalls >= t
+        if not mask.any():  # マスクが空の場合
             p = 0
         else:
-            p = np.max(precisions[np.where(recalls >= t)[0]])
+            p = np.max(precisions[mask])  # マスクを直接使用
         ap += p / 11.0
 
-    return ap
+    return float(ap)  # float型に変換して返す
 
 
 def compute_character_accuracy(
-    pred_labels: List[torch.Tensor],
-    gt_labels: List[torch.Tensor],
-    pred_boxes: List[torch.Tensor],
-    gt_boxes: List[torch.Tensor],
+    pred_labels: list[torch.Tensor],
+    gt_labels: list[torch.Tensor],
+    pred_boxes: list[torch.Tensor],
+    gt_boxes: list[torch.Tensor],
     iou_threshold: float = 0.5,
-) -> Tuple[float, Dict[int, float]]:
+) -> tuple[float, dict[int, float]]:
     """文字認識の精度を計算
 
     Args:
@@ -211,7 +218,7 @@ def compute_character_accuracy(
     class_correct = defaultdict(int)
     class_total = defaultdict(int)
 
-    for pred_label, gt_label, pred_box, gt_box in zip(pred_labels, gt_labels, pred_boxes, gt_boxes):
+    for pred_label, gt_label, pred_box, gt_box in zip(pred_labels, gt_labels, pred_boxes, gt_boxes, strict=False):
         # IoUの計算
         ious = compute_iou(pred_box, gt_box)
 
@@ -220,7 +227,7 @@ def compute_character_accuracy(
         valid_mask = max_ious >= iou_threshold
 
         # 正解とのマッチング
-        for i, (pred, gt_idx, is_valid) in enumerate(zip(pred_label, matched_idx, valid_mask)):
+        for _i, (pred, gt_idx, is_valid) in enumerate(zip(pred_label, matched_idx, valid_mask, strict=False)):
             if is_valid:
                 gt = gt_label[gt_idx]
                 class_total[gt.item()] += 1

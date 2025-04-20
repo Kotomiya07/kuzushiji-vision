@@ -1,13 +1,12 @@
 import torch
 import torch.nn as nn
-from typing import Dict, Tuple
 from ultralytics import YOLO
 
 
 class ColumnDetectionModel(nn.Module):
     """YOLOv8をベースにした列検出モデル"""
 
-    def __init__(self, config: Dict):
+    def __init__(self, config: dict):
         """
         Args:
             config (Dict): モデルの設定
@@ -25,7 +24,7 @@ class ColumnDetectionModel(nn.Module):
         self.conf_threshold = config["model"]["confidence_threshold"]
         self.nms_threshold = config["model"]["nms_threshold"]
 
-    def forward(self, images: torch.Tensor, targets: Dict[str, torch.Tensor] = None) -> Dict[str, torch.Tensor]:
+    def forward(self, images: torch.Tensor, targets: dict[str, torch.Tensor] = None) -> dict[str, torch.Tensor]:
         """順伝播
 
         Args:
@@ -83,7 +82,7 @@ class ColumnDetectionModel(nn.Module):
             self.model = YOLO(weights_path)
 
     @torch.no_grad()
-    def predict(self, image: torch.Tensor, score_threshold: float = None) -> Tuple[torch.Tensor, torch.Tensor]:
+    def predict(self, image: torch.Tensor, score_threshold: float = None) -> tuple[torch.Tensor, torch.Tensor]:
         """単一画像に対する推論
 
         Args:
