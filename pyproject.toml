@@ -26,6 +26,8 @@ dependencies = [
     "tensorrt>=10.9.0.34",
     "transformers>=4.50.0",
     "gradio>=5.23.1",
+    "torch-geometric>=2.6.1",
+    "torchaudio==2.5.1+cu124",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
@@ -49,7 +51,7 @@ dev-dependencies = [
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src", "."]
+packages = ["src"]
 
 [[tool.rye.sources]]
 name = "torch"

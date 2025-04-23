@@ -8,12 +8,12 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset
 
-from .augmentation import (
+from ..utils.augmentation import (
     get_character_detection_train_transforms,
     get_character_detection_val_transforms,
 )  # Import new transform functions
-from .image_processing import normalize_image, resize_keeping_aspect_ratio  # Needed for ColumnDetectionDataset
-from .util import EasyDict  # Import EasyDict
+from ..utils.image_processing import normalize_image, resize_keeping_aspect_ratio  # Needed for ColumnDetectionDataset
+from ..utils.util import EasyDict  # Import EasyDict
 
 
 class ColumnDetectionDataset(Dataset):
