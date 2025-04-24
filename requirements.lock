@@ -16,6 +16,12 @@ accelerate==1.5.2
     # via kuzushiji-vision
 aiofiles==23.2.1
     # via gradio
+aiohappyeyeballs==2.6.1
+    # via aiohttp
+aiohttp==3.11.18
+    # via torch-geometric
+aiosignal==1.3.2
+    # via aiohttp
 albucore==0.0.23
     # via albumentations
 albumentations==2.0.5
@@ -29,6 +35,10 @@ anyio==4.9.0
     # via gradio
     # via httpx
     # via starlette
+async-timeout==5.0.1
+    # via aiohttp
+attrs==25.3.0
+    # via aiohttp
 certifi==2022.12.7
     # via httpcore
     # via httpx
@@ -63,10 +73,14 @@ flatbuffers==25.2.10
     # via onnxruntime-gpu
 fonttools==4.56.0
     # via matplotlib
+frozenlist==1.6.0
+    # via aiohttp
+    # via aiosignal
 fsspec==2024.6.1
     # via gradio-client
     # via huggingface-hub
     # via torch
+    # via torch-geometric
 gitdb==4.0.12
     # via gitpython
 gitpython==3.1.44
@@ -103,9 +117,11 @@ idna==3.4
     # via anyio
     # via httpx
     # via requests
+    # via yarl
 jinja2==3.1.4
     # via gradio
     # via torch
+    # via torch-geometric
 joblib==1.4.2
     # via scikit-learn
 kiwisolver==1.4.8
@@ -129,6 +145,9 @@ mdurl==0.1.2
     # via markdown-it-py
 mpmath==1.3.0
     # via sympy
+multidict==6.4.3
+    # via aiohttp
+    # via yarl
 networkx==3.3
     # via torch
 numpy==1.26.3
@@ -147,6 +166,7 @@ numpy==1.26.3
     # via scipy
     # via seaborn
     # via tensorboard
+    # via torch-geometric
     # via torchmetrics
     # via torchvision
     # via transformers
@@ -225,6 +245,9 @@ pillow==11.0.0
     # via ultralytics
 platformdirs==4.3.6
     # via wandb
+propcache==0.3.1
+    # via aiohttp
+    # via yarl
 protobuf==5.29.3
     # via onnx
     # via onnxruntime-gpu
@@ -232,6 +255,7 @@ protobuf==5.29.3
     # via wandb
 psutil==7.0.0
     # via accelerate
+    # via torch-geometric
     # via ultralytics
     # via wandb
 py-cpuinfo==9.0.0
@@ -249,6 +273,7 @@ pygments==2.19.1
     # via rich
 pyparsing==3.2.1
     # via matplotlib
+    # via torch-geometric
 python-dateutil==2.9.0.post0
     # via matplotlib
     # via pandas
@@ -271,6 +296,7 @@ regex==2024.11.6
     # via transformers
 requests==2.28.1
     # via huggingface-hub
+    # via torch-geometric
     # via transformers
     # via ultralytics
     # via wandb
@@ -347,10 +373,15 @@ torch==2.5.1+cu124
     # via accelerate
     # via kuzushiji-vision
     # via timm
+    # via torchaudio
     # via torchmetrics
     # via torchvision
     # via ultralytics
     # via ultralytics-thop
+torch-geometric==2.6.1
+    # via kuzushiji-vision
+torchaudio==2.5.1+cu124
+    # via kuzushiji-vision
 torchmetrics==1.0.3
     # via kuzushiji-vision
 torchvision==0.20.1+cu124
@@ -360,6 +391,7 @@ torchvision==0.20.1+cu124
 tqdm==4.66.5
     # via huggingface-hub
     # via kuzushiji-vision
+    # via torch-geometric
     # via transformers
     # via ultralytics
 transformers==4.50.0
@@ -375,6 +407,7 @@ typing-extensions==4.12.2
     # via gradio-client
     # via huggingface-hub
     # via lightning-utilities
+    # via multidict
     # via pydantic
     # via pydantic-core
     # via rich
@@ -399,3 +432,5 @@ websockets==15.0.1
     # via gradio-client
 werkzeug==3.1.3
     # via tensorboard
+yarl==1.20.0
+    # via aiohttp

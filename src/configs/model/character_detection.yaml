@@ -3,16 +3,52 @@ seed: 42 # Global random seed
 
 model:
   name: "character_detection"
-  type: "vision_transformer"
-  backbone: "google/vit-base-patch16-384"  # Pre-trained model
+  # type: "vision_transformer" # 既存モデルを使う場合
+  type: "csa_vit" # 新しいCSA-ViTモデルを使う場合
+  backbone: "google/vit-base-patch16-384"  # ViTConfigの初期化や事前学習重みロードの参考に使う可能性あり
   input_size: [192, None]  # Resize to 192xN (variable width)
   patch_size: 16
-  num_heads: 4 # Match pre-trained ViT-Base
+  num_channels: 3 # ViTConfig用に追加
+  num_heads: 12 # ViT-Baseのデフォルト (Self-Attention用)
   num_layers: 12
-  hidden_size: 256 # Match pre-trained ViT-Base
+  hidden_size: 768 # ViT-Baseのデフォルト
   dropout: 0.1
-  attention_dropout: 0.1
-  num_classes: 4328  # Number of Kuzushiji classes
+  attention_dropout: 0.1 # Self-Attention用
+  layer_norm_eps: 1e-12 # ViTConfig用に追加 (ViTのデフォルト値)
+  num_classes: 4328  # Number of Kuzushiji classes (デコーダで使用)
+
+  # --- CSA-ViT 固有設定 ---
+  decoder_type: "ctc" # "ctc" or "transformer"
+  # 構造適応モジュール設定
+  use_structure_module_indices: [0, 1, 2] # 例: 最初の3層で使用
+  structure_module_type: "cnn" # "cnn" or "gat" or null
+  # CNNブランチ用設定 (structure_module_typeが'cnn'の場合)
+  structure_cnn_kernel_size: 3
+  structure_cnn_use_bn: true
+  # GATブランチ用設定 (structure_module_typeが'gat'の場合)
+  gat_heads: 4             # GATのヘッド数
+  gat_dropout: 0.1         # GATのドロップアウト率
+  gat_add_self_loops: true # GATで自己ループを追加するか
+
+  # --- Transformer Decoder 設定 (decoder_typeが'transformer'の場合) ---
+  decoder_layers: 6          # デコーダの層数 (例: エンコーダの半分)
+  decoder_ffn_dim: 3072      # デコーダFFNの中間層次元 (例: hidden_size * 4)
+  max_target_length: 100     # デコーダが扱う最大ターゲットシーケンス長 (位置エンコーディング用)
+  inference_strategy: "greedy" # 推論時のデコード戦略 ("greedy" or "beam")
+  beam_size: 5               # Beam Search のビームサイズ (inference_strategyが'beam'の場合)
+  length_penalty_alpha: 0.7  # Beam Search の Length Normalization パラメータ (0で無効)
+  # decoder_heads は num_heads を流用
+  # decoder_dropout は dropout を流用
+
+  # --- 文脈統合モジュール設定 ---
+  use_context_module_indices: [9, 10, 11] # 例: 最後の3層で使用
+  context_embedding_dim: 256 # 文脈埋め込みの次元 (外部から与えられる想定)
+  layout_embedding_dim: 128 # レイアウト埋め込みの次元 (外部から与えられる想定)
+  cross_attention_heads: 12 # Cross-Attentionのヘッド数 (num_headsと同じか別の値)
+  cross_attention_dropout: 0.1 # Cross-Attentionのドロップアウト率
+  # --- CSA-ViT 固有設定ここまで ---
+
+  # 検出/後処理関連設定 (既存のものを流用)
   confidence_threshold: 0.5  # Detection score threshold
   nms_threshold: 0.5  # NMS IoU threshold
   # IoU threshold settings for detection loss calculation
