@@ -28,6 +28,7 @@ dependencies = [
     "gradio>=5.23.1",
     "torch-geometric>=2.6.1",
     "torchaudio==2.5.1+cu124",
+    "scikit-image>=0.25.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
