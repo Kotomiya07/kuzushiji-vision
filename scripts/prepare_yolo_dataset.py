@@ -4,11 +4,12 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import yaml  # Add yaml import
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
-from utils.util import EasyDict  # Use absolute import
+from src.utils.util import EasyDict  # Use absolute import
 
 
 def convert_to_yolo_format(box, image_width, image_height):
@@ -103,7 +104,7 @@ def get_doc_id_from_original_path(original_image_path: str) -> str:
 
 def prepare_yolo_dataset(
     column_info_file: str,
-    # base_data_dir は column_info.csv 内の original_image パスが基準となるため、引数としては不要になる
+    not_use_data: str,
     output_dir: str,
     train_docs_count: int = 31,
     val_docs_count: int = 7,
@@ -146,6 +147,22 @@ def prepare_yolo_dataset(
         print(f"Error reading or processing CSV file {column_info_path}: {e}")
         return
 
+    # --- Exclude doc_ids listed in not_use_data.yaml ---
+    not_use_yaml_path = Path(not_use_data)
+    not_use_doc_ids = set()
+    if not_use_yaml_path.exists():
+        try:
+            with open(not_use_yaml_path, 'r', encoding='utf-8') as f:
+                not_use_yaml = yaml.safe_load(f)
+            if not_use_yaml and 'dirs' in not_use_yaml:
+                not_use_doc_ids = set(str(d) for d in not_use_yaml['dirs'])
+            else:
+                print(f"Warning: 'dirs' key not found in {not_use_yaml_path}, no exclusions applied.")
+        except Exception as e:
+            print(f"Warning: Failed to load {not_use_yaml_path}, no exclusions applied. Error: {e}")
+    else:
+        print(f"Warning: {not_use_yaml_path} does not exist, no exclusions applied.")
+
     # ドキュメントIDを original_image パスから抽出
     doc_ids = []
     invalid_paths = []
@@ -160,6 +177,13 @@ def prepare_yolo_dataset(
 
     df["doc_id"] = doc_ids
     df.dropna(subset=["doc_id"], inplace=True)  # ID抽出に失敗した行を削除
+
+    # --- Exclude rows with doc_id in not_use_doc_ids ---
+    before_exclude_count = len(df)
+    df = df[~df["doc_id"].isin(not_use_doc_ids)]
+    excluded_count = before_exclude_count - len(df)
+    if excluded_count > 0:
+        print(f"Excluded {excluded_count} entries based on not_use_data.yaml.")
 
     if invalid_paths:
         print(f"Warning: Could not extract document ID from {len(invalid_paths)} paths. Examples:")
@@ -193,65 +217,83 @@ def prepare_yolo_dataset(
         return
     # ------------------------------------
 
-    # ユニークなドキュメントIDを取得
-    unique_doc_ids = df["doc_id"].unique()
-    total_docs = len(unique_doc_ids)
-    print(f"Found {total_docs} unique document IDs with existing images.")
-
-    # 指定された分割数と実際のドキュメント数を確認
-    requested_total = train_docs_count + val_docs_count + test_docs_count
-    if total_docs < requested_total:
-        print(
-            f"Error: Not enough unique documents ({total_docs}) to fulfill the requested split "
-            f"({train_docs_count} train, {val_docs_count} val, {test_docs_count} test)."
-        )
-        return
-    elif total_docs > requested_total:
-        print(
-            f"Warning: Found {total_docs} documents, but only {requested_total} are requested for the split. "
-            f"{total_docs - requested_total} documents will be unused."
-        )
-
-    # ドキュメントIDを train, val, test に分割
-    train_doc_ids, temp_doc_ids = train_test_split(
-        unique_doc_ids, test_size=(val_docs_count + test_docs_count), train_size=train_docs_count, random_state=random_state
-    )
-
-    if val_docs_count + test_docs_count > 0 and len(temp_doc_ids) > 0:
-        test_proportion_in_temp = test_docs_count / (val_docs_count + test_docs_count)
-        if test_proportion_in_temp == 1.0:
-            val_doc_ids = np.array([])
-            test_doc_ids = temp_doc_ids
-        elif test_proportion_in_temp == 0.0:
-            val_doc_ids = temp_doc_ids
-            test_doc_ids = np.array([])
-        else:
-            val_doc_ids, test_doc_ids = train_test_split(
-                temp_doc_ids, test_size=test_proportion_in_temp, random_state=random_state
-            )
-    else:
-        val_doc_ids = temp_doc_ids if val_docs_count > 0 else np.array([])
-        test_doc_ids = temp_doc_ids if test_docs_count > 0 and val_docs_count == 0 else np.array([])
-
-    print(f"Actual split: Train={len(train_doc_ids)}, Val={len(val_doc_ids)}, Test={len(test_doc_ids)}")
-    if len(train_doc_ids) != train_docs_count or len(val_doc_ids) != val_docs_count or len(test_doc_ids) != test_docs_count:
-        print("Warning: The final split counts do not exactly match the requested counts.")
-
-    doc_id_splits = {"train": set(train_doc_ids), "val": set(val_doc_ids), "test": set(test_doc_ids)}
-
-    # --- 書籍IDの分割情報をCSVに保存 ---
-    split_records = []
-    for split_name, ids in doc_id_splits.items():
-        for doc_id in ids:
-            split_records.append(EasyDict({"doc_id": doc_id, "split": split_name}))
-
-    split_df_info = pd.DataFrame(split_records)
+    # --- Split logic: use existing split info if present ---
     split_info_path = output_path / "dataset_split_info.csv"
-    try:
-        split_df_info.to_csv(split_info_path, index=False, encoding="utf-8")
-        print(f"Saved dataset split information to: {split_info_path}")
-    except Exception as e:
-        print(f"Warning: Failed to save dataset split information to {split_info_path}. Error: {e}")
+    doc_id_splits = {"train": set(), "val": set(), "test": set()}
+    use_existing_split = False
+    if split_info_path.exists():
+        try:
+            split_df_info = pd.read_csv(split_info_path)
+            if not all(col in split_df_info.columns for col in ["doc_id", "split"]):
+                print(f"Error: {split_info_path} does not contain required columns ['doc_id', 'split']. Ignoring file.")
+            else:
+                for split in ["train", "val", "test"]:
+                    doc_id_splits[split] = set(split_df_info[split_df_info["split"] == split]["doc_id"].astype(str))
+                use_existing_split = True
+                print(f"Using existing split info from {split_info_path}. Ignoring train/val/test_docs_count arguments.")
+        except Exception as e:
+            print(f"Warning: Failed to load split info from {split_info_path}. Error: {e}. Proceeding with random split.")
+            use_existing_split = False
+
+    if not use_existing_split:
+        # ユニークなドキュメントIDを取得
+        unique_doc_ids = df["doc_id"].unique()
+        total_docs = len(unique_doc_ids)
+        print(f"Found {total_docs} unique document IDs with existing images.")
+
+        # 指定された分割数と実際のドキュメント数を確認
+        requested_total = train_docs_count + val_docs_count + test_docs_count
+        if total_docs < requested_total:
+            print(
+                f"Error: Not enough unique documents ({total_docs}) to fulfill the requested split "
+                f"({train_docs_count} train, {val_docs_count} val, {test_docs_count} test)."
+            )
+            return
+        elif total_docs > requested_total:
+            print(
+                f"Warning: Found {total_docs} documents, but only {requested_total} are requested for the split. "
+                f"{total_docs - requested_total} documents will be unused."
+            )
+
+        # ドキュメントIDを train, val, test に分割
+        train_doc_ids, temp_doc_ids = train_test_split(
+            unique_doc_ids, test_size=(val_docs_count + test_docs_count), train_size=train_docs_count, random_state=random_state
+        )
+
+        if val_docs_count + test_docs_count > 0 and len(temp_doc_ids) > 0:
+            test_proportion_in_temp = test_docs_count / (val_docs_count + test_docs_count)
+            if test_proportion_in_temp == 1.0:
+                val_doc_ids = np.array([])
+                test_doc_ids = temp_doc_ids
+            elif test_proportion_in_temp == 0.0:
+                val_doc_ids = temp_doc_ids
+                test_doc_ids = np.array([])
+            else:
+                val_doc_ids, test_doc_ids = train_test_split(
+                    temp_doc_ids, test_size=test_proportion_in_temp, random_state=random_state
+                )
+        else:
+            val_doc_ids = temp_doc_ids if val_docs_count > 0 else np.array([])
+            test_doc_ids = temp_doc_ids if test_docs_count > 0 and val_docs_count == 0 else np.array([])
+
+        print(f"Actual split: Train={len(train_doc_ids)}, Val={len(val_doc_ids)}, Test={len(test_doc_ids)}")
+        if len(train_doc_ids) != train_docs_count or len(val_doc_ids) != val_docs_count or len(test_doc_ids) != test_docs_count:
+            print("Warning: The final split counts do not exactly match the requested counts.")
+
+        doc_id_splits = {"train": set(train_doc_ids), "val": set(val_doc_ids), "test": set(test_doc_ids)}
+
+        # --- 書籍IDの分割情報をCSVに保存 ---
+        split_records = []
+        for split_name, ids in doc_id_splits.items():
+            for doc_id in ids:
+                split_records.append(EasyDict({"doc_id": doc_id, "split": split_name}))
+
+        split_df_info = pd.DataFrame(split_records)
+        try:
+            split_df_info.to_csv(split_info_path, index=False, encoding="utf-8")
+            print(f"Saved dataset split information to: {split_info_path}")
+        except Exception as e:
+            print(f"Warning: Failed to save dataset split information to {split_info_path}. Error: {e}")
     # ------------------------------------
 
     # データセット準備ループ
@@ -365,12 +407,14 @@ def prepare_yolo_dataset(
 if __name__ == "__main__":
     # --- 設定 ---
     COLUMN_INFO_FILE = "data/processed/column_info.csv"
+    # 使用しないデータ
+    NOT_USE_DATA = "data/raw/not_use_data.yaml"
     # 出力ディレクトリ名を変更して、以前のスクリプトの出力と区別する
     OUTPUT_YOLO_DIR = "data/yolo_dataset_page_images_by_book"
     # 指定された書籍数
-    TRAIN_DOCS_COUNT = 31
-    VAL_DOCS_COUNT = 7
-    TEST_DOCS_COUNT = 6
+    TRAIN_DOCS_COUNT = 27
+    VAL_DOCS_COUNT = 4
+    TEST_DOCS_COUNT = 3
     RANDOM_SEED = 42
     CLASS_ID = 0  # 列検出タスクなのでクラスは1つ (0)
     # -------------
@@ -378,7 +422,7 @@ if __name__ == "__main__":
     print("Starting YOLO dataset preparation (using page images, split by book)...")
     prepare_yolo_dataset(
         column_info_file=COLUMN_INFO_FILE,
-        # base_data_dir は不要になった
+        not_use_data=NOT_USE_DATA,
         output_dir=OUTPUT_YOLO_DIR,
         train_docs_count=TRAIN_DOCS_COUNT,
         val_docs_count=VAL_DOCS_COUNT,
