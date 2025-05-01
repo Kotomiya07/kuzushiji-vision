@@ -5,6 +5,7 @@ description = "Add your description here"
 dependencies = [
     "torch==2.5.1+cu124",
     "torchvision==0.20.1+cu124",
+    "torchaudio==2.5.1+cu124",
     "torchmetrics>=1.0.3",
     "albumentations>=2.0.5",
     "pandas>=2.2.3",
@@ -20,14 +21,9 @@ dependencies = [
     "wandb>=0.19.6",
     "accelerate>=1.5.2",
     "ultralytics>=8.3.93",
-    "onnxruntime-gpu>=1.21.0",
-    "onnx>=1.17.0",
-    "onnxslim>=0.1.48",
-    "tensorrt>=10.9.0.34",
     "transformers>=4.50.0",
     "gradio>=5.23.1",
     "torch-geometric>=2.6.1",
-    "torchaudio==2.5.1+cu124",
     "scikit-image>=0.25.2",
 ]
 readme = "README.md"
