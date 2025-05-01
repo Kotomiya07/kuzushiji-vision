@@ -1,5 +1,26 @@
+"""
+GUIアノテーションツール
+画面上で画像を表示し、ボックスを選択、編集、保存する機能を提供します。
+
+操作説明:
+- "次の画像": 次の画像を表示します。
+- "前の画像": 前の画像を表示します。
+- "保存": 現在の画像のボックス情報を保存します。
+- "結合": 選択した列を結合します。
+- "１点分割": 選択した文字から２つに分割します。
+- "選択分割": 選択した文字とそれ以外の文字で分割します。
+- "列削除": 選択した列を削除します。
+- Ctrl + 左クリック: ボックスの選択/解除
+- 中クリック: ズーム/パン
+- ホイール: ズームイン/アウト
+- 左クリック: ボックスの選択/解除
+
+tips:
+- 文字を複数選択している状態で、エンターキーを押すと、選択した文字のボックスが結合されます。
+"""
 import ast  # 文字列で保存されたリストを評価するため
 import os
+import re
 import shutil
 import tkinter as tk
 from pathlib import Path
@@ -8,7 +29,40 @@ from tkinter import filedialog, messagebox, simpledialog, ttk
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont, ImageTk
+
 # from skimage.transform import resize  # Pillowだけだと高品質なリサイズが少し面倒なため (不要になったためコメントアウト)
+
+
+def unicode_to_char(unicode_str):
+  """
+  'U+XXXX' 形式のUnicodeコードポイント文字列を文字に変換します。
+
+  Args:
+    unicode_str: 'U+XXXX' 形式の文字列 (例: 'U+4E00')。
+
+  Returns:
+    対応する文字。変換できない場合は None を返します。
+  """
+  # 'U+'で始まり、その後に16進数が続く形式かチェック
+  if not isinstance(unicode_str, str) or not re.match(r'^U\+[0-9A-Fa-f]+$', unicode_str):
+      print(f"エラー: 不正な形式です。'U+XXXX' の形式で入力してください。入力値: {unicode_str}")
+      return None
+
+  try:
+    # 'U+' プレフィックスを除去
+    hex_code = unicode_str[2:]
+    # 16進数文字列を整数（コードポイント）に変換
+    code_point = int(hex_code, 16)
+    # コードポイントを文字に変換
+    return chr(code_point)
+  except ValueError:
+    # int() や chr() でエラーが発生した場合 (例: 無効な16進数、範囲外のコードポイント)
+    print(f"エラー: コードポイントの変換に失敗しました。入力値: {unicode_str}")
+    return None
+  except Exception as e:
+    # その他の予期せぬエラー
+    print(f"予期せぬエラーが発生しました: {e}")
+    return None
 
 
 class ImageCanvas(tk.Canvas):
@@ -220,7 +274,7 @@ class ImageCanvas(tk.Canvas):
 
             # 選択状態に応じて色や太さを変更
             if tag in self.selected_box_tags:
-                color = "blue"
+                color = "red"
                 width = 3
 
             item_id = self.create_rectangle(x1, y1, x2, y2, outline=color, width=width, tags=("box", tag))
@@ -231,10 +285,10 @@ class ImageCanvas(tk.Canvas):
                 font_size = max(8, min(12, int((y2 - y1) * 0.8)))  # ボックスの高さに応じて調整
 
                 # tkinter 用のフォント指定 (タプル形式)
-                tk_font = ("arial", font_size)
+                tk_font = ("游ゴシック", font_size)
 
                 self.create_text(
-                    x1 + 2, y1 + 2, text=box_info["text"], anchor="nw", fill=color, tags=("box_text", tag), font=tk_font
+                    x2 + 20, y1 + 2, text=box_info["text"], anchor="nw", fill=color, tags=("box_text", tag), font=tk_font
                 )
 
     def clear_canvas(self):
@@ -285,24 +339,58 @@ class ImageCanvas(tk.Canvas):
     def on_left_click(self, event):
         canvas_x = self.canvasx(event.x)
         canvas_y = self.canvasy(event.y)
-        clicked_items = self.find_overlapping(canvas_x - 1, canvas_y - 1, canvas_x + 1, canvas_y + 1)
 
+        # Find all items with the 'box' tag
+        all_box_items = self.find_withtag('box')
         clicked_box_tags = set()
-        for item_id in clicked_items:
-            if item_id in self.box_id_map:
-                clicked_box_tags.add(self.box_id_map[item_id])
 
-        if not clicked_box_tags:  # ボックス外をクリックしたら選択解除
-            self.selected_box_tags.clear()
+        # Iterate through all box items to find which one(s) contain the click point
+        for item_id in all_box_items:
+            try:
+                x1, y1, x2, y2 = self.coords(item_id)
+                # Check if the click coordinates are within the item's bounds
+                if x1 <= canvas_x <= x2 and y1 <= canvas_y <= y2:
+                    if item_id in self.box_id_map:
+                        clicked_box_tags.add(self.box_id_map[item_id])
+            except Exception as e:
+                # self.coords might fail if item is deleted concurrently? Unlikely but safe.
+                print(f"Warning: Error getting coords for item {item_id}: {e}")
+
+        # Check if Ctrl key was pressed during the click
+        ctrl_pressed = bool(event.state & 0x0004) # Define ctrl_pressed here
+
+        if not clicked_box_tags:
+            # Clicked outside any box
+            if not ctrl_pressed:
+                # If Ctrl is not pressed, clear selection
+                self.selected_box_tags.clear()
+            # If Ctrl is pressed, do nothing (keep existing selection)
         else:
-            # クリックされたボックスを選択/選択解除 (Ctrlキーで複数選択)
-            # 現状は単一選択のみ実装
-            self.selected_box_tags = clicked_box_tags
+            # Clicked inside one or more boxes
+            if ctrl_pressed:
+                # Ctrl key is pressed: toggle selection state of clicked boxes
+                for tag in clicked_box_tags:
+                    if tag in self.selected_box_tags:
+                        self.selected_box_tags.remove(tag)  # Deselect if already selected
+                    else:
+                        self.selected_box_tags.add(tag)  # Select if not selected
+            else:
+                # Ctrl key is not pressed:
+                # If the click is on an already selected box, do nothing (allows dragging later if needed)
+                # If the click is on a non-selected box, select *only* the clicked box(es)
+                # Check if *any* of the clicked tags are *not* currently selected
+                needs_new_selection = any(tag not in self.selected_box_tags for tag in clicked_box_tags)
+                if needs_new_selection:
+                    self.selected_box_tags = clicked_box_tags # Select only the clicked one(s)
+                # If all clicked tags were already selected, keep the current selection
 
-        self.redraw_boxes()  # 選択状態を反映して再描画
-        # アプリケーション本体に通知 (コールバック経由)
+        # Redraw boxes to reflect selection changes
+        self.redraw_boxes()
+
+        # Notify the main application about the click event
         if hasattr(self.master, "on_canvas_click"):
-            self.master.on_canvas_click(self, clicked_box_tags, event.state & 0x0004)  # Ctrlキーの状態も渡す
+            # Pass the canvas instance, the tags of boxes under the cursor, and the Ctrl key state
+            self.master.on_canvas_click(self, clicked_box_tags, ctrl_pressed) # Now ctrl_pressed is defined
 
     def get_selected_tags(self):
         return list(self.selected_box_tags)
@@ -768,6 +856,95 @@ class DataManager:
         print(f"Column {column_path_to_split} split into {new_path1} and {new_path2}")
         return True
 
+    def split_column_by_selection(self, column_path_to_split, selected_char_indices):
+        """選択された文字とそれ以外で列を2つに分割する"""
+        column_data = self.get_column_data(column_path_to_split)
+        if not column_data:
+            messagebox.showerror("エラー", f"列データが見つかりません: {column_path_to_split}")
+            return False
+
+        char_boxes_col = column_data["char_boxes_in_column"]
+        unicode_ids = column_data["unicode_ids"]
+        original_image_path = column_data["original_image"]
+        col_box_orig_crop = column_data["box_in_original"] # マージン込み
+
+        if not selected_char_indices:
+            messagebox.showerror("エラー", "分割する文字が選択されていません。")
+            return False
+        if len(selected_char_indices) == len(unicode_ids):
+             messagebox.showerror("エラー", "全ての文字が選択されています。分割できません。")
+             return False
+
+        # --- 元画像上の絶対座標を取得 ---
+        crop_x1, crop_y1, _, _ = col_box_orig_crop
+        char_boxes_orig = []
+        for box in char_boxes_col:
+            orig_x1 = box[0] + crop_x1
+            orig_y1 = box[1] + crop_y1
+            orig_x2 = box[2] + crop_x1
+            orig_y2 = box[3] + crop_y1
+            char_boxes_orig.append([orig_x1, orig_y1, orig_x2, orig_y2])
+
+        # 選択された文字とそれ以外に分割
+        selected_indices_set = set(selected_char_indices)
+        chars_orig_selected = []
+        ids_selected = []
+        chars_orig_other = []
+        ids_other = []
+
+        for i, (box_orig, uid) in enumerate(zip(char_boxes_orig, unicode_ids)):
+            if i in selected_indices_set:
+                chars_orig_selected.append(box_orig)
+                ids_selected.append(uid)
+            else:
+                chars_orig_other.append(box_orig)
+                ids_other.append(uid)
+
+        # Y座標でソート (元の順番を維持するため、分割後にソート)
+        if chars_orig_selected:
+            sorted_indices_sel = np.argsort([box[1] for box in chars_orig_selected])
+            chars_orig_selected = [chars_orig_selected[i] for i in sorted_indices_sel]
+            ids_selected = [ids_selected[i] for i in sorted_indices_sel]
+        if chars_orig_other:
+            sorted_indices_oth = np.argsort([box[1] for box in chars_orig_other])
+            chars_orig_other = [chars_orig_other[i] for i in sorted_indices_oth]
+            ids_other = [ids_other[i] for i in sorted_indices_oth]
+
+        # --- 新しい列を生成 ---
+        new_data_sel, new_path_sel = self._recreate_column_from_chars(
+            chars_orig_selected, ids_selected, original_image_path, column_path_to_split, "_selA"
+        )
+        new_data_oth, new_path_oth = self._recreate_column_from_chars(
+            chars_orig_other, ids_other, original_image_path, column_path_to_split, "_selB"
+        )
+
+        if new_data_sel is None or new_data_oth is None:
+            messagebox.showerror("エラー", "選択分割後の列の生成に失敗しました。")
+            # 作成途中のファイルを削除
+            if new_path_sel: os.remove(self.processed_dir / new_path_sel)
+            if new_path_oth: os.remove(self.processed_dir / new_path_oth)
+            return False
+
+        # --- DataFrameの更新 ---
+        index_to_drop = self.df[self.df["column_image"] == column_path_to_split].index
+        self.df = self.df.drop(index_to_drop)
+        new_rows_df = pd.DataFrame([new_data_sel, new_data_oth])
+        self.df = pd.concat([self.df, new_rows_df], ignore_index=True)
+
+        # --- 元の列画像ファイルを削除 ---
+        try:
+            abs_path_to_delete = self.get_column_abs_path(column_path_to_split)
+            if abs_path_to_delete.exists():
+                os.remove(abs_path_to_delete)
+                print(f"Deleted old column image: {abs_path_to_delete}")
+        except Exception as e:
+            print(f"Warning: Could not delete old column image {column_path_to_split}: {e}")
+
+        self.changes_made = True
+        print(f"Column {column_path_to_split} split by selection into {new_path_sel} and {new_path_oth}")
+        return True
+
+
     def move_characters(self, src_column_path, target_column_path, char_indices_to_move):
         """特定の文字をソース列からターゲット列へ移動"""
         if src_column_path == target_column_path:
@@ -830,61 +1007,18 @@ class DataManager:
         final_tgt_chars_orig = [combined_tgt_chars_orig[i] for i in sorted_indices]
         final_tgt_ids = [combined_tgt_ids[i] for i in sorted_indices]
 
-        # --- 移動元と移動先の列を再生成 ---
-        def recreate_column(chars_in_orig, u_ids, original_img_path, base_rel_path_str, suffix):
-            # 結合や分割で使った create_new_column_from_chars とほぼ同じ
-            if not chars_in_orig:
-                return None, None
-
-            new_col_bounds_no_margin = self._recalculate_column_bounds(chars_in_orig)
-            nc_x1, nc_y1, nc_x2, nc_y2 = new_col_bounds_no_margin
-
-            orig_img = Image.open(self.get_original_image_abs_path(original_img_path)).convert("RGB")
-            margin = 5
-            crop_x1 = max(0, int(nc_x1 - margin))
-            crop_y1 = max(0, int(nc_y1 - margin))
-            crop_x2 = min(orig_img.width, int(nc_x2 + margin))
-            crop_y2 = min(orig_img.height, int(nc_y2 + margin))
-            if crop_x1 >= crop_x2 or crop_y1 >= crop_y2:
-                return None, None
-
-            new_col_img_pil = orig_img.crop((crop_x1, crop_y1, crop_x2, crop_y2))
-
-            base_path = Path(base_rel_path_str)
-            new_filename = f"{base_path.stem}_moved{suffix}_{pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')}.jpg"
-            new_col_rel_path = base_path.parent / new_filename
-            new_col_abs_path = self.processed_dir / new_col_rel_path
-            new_col_abs_path.parent.mkdir(parents=True, exist_ok=True)
-            new_col_img_pil.save(new_col_abs_path, "JPEG")
-
-            char_boxes_in_cropped = []
-            for box_orig in chars_in_orig:
-                rel_x1 = box_orig[0] - crop_x1
-                rel_y1 = box_orig[1] - crop_y1
-                rel_x2 = box_orig[2] - crop_x1
-                rel_y2 = box_orig[3] - crop_y1
-                char_boxes_in_cropped.append([rel_x1, rel_y1, rel_x2, rel_y2])
-
-            new_data = {
-                "column_image": str(new_col_rel_path).replace("\\", "/"),
-                "original_image": original_img_path,
-                "box_in_original": [crop_x1, crop_y1, crop_x2, crop_y2],
-                "char_boxes_in_column": char_boxes_in_cropped,
-                "unicode_ids": u_ids,
-            }
-            return new_data, new_col_rel_path
-
+        # --- 移動元と移動先の列を再生成 (共通ヘルパー関数を使用) ---
         # 移動元の新しい列データ (空になる場合もある)
-        new_src_data, new_src_path = recreate_column(
-            remaining_src_chars_orig, remaining_src_ids, src_data["original_image"], src_column_path, "_src"
+        new_src_data, new_src_path = self._recreate_column_from_chars(
+            remaining_src_chars_orig, remaining_src_ids, src_data["original_image"], src_column_path, "_move_src"
         )
 
         # 移動先の新しい列データ
-        new_tgt_data, new_tgt_path = recreate_column(
-            final_tgt_chars_orig, final_tgt_ids, tgt_data["original_image"], target_column_path, "_tgt"
+        new_tgt_data, new_tgt_path = self._recreate_column_from_chars(
+            final_tgt_chars_orig, final_tgt_ids, tgt_data["original_image"], target_column_path, "_move_tgt"
         )
 
-        if new_tgt_data is None:  # 移動先が (理論上ありえないが) 不正
+        if new_tgt_data is None:  # 移動先が不正
             messagebox.showerror("エラー", "移動先の列の再生成に失敗しました。")
             # 作成途中のファイルを削除
             if new_src_path:
@@ -975,55 +1109,18 @@ class DataManager:
             return self.delete_column(column_path)  # 列ごと削除
 
         # --- 元画像上の絶対座標に変換 ---
-        crop_x1, crop_y1, _, _ = col_box_orig_crop
+        crop_x1_orig, crop_y1_orig, _, _ = col_box_orig_crop
         new_char_boxes_orig = []
         for box_col in new_char_boxes_col:
-            orig_x1 = box_col[0] + crop_x1
-            orig_y1 = box_col[1] + crop_y1
-            orig_x2 = box_col[2] + crop_x1
-            orig_y2 = box_col[3] + crop_y1
+            orig_x1 = box_col[0] + crop_x1_orig
+            orig_y1 = box_col[1] + crop_y1_orig
+            orig_x2 = box_col[2] + crop_x1_orig
+            orig_y2 = box_col[3] + crop_y1_orig # ★以前の修正で crop_x1 -> crop_y1 になっているはずだが、念のため確認
             new_char_boxes_orig.append([orig_x1, orig_y1, orig_x2, orig_y2])
 
-        # --- 列を再生成 ---
-        # 結合や分割で使った recreate_column を流用
-        def recreate_column_after_delete(chars_in_orig, u_ids, original_img_path, base_rel_path_str, suffix):
-            if not chars_in_orig:
-                return None, None
-            new_col_bounds_no_margin = self._recalculate_column_bounds(chars_in_orig)
-            nc_x1, nc_y1, nc_x2, nc_y2 = new_col_bounds_no_margin
-            orig_img = Image.open(self.get_original_image_abs_path(original_img_path)).convert("RGB")
-            margin = 5
-            crop_x1 = max(0, int(nc_x1 - margin))
-            crop_y1 = max(0, int(nc_y1 - margin))
-            crop_x2 = min(orig_img.width, int(nc_x2 + margin))
-            crop_y2 = min(orig_img.height, int(nc_y2 + margin))
-            if crop_x1 >= crop_x2 or crop_y1 >= crop_y2:
-                return None, None
-            new_col_img_pil = orig_img.crop((crop_x1, crop_y1, crop_x2, crop_y2))
-            base_path = Path(base_rel_path_str)
-            new_filename = f"{base_path.stem}_chardel{suffix}_{pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')}.jpg"
-            new_col_rel_path = base_path.parent / new_filename
-            new_col_abs_path = self.processed_dir / new_col_rel_path
-            new_col_abs_path.parent.mkdir(parents=True, exist_ok=True)
-            new_col_img_pil.save(new_col_abs_path, "JPEG")
-            char_boxes_in_cropped = []
-            for box_orig in chars_in_orig:
-                rel_x1 = box_orig[0] - crop_x1
-                rel_y1 = box_orig[1] - crop_y1
-                rel_x2 = box_orig[2] - crop_x1
-                rel_y2 = box_orig[3] - crop_x1
-                char_boxes_in_cropped.append([rel_x1, rel_y1, rel_x2, rel_y2])
-            new_data = {
-                "column_image": str(new_col_rel_path).replace("\\", "/"),
-                "original_image": original_img_path,
-                "box_in_original": [crop_x1, crop_y1, crop_x2, crop_y2],
-                "char_boxes_in_column": char_boxes_in_cropped,
-                "unicode_ids": u_ids,
-            }
-            return new_data, new_col_rel_path
-
-        new_col_data, new_col_path = recreate_column_after_delete(
-            new_char_boxes_orig, new_unicode_ids, original_image_path, column_path, ""
+        # --- 列を再生成 (共通ヘルパー関数を使用) ---
+        new_col_data, new_col_path = self._recreate_column_from_chars(
+            new_char_boxes_orig, new_unicode_ids, original_image_path, column_path, "_chardel"
         )
 
         if new_col_data is None:
@@ -1046,6 +1143,78 @@ class DataManager:
         self.changes_made = True
         print(f"Character {char_index_to_delete} deleted from {column_path}, recreated as {new_col_path}")
         return True
+
+    def _recreate_column_from_chars(self, chars_in_orig, u_ids, original_img_path, base_rel_path_str, suffix):
+        """
+        指定された元画像上の文字座標リストから新しい列データと列画像を生成する共通ヘルパー関数。
+        Returns: (new_column_data_dict, new_column_relative_path) or (None, None) on failure.
+        """
+        if not chars_in_orig:
+            return None, None
+
+        # 1. 新しい列のバウンディングボックス (元画像上、マージンなし)
+        new_col_bounds_no_margin = self._recalculate_column_bounds(chars_in_orig)
+        nc_x1, nc_y1, nc_x2, nc_y2 = new_col_bounds_no_margin
+
+        # 2. マージン追加と切り抜き座標計算
+        try:
+            orig_img_abs_path = self.get_original_image_abs_path(original_img_path)
+            if not orig_img_abs_path or not orig_img_abs_path.exists():
+                 raise FileNotFoundError(f"Original image not found: {orig_img_abs_path}")
+            orig_img = Image.open(orig_img_abs_path).convert("RGB")
+        except Exception as e:
+            print(f"Error opening original image {original_img_path}: {e}")
+            return None, None
+
+        margin = 5 # TODO: 設定可能にするか、より賢いマージン計算を検討
+        crop_x1 = max(0, int(nc_x1 - margin))
+        crop_y1 = max(0, int(nc_y1 - margin))
+        crop_x2 = min(orig_img.width, int(nc_x2 + margin))
+        crop_y2 = min(orig_img.height, int(nc_y2 + margin))
+
+        if crop_x1 >= crop_x2 or crop_y1 >= crop_y2:
+            print(f"Warning: Invalid crop region calculated for {base_rel_path_str}{suffix} ([{crop_x1},{crop_y1},{crop_x2},{crop_y2}])")
+            return None, None
+
+        # 3. 列画像切り出し
+        try:
+            new_col_img_pil = orig_img.crop((crop_x1, crop_y1, crop_x2, crop_y2))
+        except Exception as e:
+            print(f"Error cropping image for {base_rel_path_str}{suffix}: {e}")
+            return None, None
+
+        # 4. 新しい列画像のパス決定と保存
+        base_path = Path(base_rel_path_str)
+        # タイムスタンプにマイクロ秒まで含めてファイル名の衝突を避ける
+        timestamp = pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')
+        new_filename = f"{base_path.stem}{suffix}_{timestamp}.jpg"
+        new_col_rel_path = base_path.parent / new_filename
+        new_col_abs_path = self.processed_dir / new_col_rel_path
+        new_col_abs_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            new_col_img_pil.save(new_col_abs_path, "JPEG")
+        except Exception as e:
+            print(f"Error saving new column image {new_col_abs_path}: {e}")
+            return None, None
+
+        # 5. 列画像内の文字座標 (相対座標、マージン考慮)
+        char_boxes_in_cropped = []
+        for box_orig in chars_in_orig:
+            rel_x1 = box_orig[0] - crop_x1
+            rel_y1 = box_orig[1] - crop_y1
+            rel_x2 = box_orig[2] - crop_x1
+            rel_y2 = box_orig[3] - crop_y1 # ★タイポ修正済み
+            char_boxes_in_cropped.append([rel_x1, rel_y1, rel_x2, rel_y2])
+
+        # 6. 新しい行データ作成
+        new_data = {
+            "column_image": str(new_col_rel_path).replace("\\", "/"),
+            "original_image": original_img_path,
+            "box_in_original": [crop_x1, crop_y1, crop_x2, crop_y2], # マージン込みの切り抜き座標
+            "char_boxes_in_column": char_boxes_in_cropped, # 切り出した画像内での相対座標
+            "unicode_ids": u_ids,
+        }
+        return new_data, new_col_rel_path
 
     def save_changes(self):
         if not self.changes_made:
@@ -1097,11 +1266,15 @@ class AnnotatorApp:
         self.prev_button = ttk.Button(nav_frame, text="<< 前の画像", command=self.prev_image)
         self.prev_button.pack(side="left", padx=5)
         self.image_label = ttk.Label(nav_frame, text="画像: ", width=60, anchor="w")  # 幅調整
-        self.image_label.pack(side="left", padx=5, fill="x", expand=True)
+        self.image_label.pack(side="left", padx=5, fill="x", expand=True) # ラベルは中央で伸縮
         self.next_button = ttk.Button(nav_frame, text="次の画像 >>", command=self.next_image)
-        self.next_button.pack(side="left", padx=5)
+        self.next_button.pack(side="left", padx=5) # 次へボタンはラベルの右
+
+        # 右詰めの要素 (保存ボタンとページ情報)
+        self.page_info_label = ttk.Label(nav_frame, text="- / -", width=10, anchor="e") # ページ情報ラベル (右寄せ)
+        self.page_info_label.pack(side="right", padx=5)
         self.save_button = ttk.Button(nav_frame, text="変更を保存", command=self.save_all_changes)
-        self.save_button.pack(side="left", padx=10)
+        self.save_button.pack(side="right", padx=5) # 保存ボタンはページ情報の左
 
         # --- 左: 元画像表示 ---
         orig_frame = ttk.LabelFrame(main_frame, text="元画像と列範囲")
@@ -1128,8 +1301,10 @@ class AnnotatorApp:
 
         self.merge_button = ttk.Button(op_buttons_frame, text="結合", command=self.merge_selected_columns)
         self.merge_button.pack(side="left", padx=2, fill="x", expand=True)
-        self.split_button = ttk.Button(op_buttons_frame, text="分割", command=self.split_selected_column)
+        self.split_button = ttk.Button(op_buttons_frame, text="1点分割", command=self.split_selected_column) # 名前変更
         self.split_button.pack(side="left", padx=2, fill="x", expand=True)
+        self.split_selection_button = ttk.Button(op_buttons_frame, text="選択分割", command=self.split_column_by_selection) # ★追加
+        self.split_selection_button.pack(side="left", padx=2, fill="x", expand=True) # ★追加
         self.move_char_button = ttk.Button(op_buttons_frame, text="文字移動", command=self.initiate_move_character)
         self.move_char_button.pack(side="left", padx=2, fill="x", expand=True)
         self.delete_col_button = ttk.Button(op_buttons_frame, text="列削除", command=self.delete_selected_column)
@@ -1204,9 +1379,22 @@ class AnnotatorApp:
         self.moving_characters_info = None  # 移動状態をリセット
 
         current_image_path = self.data_manager.current_original_image
-        if not current_image_path:
+        all_images = self.data_manager.get_original_images()
+        total_pages = len(all_images)
+
+        if not current_image_path or not all_images:
             self.image_label.config(text="画像: (データなし)")
+            self.page_info_label.config(text="0 / 0") # ページ情報も更新
             return
+        else:
+            try:
+                current_page_index = all_images.index(current_image_path)
+                current_page_num = current_page_index + 1
+                self.page_info_label.config(text=f"{current_page_num} / {total_pages}")
+            except ValueError:
+                # current_image_path がリストにない場合 (通常は起こらないはず)
+                self.image_label.config(text=f"画像: {current_image_path} (リストに不整合?)")
+                self.page_info_label.config(text=f"? / {total_pages}")
 
         # ラベル更新 (パスが長すぎる場合があるので調整)
         label_path = Path(current_image_path)
@@ -1242,7 +1430,7 @@ class AnnotatorApp:
             )
             columns_df = columns_df.sort_values("sort_key")
 
-            colors = ["red", "green", "blue", "yellow", "purple", "cyan", "magenta", "orange"]
+            colors = ["orange", "yellow", "green", "cyan", "blue", "purple", "magenta"]
             for i, (_, row) in enumerate(columns_df.iterrows()):
                 col_rel_path = row["column_image"]
                 # リストボックスに追加 (表示名と実際のパスを保持)
@@ -1262,8 +1450,8 @@ class AnnotatorApp:
                         y1=col_box[1],
                         x2=col_box[2],
                         y2=col_box[3],
-                        color="blue",
-                        width=1,
+                        color=colors[i % len(colors)],
+                        width=1,  # ボックスの幅
                     )
                 else:
                     print(f"Warning: Invalid or malformed column box format for {col_path_rel}: {col_box}. Skipping drawing.")
@@ -1275,10 +1463,12 @@ class AnnotatorApp:
         if self.column_listbox.size() > 0:
             self.column_listbox.selection_clear(0, tk.END) # 念のため選択解除
             self.column_listbox.selection_set(0)
+            self.column_listbox.selection_anchor(0) # ★範囲選択のアンカーも設定
             self.column_listbox.event_generate("<<ListboxSelect>>") # 選択イベントを発火
 
-        # リストボックスにフォーカスを設定して上下キー操作を可能にする
-        self.column_listbox.focus_set()
+        # アイドルタスクを処理し、フォーカスを強制的に設定
+        self.root.update_idletasks() # GUI更新を待機
+        self.column_listbox.focus_force() # フォーカスを強制設定
 
     def on_column_select(self, event=None):
         """リストボックスで列が選択されたときの処理"""
@@ -1330,7 +1520,7 @@ class AnnotatorApp:
                             # タグとして (列パス, 文字インデックス) を使う (より詳細な識別のため)
                             char_tag = f"char_{i}"  # シンプルにインデックスのみ
                             self.detail_canvas.add_box(
-                                tag=char_tag, x1=x1, y1=y1, x2=x2, y2=y2, color="green", width=1, text=f"{i}:{uid}"
+                                tag=char_tag, x1=x1, y1=y1, x2=x2, y2=y2, color="green", width=1, text=f"{unicode_to_char(uid)}"
                             )
                         else:
                             print(f"Warning: Invalid char box format for index {i} in {column_rel_path}: {box}")
@@ -1372,6 +1562,14 @@ class AnnotatorApp:
         self.split_button.config(
             state=tk.NORMAL
             if num_selected_cols == 1 and num_selected_chars == 1 and self.current_detail_column_path
+            else tk.DISABLED
+        )
+        # 選択分割: 1つの列を選択し、詳細表示で1つ以上かつ全部未満の文字を選択
+        col_data = self.data_manager.get_column_data(self.current_detail_column_path) if self.current_detail_column_path else None
+        total_chars = len(col_data.get("unicode_ids", [])) if col_data else 0
+        self.split_selection_button.config(
+            state=tk.NORMAL
+            if num_selected_cols == 1 and self.current_detail_column_path and 0 < num_selected_chars < total_chars
             else tk.DISABLED
         )
         # 文字移動開始: 詳細表示で1つ以上の文字を選択
@@ -1419,6 +1617,40 @@ class AnnotatorApp:
         success = self.data_manager.split_column(self.current_detail_column_path, split_char_index)
         if success:
             self.load_current_image_data()
+
+    def split_column_by_selection(self):
+        """詳細表示で選択された文字に基づいて列を分割する"""
+        if len(self.selected_column_paths) != 1 or not self.current_detail_column_path:
+            messagebox.showerror("エラー", "選択分割を行うには、列リストで列を1つだけ選択してください。")
+            return
+        selected_char_tags = self.detail_canvas.get_selected_tags()
+        if not selected_char_tags:
+            messagebox.showerror("エラー", "分割する文字が選択されていません。詳細表示で文字をクリックして選択してください。")
+            return
+
+        # タグ 'char_i' からインデックス i を抽出
+        try:
+            selected_char_indices = [int(tag.split("_")[1]) for tag in selected_char_tags]
+            selected_char_indices.sort() # 念のためソート
+        except (IndexError, ValueError):
+            messagebox.showerror("エラー", "選択された文字のタグからインデックスを取得できませんでした。")
+            return
+
+        # 全ての文字が選択されていないか確認
+        col_data = self.data_manager.get_column_data(self.current_detail_column_path)
+        if col_data and len(selected_char_indices) == len(col_data.get("unicode_ids", [])):
+             messagebox.showerror("エラー", "全ての文字が選択されています。分割できません。")
+             return
+
+        confirm = messagebox.askyesno(
+            "選択分割確認",
+            f"列 '{Path(self.current_detail_column_path).name}' を、選択された {len(selected_char_indices)} 文字のグループと、\n"
+            f"残りの文字のグループの2つに分割しますか？"
+        )
+        if confirm:
+            success = self.data_manager.split_column_by_selection(self.current_detail_column_path, selected_char_indices)
+            if success:
+                self.load_current_image_data() # 表示更新
 
     def initiate_move_character(self):
         if not self.current_detail_column_path:
