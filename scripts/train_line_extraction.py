@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 from ultralytics import YOLO
 
-from utils.util import EasyDict
+from src.utils.util import EasyDict
 
 
 def get_project_root():
@@ -19,8 +19,8 @@ def main():
     os.chdir(get_project_root())
 
     # 設定の読み込み
-    with open("config/model/line_extraction.yaml", encoding="utf-8") as f:
-        config = EasyDict(yaml.safe_load(f))  # EasyDictでラップ
+    with open("src/configs/model/line_extraction.yaml", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
 
     # 実験ディレクトリの設定
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -31,6 +31,8 @@ def main():
     with open(exp_dir / "config.yaml", "w", encoding="utf-8") as f:
         yaml.dump(config, f)
 
+    config = EasyDict(config)
+
     # モデルの準備
     model = YOLO(f"{config.model.backbone}")  # YOLOモデルをロード
 
@@ -39,9 +41,10 @@ def main():
 
     # 学習の設定
     train_args = {
-        "data": "config/data/line_extraction.yaml",  # データセット設定ファイル（相対パス）
+        "data": "src/configs/data/line_extraction.yaml",
         "epochs": config.training.scheduler.total_epochs,
-        "batch": -1,  # config.training.batch_size,
+        "batch": config.training.batch_size,
+        "patience": config.training.patience,
         "imgsz": config.model.input_size[0],
         "device": 0,
         "workers": 24,

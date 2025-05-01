@@ -164,8 +164,10 @@ Thumbs.db
 memory-bank/
 data/raw/
 data/processed/
+data/processed_padded/
 data/column_dataset/
 data/yolo_dataset_page_images_by_book/
+data/visualize/
 data/*.zip
 experiments/*/
 !experiments/.gitkeep

@@ -11,7 +11,7 @@ import yaml
 from PIL import Image, ImageDraw, ImageFont
 from ultralytics import YOLO
 
-from utils.util import EasyDict  # EasyDictをインポート
+from src.utils.util import EasyDict  # EasyDictをインポート
 
 
 def load_config(config_path: str) -> EasyDict:  # 型ヒントをEasyDictに変更
@@ -160,7 +160,7 @@ def create_gradio_interface(model_path: str):
 def main():
     try:
         parser = argparse.ArgumentParser(description="くずし字行検出可視化アプリケーション")
-        parser.add_argument("--config", type=str, default="config/inference.yaml", help="設定ファイルのパス")
+        parser.add_argument("--config", type=str, default="src/configs/inference.yaml", help="設定ファイルのパス")
         parser.add_argument("--model_path", type=str, help="モデルファイルのパス（設定ファイルの値を上書きします）")
         parser.add_argument("--port", type=int, default=7860, help="Gradioインターフェースのポート番号")
         parser.add_argument("--share", action="store_true", help="Gradioインターフェースを外部に公開するかどうか")
