@@ -14,7 +14,7 @@ training:
   scheduler:
     type: "cosine"
     warmup_epochs: 10
-    total_epochs: 1000
+    total_epochs: 100
 
 augmentation:
   horizontal_flip: false  # 日本語の文書なので水平方向の反転は不要

@@ -388,9 +388,9 @@ if __name__ == "__main__":
     # 出力ディレクトリ名を変更して、以前のスクリプトの出力と区別する
     OUTPUT_YOLO_DIR = "data/yolo_dataset_page_images_by_book"
     # 指定された書籍数
-    TRAIN_DOCS_COUNT = 27
-    VAL_DOCS_COUNT = 4
-    TEST_DOCS_COUNT = 3
+    TRAIN_DOCS_COUNT = 31
+    VAL_DOCS_COUNT = 7
+    TEST_DOCS_COUNT = 6
     RANDOM_SEED = 42
     CLASS_ID = 0  # 列検出タスクなのでクラスは1つ (0)
     # -------------
