@@ -44,7 +44,28 @@ from PIL import Image, ImageDraw, ImageFont, ImageTk
 
 # from skimage.transform import resize # 不要
 
-CSV_PATH = Path("data/processed/100241706_annotations.csv")
+# ベースとなるディレクトリを指定
+base_dir = Path("data/processed")
+
+# パターンを指定 (ベースディレクトリからの相対)
+pattern = "*_annotations.csv"
+
+# パターンに一致するファイルのパスを取得 (Pathオブジェクトのイテレータが返される)
+# list() でリストに変換するか、ループで直接処理できる
+try:
+    # ディレクトリが存在するか確認してからglobを実行するとより安全
+    if base_dir.is_dir():
+        file_paths = list(base_dir.glob(pattern))
+
+    else:
+        print(f"ディレクトリ '{base_dir}' が存在しません。")
+        # カレントディレクトリを確認してみる (デバッグ用)
+        # print(f"現在の作業ディレクトリ: {os.getcwd()}")
+
+except Exception as e:
+    print(f"エラーが発生しました: {e}")
+
+CSV_PATH = file_paths[0] if file_paths else None
 
 # --- ヘルパー関数 (変更なし) ---
 def unicode_to_char(unicode_str):
