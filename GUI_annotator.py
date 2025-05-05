@@ -682,57 +682,40 @@ class DataManager:
              messagebox.showerror("エラー", "文字座標のソート中にエラーが発生しました。データ形式を確認してください。")
              return False
 
-        # ★変更: 新しい列データ生成を _recreate_column_from_chars に任せる
-        base_rel_path_str = column_paths_to_merge[0] # 新ファイル名のベース
-        suffix = "_merged"
-        new_column_data, new_column_rel_path = self._recreate_column_from_chars(
-            all_char_boxes_in_orig, all_unicode_ids, original_image_path, base_rel_path_str, suffix
-        )
-
-        if new_column_data is None:
-            # _recreate_column_from_chars 内でエラーメッセージ表示されるはず
-            return False
-
-        # --- DataFrameの更新 (エラー発生しないように最後に実行) ---
+        # --- DataFrameの更新 ---
         try:
+            # 結合後の新しい列の box_in_original を計算
+            new_col_box_orig = self._recalculate_column_bounds(all_char_boxes_in_orig)
+
+            # DataFrameから元の列を削除
             indices_to_drop = self.df[self.df["column_image"].isin(column_paths_to_merge)].index
             self.df = self.df.drop(indices_to_drop).reset_index(drop=True) # インデックス再構築
 
-            new_row_df = pd.DataFrame([new_column_data])
+            # 新しい結合列の行データを作成 (column_image は仮の値、save_changes で更新される)
+            # char_boxes_in_column は元画像上の絶対座標で保持しておく (save_changes で列画像内の相対座標に変換)
+            new_data = {
+                "column_image": f"temp_merged_{pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')}.jpg", # 仮のパス
+                "original_image": original_image_path,
+                "box_in_original": new_col_box_orig, # 結合後の新しい列の範囲 (マージンなし)
+                "char_boxes_in_column": all_char_boxes_in_orig, # 元画像上の絶対座標で保持
+                "unicode_ids": all_unicode_ids,
+                # TODO: 他の列があればデフォルト値などを設定
+            }
+
+            # 新しい行をDataFrameに追加
+            new_row_df = pd.DataFrame([new_data])
             self.df = pd.concat([self.df, new_row_df], ignore_index=True)
+
         except Exception as e:
              messagebox.showerror("エラー", f"DataFrameの更新中にエラーが発生しました: {e}")
-             # ★変更: 失敗した場合、生成した新しいファイルを削除すべきか？ -> ここではしないでおく
+             print(f"Error updating DataFrame during merge: {e}")
+             import traceback
+             traceback.print_exc()
              return False
-
-        # --- ★変更: 元の列画像ファイルを backup ディレクトリに移動 ---
-        backup_paths = []
-        move_errors = []
-        for path_rel in column_paths_to_merge:
-            src_abs_path = self.get_column_abs_path(path_rel)
-            # backup ディレクトリ内に元の相対パス構造を再現
-            backup_dest_path = self.backup_dir / path_rel
-            backup_dest_path.parent.mkdir(parents=True, exist_ok=True)
-            try:
-                if src_abs_path.exists():
-                    shutil.move(str(src_abs_path), str(backup_dest_path))
-                    backup_paths.append(str(backup_dest_path))
-                    # 元のディレクトリが空になったら削除 (オプション)
-                    # if not any(src_abs_path.parent.iterdir()):
-                    #     try: shutil.rmtree(src_abs_path.parent)
-                    #     except OSError: pass # 無視
-            except Exception as e:
-                move_errors.append(f"Could not move {path_rel} to backup: {e}")
-
-        if move_errors:
-             print("Warning: Errors occurred during backup file moving:\n" + "\n".join(move_errors))
-             # ここで処理を中断すべきか？ -> 続行する
 
         # 変更を記録
         self.changed_image_paths.add(original_image_path)
-        print(f"Columns {column_paths_to_merge} merged into: {new_column_rel_path}")
-        if backup_paths:
-            print(f"Moved original column images to backup: {len(backup_paths)} files.")
+        print(f"Columns {column_paths_to_merge} merged. DataFrame updated.")
         return True
 
     def split_column(self, column_path_to_split, split_index):
@@ -778,57 +761,51 @@ class DataManager:
             messagebox.showerror("エラー", "分割後の列が空になります。")
             return False
 
-        # --- 新しい列を生成 ---
-        new_data1, new_path1 = self._recreate_column_from_chars(
-            chars_orig1, ids1, original_image_path, column_path_to_split, "_splitA"
-        )
-        # new_data1 が None の場合、ここで return False する前に path1 を削除する必要はない
-        # _recreate_column_from_chars が失敗した場合、ファイルは作られないか、作られてもパスは返さない想定
-        if new_data1 is None: return False
-
-        new_data2, new_path2 = self._recreate_column_from_chars(
-            chars_orig2, ids2, original_image_path, column_path_to_split, "_splitB"
-        )
-        if new_data2 is None:
-            # 失敗した場合、成功した最初の列のファイルを削除するロールバック処理が必要
-            if new_path1:
-                try: os.remove(self.processed_dir / new_path1)
-                except OSError as e: print(f"Warning: Could not remove partially created file {new_path1}: {e}")
-            return False
-
-        # --- DataFrameの更新 (最後に実行) ---
+        # --- DataFrameの更新 ---
         try:
+            # 分割後の新しい列の box_in_original を計算
+            new_col_box_orig1 = self._recalculate_column_bounds(chars_orig1)
+            new_col_box_orig2 = self._recalculate_column_bounds(chars_orig2)
+
+            # DataFrameから元の列を削除
             index_to_drop = self.df[self.df["column_image"] == column_path_to_split].index
+            if index_to_drop.empty:
+                messagebox.showerror("エラー", f"DataFrameから削除する列が見つかりません: {column_path_to_split}"); return False
             self.df = self.df.drop(index_to_drop).reset_index(drop=True)
+
+            # 新しい分割列の行データを作成 (column_image は仮の値、save_changes で更新される)
+            # char_boxes_in_column は元画像上の絶対座標で保持しておく (save_changes で列画像内の相対座標に変換)
+            new_data1 = {
+                "column_image": f"temp_splitA_{pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')}.jpg", # 仮のパス
+                "original_image": original_image_path,
+                "box_in_original": new_col_box_orig1, # 分割後の新しい列の範囲 (マージンなし)
+                "char_boxes_in_column": chars_orig1, # 元画像上の絶対座標で保持
+                "unicode_ids": ids1,
+                # TODO: 他の列があればデフォルト値などを設定
+            }
+            new_data2 = {
+                "column_image": f"temp_splitB_{pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')}.jpg", # 仮のパス
+                "original_image": original_image_path,
+                "box_in_original": new_col_box_orig2, # 分割後の新しい列の範囲 (マージンなし)
+                "char_boxes_in_column": chars_orig2, # 元画像上の絶対座標で保持
+                "unicode_ids": ids2,
+                # TODO: 他の列があればデフォルト値などを設定
+            }
+
             new_rows_df = pd.DataFrame([new_data1, new_data2])
             self.df = pd.concat([self.df, new_rows_df], ignore_index=True)
+
         except Exception as e:
             messagebox.showerror("エラー", f"DataFrameの更新中にエラーが発生しました: {e}")
-            # ロールバック: 作成したファイルを削除
-            if new_path1:
-                try:
-                    os.remove(self.processed_dir / new_path1)
-                except OSError as e:
-                    print(f"Warning: Could not remove partially created file {new_path1}: {e}")
-            if new_path2:
-                try:
-                    os.remove(self.processed_dir / new_path2)
-                except OSError as e:
-                    print(f"Warning: Could not remove partially created file {new_path2}: {e}")
+            print(f"Error updating DataFrame during split: {e}")
+            import traceback
+            traceback.print_exc()
             return False
 
-        # --- 元の列画像ファイルを削除 (オプションだが、現在の仕様) ---
-        try:
-            abs_path_to_delete = self.get_column_abs_path(column_path_to_split)
-            if abs_path_to_delete.exists():
-                os.remove(abs_path_to_delete)
-                print(f"Deleted old column image: {abs_path_to_delete}")
-        except Exception as e:
-            print(f"Warning: Could not delete old column image {column_path_to_split}: {e}")
-
         # 変更を記録
+        # 元の列画像ファイルの削除は save_changes で行う
         self.changed_image_paths.add(original_image_path)
-        print(f"Column {column_path_to_split} split into {new_path1} and {new_path2}")
+        print(f"Column {column_path_to_split} split. DataFrame updated.")
         return True
 
     def split_column_by_selection(self, column_path_to_split, selected_char_indices):
@@ -878,55 +855,51 @@ class DataManager:
                 ids_other = [ids_other[i] for i in sorted_indices_oth]
         except IndexError: messagebox.showerror("エラー", "文字座標のソート中にエラーが発生しました。"); return False
 
-        # --- 新しい列を生成 ---
-        new_data_sel, new_path_sel = self._recreate_column_from_chars(
-            chars_orig_selected, ids_selected, original_image_path, column_path_to_split, "_selA"
-        )
-        if new_data_sel is None: return False
-
-        new_data_oth, new_path_oth = self._recreate_column_from_chars(
-            chars_orig_other, ids_other, original_image_path, column_path_to_split, "_selB"
-        )
-        if new_data_oth is None:
-            if new_path_sel:
-                try:
-                    os.remove(self.processed_dir / new_path_sel)
-                except OSError:
-                    print(f"Warning: Could not remove partially created file {new_path_sel}")
-            return False
-
-        # --- DataFrameの更新 (最後に実行) ---
+        # --- DataFrameの更新 ---
         try:
+            # 分割後の新しい列の box_in_original を計算
+            new_col_box_orig_sel = self._recalculate_column_bounds(chars_orig_selected)
+            new_col_box_orig_oth = self._recalculate_column_bounds(chars_orig_other)
+
+            # DataFrameから元の列を削除
             index_to_drop = self.df[self.df["column_image"] == column_path_to_split].index
+            if index_to_drop.empty:
+                messagebox.showerror("エラー", f"DataFrameから削除する列が見つかりません: {column_path_to_split}"); return False
             self.df = self.df.drop(index_to_drop).reset_index(drop=True)
+
+            # 新しい分割列の行データを作成 (column_image は仮の値、save_changes で更新される)
+            # char_boxes_in_column は元画像上の絶対座標で保持しておく (save_changes で列画像内の相対座標に変換)
+            new_data_sel = {
+                "column_image": f"temp_selA_{pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')}.jpg", # 仮のパス
+                "original_image": original_image_path,
+                "box_in_original": new_col_box_orig_sel, # 分割後の新しい列の範囲 (マージンなし)
+                "char_boxes_in_column": chars_orig_selected, # 元画像上の絶対座標で保持
+                "unicode_ids": ids_selected,
+                # TODO: 他の列があればデフォルト値などを設定
+            }
+            new_data_oth = {
+                "column_image": f"temp_selB_{pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')}.jpg", # 仮のパス
+                "original_image": original_image_path,
+                "box_in_original": new_col_box_orig_oth, # 分割後の新しい列の範囲 (マージンなし)
+                "char_boxes_in_column": chars_orig_other, # 元画像上の絶対座標で保持
+                "unicode_ids": ids_other,
+                # TODO: 他の列があればデフォルト値などを設定
+            }
+
             new_rows_df = pd.DataFrame([new_data_sel, new_data_oth])
             self.df = pd.concat([self.df, new_rows_df], ignore_index=True)
+
         except Exception as e:
             messagebox.showerror("エラー", f"DataFrameの更新中にエラーが発生しました: {e}")
-            if new_path_sel:
-                try:
-                    os.remove(self.processed_dir / new_path_sel)
-                except OSError:
-                    pass
-            if new_path_oth:
-                try:
-                    os.remove(self.processed_dir / new_path_oth)
-                except OSError:
-                    pass
+            print(f"Error updating DataFrame during split by selection: {e}")
+            import traceback
+            traceback.print_exc()
             return False
 
-        # --- 元の列画像ファイルを削除 ---
-        try:
-            abs_path_to_delete = self.get_column_abs_path(column_path_to_split)
-            if abs_path_to_delete.exists():
-                os.remove(abs_path_to_delete)
-                print(f"Deleted old column image: {abs_path_to_delete}")
-        except Exception as e:
-            print(f"Warning: Could not delete old column image {column_path_to_split}: {e}")
-
         # 変更を記録
+        # 元の列画像ファイルの削除は save_changes で行う
         self.changed_image_paths.add(original_image_path)
-        print(f"Column {column_path_to_split} split by selection into {new_path_sel} and {new_path_oth}")
+        print(f"Column {column_path_to_split} split by selection. DataFrame updated.")
         return True
 
     def move_characters(self, src_column_path, target_column_path, char_indices_to_move):
@@ -979,73 +952,59 @@ class DataManager:
         except (TypeError, IndexError, KeyError, ValueError) as e:
             messagebox.showerror("エラー", f"データ処理中にエラーが発生しました: {e}"); return False
 
-        # --- 列再生成 ---
-        # 移動元 (空でも _recreate は None を返すのでOK)
-        new_src_data, new_src_path = self._recreate_column_from_chars(
-            remaining_src_chars_orig, remaining_src_ids, original_image_path, src_column_path, "_move_src"
-        )
-        # new_src_data が None でも致命的ではない場合がある (元が空になっただけ) が、
-        # _recreate が None を返すのは通常エラーなので、ここで中断する方が安全
-        if remaining_src_chars_orig and new_src_data is None:
-            messagebox.showerror("エラー", "移動元の列の再生成に失敗しました。"); return False
-
-        # 移動先
-        new_tgt_data, new_tgt_path = self._recreate_column_from_chars(
-            final_tgt_chars_orig, final_tgt_ids, original_image_path, target_column_path, "_move_tgt"
-        )
-        if new_tgt_data is None:
-             messagebox.showerror("エラー", "移動先の列の再生成に失敗しました。")
-             # ロールバック: 移動元のファイル(もし作られていたら)を削除
-             if new_src_path:
-                try:
-                    os.remove(self.processed_dir / new_src_path)
-                except OSError as e:
-                    print(f"Warning: Could not remove partially created file {new_src_path}: {e}")
-             return False
-
-        # --- DataFrame更新 (最後に実行) ---
+        # --- DataFrame更新 ---
         try:
+            # 移動元列の新しい box_in_original を計算 (文字が残っている場合のみ)
+            new_src_box_orig = self._recalculate_column_bounds(remaining_src_chars_orig) if remaining_src_chars_orig else None
+
+            # 移動先列の新しい box_in_original を計算
+            new_tgt_box_orig = self._recalculate_column_bounds(final_tgt_chars_orig)
+
+            # DataFrameから元の列を削除
             indices_to_drop = self.df[
                 (self.df["column_image"] == src_column_path) | (self.df["column_image"] == target_column_path)
             ].index
+            if indices_to_drop.empty:
+                messagebox.showerror("エラー", f"DataFrameから削除する列が見つかりません: {src_column_path}, {target_column_path}"); return False
             self.df = self.df.drop(indices_to_drop).reset_index(drop=True)
 
+            # 新しい行データを作成 (column_image は仮の値、save_changes で更新される)
             new_rows = []
-            if new_src_data: new_rows.append(new_src_data) # 移動元が空でなければ追加
-            new_rows.append(new_tgt_data) # 移動先は必ず追加
+            if remaining_src_chars_orig: # 移動元に文字が残っている場合のみ新しい行を作成
+                new_src_data = {
+                    "column_image": f"temp_move_src_{pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')}.jpg", # 仮のパス
+                    "original_image": original_image_path,
+                    "box_in_original": new_src_box_orig, # 新しい列の範囲 (マージンなし)
+                    "char_boxes_in_column": remaining_src_chars_orig, # 元画像上の絶対座標で保持
+                    "unicode_ids": remaining_src_ids,
+                    # TODO: 他の列があればデフォルト値などを設定
+                }
+                new_rows.append(new_src_data)
+
+            new_tgt_data = {
+                "column_image": f"temp_move_tgt_{pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')}.jpg", # 仮のパス
+                "original_image": original_image_path,
+                "box_in_original": new_tgt_box_orig, # 新しい列の範囲 (マージンなし)
+                "char_boxes_in_column": final_tgt_chars_orig, # 元画像上の絶対座標で保持
+                "unicode_ids": final_tgt_ids,
+                # TODO: 他の列があればデフォルト値などを設定
+            }
+            new_rows.append(new_tgt_data)
 
             new_rows_df = pd.DataFrame(new_rows)
             self.df = pd.concat([self.df, new_rows_df], ignore_index=True)
+
         except Exception as e:
             messagebox.showerror("エラー", f"DataFrameの更新中にエラーが発生しました: {e}")
-            # ロールバック: 作成したファイルを削除
-            if new_src_path:
-                try:
-                    os.remove(self.processed_dir / new_src_path)
-                except OSError as e:
-                    print(f"Warning: Could not remove partially created file {new_src_path}: {e}")
-            if new_tgt_path:
-                try:
-                    os.remove(self.processed_dir / new_tgt_path)
-                except OSError as e:
-                    print(f"Warning: Could not remove partially created file {new_tgt_path}: {e}")
+            print(f"Error updating DataFrame during move characters: {e}")
+            import traceback
+            traceback.print_exc()
             return False
 
-        # --- 古い画像削除 ---
-        delete_errors = []
-        try:
-            src_abs = self.get_column_abs_path(src_column_path)
-            if src_abs.exists(): os.remove(src_abs); print(f"Deleted old column image: {src_column_path}")
-        except Exception as e: delete_errors.append(f"Could not delete {src_column_path}: {e}")
-        try:
-            tgt_abs = self.get_column_abs_path(target_column_path)
-            if tgt_abs.exists(): os.remove(tgt_abs); print(f"Deleted old column image: {target_column_path}")
-        except Exception as e: delete_errors.append(f"Could not delete {target_column_path}: {e}")
-        if delete_errors: print("Warning: Errors during old file deletion:\n" + "\n".join(delete_errors))
-
         # 変更を記録
+        # 元の列画像ファイルの削除は save_changes で行う
         self.changed_image_paths.add(original_image_path)
-        print(f"Characters moved from {src_column_path} to {new_tgt_path or 'None'}")
+        print(f"Characters moved from {src_column_path} to {target_column_path}. DataFrame updated.")
         return True
 
     def delete_column(self, column_path_to_delete):
@@ -1120,51 +1079,39 @@ class DataManager:
             # delete_column を呼び出すと、その中で DataFrame 更新とファイル削除が行われる
             return self.delete_column(column_path)
 
-        # --- 文字が残っている場合 -> 列を再生成 ---
+        # --- 文字が残っている場合 -> DataFrameを更新 ---
         try:
+            # 元画像上の絶対座標を取得
             crop_x1_orig, crop_y1_orig, _, _ = col_box_orig_crop
             new_char_boxes_orig = []
             for box_col in new_char_boxes_col:
                 orig_x1 = box_col[0] + crop_x1_orig; orig_y1 = box_col[1] + crop_y1_orig
                 orig_x2 = box_col[2] + crop_x1_orig; orig_y2 = box_col[3] + crop_y1_orig
                 new_char_boxes_orig.append([orig_x1, orig_y1, orig_x2, orig_y2])
-        except Exception as e:
-            messagebox.showerror("エラー", f"文字座標の計算中にエラーが発生しました: {e}"); return False
 
-        # 列を再生成
-        new_col_data, new_col_path = self._recreate_column_from_chars(
-            new_char_boxes_orig, new_unicode_ids, original_image_path, column_path, "_chardel"
-        )
-        if new_col_data is None:
-            messagebox.showerror("Error", "Failed to recreate column after deleting character."); return False
+            # 新しい列の box_in_original を計算
+            new_col_box_orig = self._recalculate_column_bounds(new_char_boxes_orig)
 
-        # --- DataFrame Update (最後に実行) ---
-        try:
-            index_to_drop = self.df[self.df["column_image"] == column_path].index
-            self.df = self.df.drop(index_to_drop).reset_index(drop=True)
-            new_row_df = pd.DataFrame([new_col_data])
-            self.df = pd.concat([self.df, new_row_df], ignore_index=True)
+            # DataFrameの該当行を更新
+            row_index = self.df[self.df["column_image"] == column_path].index
+            if row_index.empty:
+                messagebox.showerror("Error", f"Column data not found in DataFrame for update: {column_path}"); return False
+
+            self.df.loc[row_index, "box_in_original"] = [new_col_box_orig] # リストでラップ
+            self.df.loc[row_index, "char_boxes_in_column"] = [new_char_boxes_orig] # リストでラップ
+            self.df.loc[row_index, "unicode_ids"] = [new_unicode_ids] # リストでラップ
+
         except Exception as e:
             messagebox.showerror("Error", f"DataFrame update failed after char delete: {e}")
-            if new_col_path:
-                try:
-                    os.remove(self.processed_dir / new_col_path)
-                except OSError as e:
-                    print(f"Warning: Could not remove new column image {new_col_path}: {e}")
+            print(f"Error updating DataFrame: {e}")
+            import traceback
+            traceback.print_exc()
             return False
 
-        # --- Delete old image ---
-        try:
-            old_abs_path = self.get_column_abs_path(column_path)
-            if old_abs_path.exists():
-                os.remove(old_abs_path)
-                print(f"Deleted old column image: {column_path}")
-        except Exception as e:
-            print(f"Warning: could not delete old image {column_path}: {e}")
-
         # 変更を記録
+        # 列画像の再生成/削除は save_changes で行う
         self.changed_image_paths.add(original_image_path)
-        print(f"Character {char_index_to_delete} deleted from {column_path}, recreated as {new_col_path}")
+        print(f"Character {char_index_to_delete} deleted from {column_path}. DataFrame updated.")
         return True
 
     # ★新規追加: 文字追加メソッド
@@ -1214,40 +1161,38 @@ class DataManager:
             final_unicode_ids = [all_unicode_ids[i] for i in sorted_indices]
         except IndexError: messagebox.showerror("エラー", "文字座標のソート中にエラーが発生しました。"); return False
 
-        # --- 列を再生成 ---
-        new_col_data, new_col_path = self._recreate_column_from_chars(
-            final_char_boxes_orig, final_unicode_ids, original_image_path, column_path, "_charadd"
-        )
-        if new_col_data is None:
-            messagebox.showerror("Error", "Failed to recreate column after adding character."); return False
-
-        # --- DataFrame Update (最後に実行) ---
+        # --- DataFrame Update ---
         try:
-            index_to_drop = self.df[self.df["column_image"] == column_path].index
-            self.df = self.df.drop(index_to_drop).reset_index(drop=True)
-            new_row_df = pd.DataFrame([new_col_data])
-            self.df = pd.concat([self.df, new_row_df], ignore_index=True)
+            # 元画像上の絶対座標から列画像内の相対座標に変換
+            crop_x1_orig, crop_y1_orig, _, _ = col_box_orig_crop
+            final_char_boxes_col = []
+            for box_orig in final_char_boxes_orig:
+                rel_x1 = int(box_orig[0] - crop_x1_orig)
+                rel_y1 = int(box_orig[1] - crop_y1_orig)
+                rel_x2 = int(box_orig[2] - crop_x1_orig)
+                rel_y2 = int(box_orig[3] - crop_y1_orig)
+                final_char_boxes_col.append([rel_x1, rel_y1, rel_x2, rel_y2])
+
+            # DataFrameの該当行を更新
+            # column_path に一致する行を見つける
+            row_index = self.df[self.df["column_image"] == column_path].index
+            if row_index.empty:
+                 messagebox.showerror("Error", f"Column data not found in DataFrame for update: {column_path}"); return False
+
+            # inplace=True は非推奨なので、iloc を使って更新
+            self.df.loc[row_index, "char_boxes_in_column"] = [final_char_boxes_col] # リストでラップする必要がある
+            self.df.loc[row_index, "unicode_ids"] = [final_unicode_ids] # リストでラップする必要がある
+
         except Exception as e:
             messagebox.showerror("Error", f"DataFrame update failed after char add: {e}")
-            if new_col_path:
-                try:
-                    os.remove(self.processed_dir / new_col_path)
-                except OSError as e:
-                    print(f"Warning: Could not remove partially created file {new_col_path}: {e}")
+            print(f"Error updating DataFrame: {e}")
+            import traceback
+            traceback.print_exc()
             return False
-
-        # --- Delete old image ---
-        try:
-            old_abs_path = self.get_column_abs_path(column_path)
-            if old_abs_path.exists():
-                os.remove(old_abs_path)
-                print(f"Deleted old column image: {column_path}")
-        except Exception as e:
-            print(f"Warning: could not delete old image {column_path}: {e}")
 
         # 変更を記録
         self.changed_image_paths.add(original_image_path)
-        print(f"Character '{new_unicode_id}' added to {column_path}, recreated as {new_col_path}")
+        print(f"Character '{new_unicode_id}' added to {column_path}. DataFrame updated.")
         return True
 
     # ★新規追加: 列追加メソッド
@@ -1255,97 +1200,40 @@ class DataManager:
         """
         指定された元画像に新しい列を追加する。
         new_box_in_original: [x1, y1, x2, y2] (元画像上の絶対座標、マージンなし)
+        DataFrameに新しい行を追加するのみで、画像ファイルの生成は save_changes で行う。
         """
         if not isinstance(new_box_in_original, list) or len(new_box_in_original) != 4:
             messagebox.showerror("エラー", "新しい列の座標形式が無効です。", parent=None) # GUIがない場合もあるので parent=None
             return False
 
-        nc_x1, nc_y1, nc_x2, nc_y2 = new_box_in_original
+        # 元画像ファイルの存在チェックは save_changes で行うためここではスキップ
 
-        # 1. 元画像を開く
-        orig_img_abs_path = self.get_original_image_abs_path(original_image_path)
-        if not orig_img_abs_path or not orig_img_abs_path.exists():
-             messagebox.showerror("エラー", f"元画像ファイルが見つかりません:\n{orig_img_abs_path}", parent=None)
-             print(f"Error: Original image not found: {orig_img_abs_path}")
-             return False
-        try:
-            orig_img = Image.open(orig_img_abs_path).convert("RGB")
-        except Exception as e:
-            messagebox.showerror("エラー", f"元画像の読み込みに失敗しました:\n{orig_img_abs_path}\n{e}", parent=None)
-            print(f"Error opening original image {original_image_path}: {e}")
-            return False
-
-        # 2. マージン追加と切り抜き座標計算
-        margin = 5 # TODO: 設定可能にするか検討
-        crop_x1 = max(0, int(nc_x1 - margin))
-        crop_y1 = max(0, int(nc_y1 - margin))
-        crop_x2 = min(orig_img.width, int(nc_x2 + margin))
-        crop_y2 = min(orig_img.height, int(nc_y2 + margin))
-
-        # 幅か高さが0以下の場合はエラー
-        if crop_x1 >= crop_x2 or crop_y1 >= crop_y2:
-            print(f"Warning: Invalid crop region calculated for new column ([{crop_x1},{crop_y1},{crop_x2},{crop_y2}]). Cannot create column image.")
-            messagebox.showerror("エラー", f"列画像の切り抜き領域が無効になりました。\n座標: [{crop_x1},{crop_y1},{crop_x2},{crop_y2}]", parent=None)
-            return False
-
-        # 3. 列画像切り出し
-        try:
-            new_col_img_pil = orig_img.crop((crop_x1, crop_y1, crop_x2, crop_y2))
-        except Exception as e:
-            messagebox.showerror("エラー", f"画像の切り出し中にエラーが発生しました:\n{e}", parent=None)
-            print(f"Error cropping image for new column: {e}")
-            return False
-
-        # 4. 新しい列画像のパス決定と保存
-        try:
-            # 保存先ディレクトリを決定 (書籍ID/ページID)
-            orig_path_obj = Path(original_image_path)
-            # 例: '100241706/images/100241706_00001.jpg'
-            book_id = orig_path_obj.parent.parent.stem # '100241706'
-            page_id = orig_path_obj.stem       # '100241706_00001'
-            save_dir = self.column_images_base_dir / book_id / page_id # data/processed/column_images/書籍ID/ページID
-            save_dir.mkdir(parents=True, exist_ok=True)
-
-            timestamp = pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')
-            # 新しいファイル名 (例: newcol_2025....jpg)
-            new_filename = f"newcol_{timestamp}.jpg"
-            new_col_abs_path = save_dir / new_filename # data/processed/column_images/書籍ID/ページID/newcol_....jpg
-
-            # 相対パス (processed/からのパス)
-            new_col_rel_path = f"column_images/{book_id}/{page_id}/{new_filename}"
-
-            new_col_img_pil.save(new_col_abs_path, "JPEG")
-            print(f"New column image saved to: {new_col_abs_path}")
-
-        except Exception as e:
-            messagebox.showerror("エラー", f"新しい列画像の保存中にエラーが発生しました:\n{new_col_abs_path}\n{e}", parent=None)
-            print(f"Error saving new column image {new_col_abs_path}: {e}")
-            return False
-
-        # 5. 新しい行データ作成 (文字情報は空)
+        # 新しい行データ作成 (文字情報は空)
+        # column_image は仮の値、save_changes で更新される
         new_data = {
-            "column_image": str(new_col_rel_path).replace("\\", "/"),
+            "column_image": f"temp_newcol_{pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')}.jpg", # 仮のパス
             "original_image": original_image_path,
-            "box_in_original": [crop_x1, crop_y1, crop_x2, crop_y2], # マージン込みの座標
+            "box_in_original": new_box_in_original, # 元画像上の絶対座標 (マージンなし) で保持
             "char_boxes_in_column": [], # 新規列なので空
             "unicode_ids": [],          # 新規列なので空
-            # 他の列があればデフォルト値などを設定
+            # TODO: 他の列があればデフォルト値などを設定
         }
 
-        # 6. DataFrameに追加
+        # DataFrameに追加
         try:
             new_row_df = pd.DataFrame([new_data])
             self.df = pd.concat([self.df, new_row_df], ignore_index=True)
         except Exception as e:
              messagebox.showerror("エラー", f"DataFrameへの追加中にエラーが発生しました: {e}", parent=None)
-             # ロールバック: 作成したファイルを削除
-             try: os.remove(new_col_abs_path)
-             except OSError as e_rm: print(f"Warning: Could not remove created file {new_col_abs_path}: {e_rm}")
+             print(f"Error adding new column to DataFrame: {e}")
+             import traceback
+             traceback.print_exc()
              return False
 
-        # 7. 変更を記録
+        # 変更を記録
+        # 列画像の生成/保存は save_changes で行う
         self.changed_image_paths.add(original_image_path)
-        print(f"New column added: {new_col_rel_path}")
+        print(f"New column added to DataFrame for original image: {original_image_path}. Box: {new_box_in_original}")
         return True
 
 
@@ -1443,111 +1331,141 @@ class DataManager:
         return new_data, new_col_rel_path
 
 
-    # ★変更: 変更があったページのアノテーションを別のCSVファイルに「追記」する
+    # ★変更: 変更があったページについて、列画像の再生成とDataFrameの更新、そして保存を行う
     def save_changes(self):
         """
-        現在のセッションで変更があったページについて、最新のアノテーションを
-        別のCSVファイル (self.modified_csv_path) に追記する。
-        追記前に、ファイル内に既に存在する該当ページの古いデータを削除する。
+        現在のセッションで変更があったページについて、
+        関連する列画像を再生成・保存し、DataFrameを更新し、
+        最終的なアノテーションデータを別のCSVファイル (self.modified_csv_path) に保存する。
         """
         if not self.changed_image_paths:
             print("保存すべき変更はありません。")
             return True
 
-        changed_paths_list = list(self.changed_image_paths)
-        if not changed_paths_list:
-            print("変更リストは空です。")
-            return True
+        print(f"変更があった {len(self.changed_image_paths)} ページのアノテーションを処理し、'{self.modified_csv_path}' に保存します...")
 
-        print(f"変更があった {len(changed_paths_list)} ページのアノテーションを '{self.modified_csv_path}' に追記します...")
+        # 処理中にDataFrameを変更するため、コピーを作成
+        df_current = self.df.copy()
+        updated_rows = []
+        deleted_column_paths = set()
+        processing_errors = []
 
-        try:
-            # --- メモリ上のDataFrameから今回変更があったページの最新データを抽出 ---
-            df_to_append = self.df[self.df['original_image'].isin(changed_paths_list)].copy()
+        for original_image_path in list(self.changed_image_paths): # セットのコピーをイテレート
+            try:
+                # その元画像に紐づく全ての列データを取得
+                columns_for_page = df_current[df_current['original_image'] == original_image_path].copy()
 
-            if df_to_append.empty:
-                print(f"Warning: DataFrame内に今回変更があったページ ({changed_paths_list}) のデータが見つかりませんでした。")
-                self.changed_image_paths.clear()
-                return True
+                if columns_for_page.empty:
+                    # ページ内の全ての列が削除された場合など
+                    print(f"Warning: Original image '{original_image_path}' has no columns in DataFrame. Skipping image processing.")
+                    # このページの既存の修正済みデータは削除する必要があるが、それはCSV書き出し時に行う
+                    continue
 
-            # --- DataFrameをCSV保存用に準備 (文字列変換) ---
-            def safe_stringify(value): # (前回と同じ safe_stringify 関数)
-                def nan_to_none_recursive(item):
-                    if isinstance(item, list): return [nan_to_none_recursive(sub_item) for sub_item in item]
-                    elif isinstance(item, tuple): return tuple(nan_to_none_recursive(sub_item) for sub_item in item)
-                    elif isinstance(item, dict): return {k: nan_to_none_recursive(v) for k, v in item.items()}
-                    elif isinstance(item, float) and np.isnan(item): return None
-                    elif pd.isna(item): return None
-                    else: return item
-                if isinstance(value, np.ndarray):
-                    try:
-                        py_list = value.tolist()
-                        cleaned_list = nan_to_none_recursive(py_list)
-                        return str(cleaned_list)
-                    except Exception: return '[]'
-                elif isinstance(value, (list, tuple)):
-                    cleaned_list = nan_to_none_recursive(list(value))
-                    return str(cleaned_list)
-                elif isinstance(value, dict):
-                    cleaned_dict = nan_to_none_recursive(value)
-                    return str(cleaned_dict)
-                elif pd.isna(value): return '[]'
-                else: return str(value)
+                # 各列について処理
+                for index, column_data in columns_for_page.iterrows():
+                    col_rel_path_old = column_data["column_image"]
+                    char_boxes_in_orig = column_data["char_boxes_in_column"] # 元画像上の絶対座標で保持されている想定
+                    unicode_ids = column_data["unicode_ids"]
 
-            cols_to_stringify = ["box_in_original", "char_boxes_in_column", "unicode_ids"]
-            for col in cols_to_stringify:
-                if col in df_to_append.columns:
-                    try:
-                        df_to_append[col] = df_to_append[col].apply(safe_stringify)
-                    except Exception as e:
-                        print(f"Error applying string conversion to column '{col}'. Saving might fail. Error: {e}")
-                        messagebox.showerror("内部エラー", f"列 '{col}' のデータ変換中にエラーが発生しました。\n保存に失敗する可能性があります。\nError: {e}")
-                        return False
+                    # _recreate_column_from_chars は chars_in_orig が空の場合は (None, None) を返す
+                    new_col_data, new_col_rel_path = self._recreate_column_from_chars(
+                        char_boxes_in_orig, unicode_ids, original_image_path, col_rel_path_old, "_updated"
+                    )
 
-            # --- 追記処理 ---
-            file_exists = self.modified_csv_path.exists()
-            temp_file_path = self.modified_csv_path.with_suffix(self.modified_csv_path.suffix + '.tmp') # 一時ファイル
+                    if new_col_data is None:
+                        # 文字が全て削除された場合など、列自体が不要になったケース
+                        print(f"Column {col_rel_path_old} resulted in no characters. Marking for deletion.")
+                        deleted_column_paths.add(col_rel_path_old)
+                        # DataFrameからは既に削除されているか、後でフィルタリングされる
+                    else:
+                        # 新しい列データで更新
+                        updated_rows.append(new_col_data)
+                        # 古い列画像ファイルは後でまとめて削除
+                        deleted_column_paths.add(col_rel_path_old) # 再生成された元の列も削除対象に含める
 
-            if file_exists:
-                # 既存ファイルを読み込み、追記対象ページのデータを削除
+            except Exception as e:
+                processing_errors.append(f"Error processing image '{original_image_path}': {e}")
+                print(f"Error processing image '{original_image_path}': {e}")
+                import traceback
+                traceback.print_exc()
+                # このページの変更は保存しない方が安全かもしれないが、ここではエラーを記録して続行する
+
+        # --- DataFrameの最終的な構築 ---
+        # 変更があったページの古いデータをDataFrameから削除
+        df_filtered = self.df[~self.df['original_image'].isin(self.changed_image_paths)].copy()
+
+        # 更新された行をDataFrameに追加
+        if updated_rows:
+            df_updated_rows = pd.DataFrame(updated_rows)
+            self.df = pd.concat([df_filtered, df_updated_rows], ignore_index=True)
+        else:
+            self.df = df_filtered # 更新された行がない場合はフィルタリングしたデータのみ
+
+        # --- 古い列画像ファイルを削除 ---
+        delete_errors = []
+        for old_path_rel in deleted_column_paths:
+            try:
+                old_abs_path = self.get_column_abs_path(old_path_rel)
+                if old_abs_path.exists():
+                    os.remove(old_abs_path)
+                    print(f"Deleted old column image: {old_path_rel}")
+                    # ディレクトリが空になったら削除 (オプション)
+                    dir_to_check = old_abs_path.parent
+                    if dir_to_check.exists() and not any(dir_to_check.iterdir()):
+                         try:
+                             shutil.rmtree(dir_to_check)
+                             print(f"Deleted empty directory: {dir_to_check}")
+                         except OSError as e_rmdir:
+                              print(f"Warning: Could not delete empty directory {dir_to_check}: {e_rmdir}")
+
+            except Exception as e:
+                delete_errors.append(f"Could not delete old column image file {old_path_rel}: {e}")
+                print(f"Warning: Could not delete old column image file {old_path_rel}: {e}")
+
+
+        # --- DataFrameをCSV保存用に準備 (文字列変換) ---
+        # load_and_merge_data でパースできるように、list/dict を文字列に変換
+        def safe_stringify(value):
+            def nan_to_none_recursive(item):
+                if isinstance(item, list): return [nan_to_none_recursive(sub_item) for sub_item in item]
+                elif isinstance(item, tuple): return tuple(nan_to_none_recursive(sub_item) for sub_item in item)
+                elif isinstance(item, dict): return {k: nan_to_none_recursive(v) for k, v in item.items()}
+                elif isinstance(item, float) and np.isnan(item): return None
+                elif pd.isna(item): return None
+                else: return item
+            if isinstance(value, np.ndarray):
                 try:
-                    df_existing = pd.read_csv(self.modified_csv_path) # コンバーターなしで読み込む(文字列比較のため)
-                    # original_image 列が文字列でない可能性を考慮
-                    df_existing['original_image'] = df_existing['original_image'].astype(str)
-                    changed_paths_str = [str(p) for p in changed_paths_list]
+                    py_list = value.tolist()
+                    cleaned_list = nan_to_none_recursive(py_list)
+                    return str(cleaned_list)
+                except Exception: return '[]'
+            elif isinstance(value, (list, tuple)):
+                cleaned_list = nan_to_none_recursive(list(value))
+                return str(cleaned_list)
+            elif isinstance(value, dict):
+                cleaned_dict = nan_to_none_recursive(value)
+                return str(cleaned_dict)
+            elif pd.isna(value): return '[]'
+            else: return str(value)
 
-                    # 追記対象外のデータのみをフィルタリング
-                    df_to_keep = df_existing[~df_existing['original_image'].isin(changed_paths_str)]
+        cols_to_stringify = ["box_in_original", "char_boxes_in_column", "unicode_ids"]
+        df_to_save = self.df.copy() # 保存用にコピーを作成
+        for col in cols_to_stringify:
+            if col in df_to_save.columns:
+                try:
+                    df_to_save[col] = df_to_save[col].apply(safe_stringify)
+                except Exception as e:
+                    print(f"Error applying string conversion to column '{col}' for saving. Error: {e}")
+                    messagebox.showerror("内部エラー", f"列 '{col}' のデータ変換中にエラーが発生しました。\n保存に失敗する可能性があります。\nError: {e}")
+                    # エラーが発生しても保存は試みる
+                    pass
 
-                    # ヘッダー付きで一時ファイルに書き込み (mode='w')
-                    df_to_keep.to_csv(temp_file_path, index=False, encoding='utf-8', mode='w')
 
-                    # 追記するデータを一時ファイルに追記 (mode='a', header=False)
-                    df_to_append.to_csv(temp_file_path, index=False, encoding='utf-8', mode='a', header=False)
-
-                    # 元のファイルを削除し、一時ファイル名を変更
-                    os.remove(self.modified_csv_path)
-                    os.rename(temp_file_path, self.modified_csv_path)
-
-                except Exception as read_write_e:
-                    print(f"既存CSVの読み書き中にエラーが発生しました: {read_write_e}")
-                    # エラー時は追記だけ試みる (重複データが残る可能性あり)
-                    print("フォールバック: 既存データを削除せずに追記します。")
-                    df_to_append.to_csv(self.modified_csv_path, index=False, encoding='utf-8', mode='a', header=not file_exists)
-                    # エラーが発生したことをユーザーに通知
-                    messagebox.showwarning("保存警告", f"既存データの更新中にエラーが発生しました。\nデータを追記しましたが、古いデータが残っている可能性があります。\nError: {read_write_e}")
-                    # 追記は試みたので changed_image_paths はクリアする
-                    self.changed_image_paths.clear()
-                    return True # 部分成功として扱う
-
-            else:
-                # ファイルが存在しない場合は、ヘッダー付きで新規作成 (mode='w')
-                df_to_append.to_csv(self.modified_csv_path, index=False, encoding='utf-8', mode='w', header=True)
-
-            # 保存が成功したら変更フラグをクリア
-            self.changed_image_paths.clear()
-            print(f"変更されたページのアノテーションをCSVファイルに追記/更新しました: {self.modified_csv_path}")
-            return True
+        # --- CSVファイルへの書き出し ---
+        try:
+            # modified_csv_path に上書き保存
+            df_to_save.to_csv(self.modified_csv_path, index=False, encoding='utf-8', mode='w', header=True)
+            print(f"更新されたアノテーションデータをCSVファイルに保存しました: {self.modified_csv_path}")
 
         except PermissionError as e:
             error_msg = f"CSVファイルへの書き込み権限がありません:\n{self.modified_csv_path}\n\nファイルが開かれていないか確認してください。\nError: {e}"
@@ -1566,6 +1484,15 @@ class DataManager:
             traceback.print_exc()
             messagebox.showerror("保存エラー", error_msg)
             return False
+
+        # 全ての処理が成功したら変更フラグをクリア
+        self.changed_image_paths.clear()
+
+        if processing_errors or delete_errors:
+             messagebox.showwarning("保存警告", "保存処理中に一部エラーが発生しました。\n詳細はコンソールを確認してください。")
+             return False # 一部エラーとして扱う
+        else:
+            return True # 完全に成功
 
 
     # 元のCSV保存メソッド (参考用、未使用)
