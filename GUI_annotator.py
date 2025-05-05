@@ -1250,6 +1250,104 @@ class DataManager:
         print(f"Character '{new_unicode_id}' added to {column_path}, recreated as {new_col_path}")
         return True
 
+    # ★新規追加: 列追加メソッド
+    def add_column(self, original_image_path, new_box_in_original):
+        """
+        指定された元画像に新しい列を追加する。
+        new_box_in_original: [x1, y1, x2, y2] (元画像上の絶対座標、マージンなし)
+        """
+        if not isinstance(new_box_in_original, list) or len(new_box_in_original) != 4:
+            messagebox.showerror("エラー", "新しい列の座標形式が無効です。", parent=None) # GUIがない場合もあるので parent=None
+            return False
+
+        nc_x1, nc_y1, nc_x2, nc_y2 = new_box_in_original
+
+        # 1. 元画像を開く
+        orig_img_abs_path = self.get_original_image_abs_path(original_image_path)
+        if not orig_img_abs_path or not orig_img_abs_path.exists():
+             messagebox.showerror("エラー", f"元画像ファイルが見つかりません:\n{orig_img_abs_path}", parent=None)
+             print(f"Error: Original image not found: {orig_img_abs_path}")
+             return False
+        try:
+            orig_img = Image.open(orig_img_abs_path).convert("RGB")
+        except Exception as e:
+            messagebox.showerror("エラー", f"元画像の読み込みに失敗しました:\n{orig_img_abs_path}\n{e}", parent=None)
+            print(f"Error opening original image {original_image_path}: {e}")
+            return False
+
+        # 2. マージン追加と切り抜き座標計算
+        margin = 5 # TODO: 設定可能にするか検討
+        crop_x1 = max(0, int(nc_x1 - margin))
+        crop_y1 = max(0, int(nc_y1 - margin))
+        crop_x2 = min(orig_img.width, int(nc_x2 + margin))
+        crop_y2 = min(orig_img.height, int(nc_y2 + margin))
+
+        # 幅か高さが0以下の場合はエラー
+        if crop_x1 >= crop_x2 or crop_y1 >= crop_y2:
+            print(f"Warning: Invalid crop region calculated for new column ([{crop_x1},{crop_y1},{crop_x2},{crop_y2}]). Cannot create column image.")
+            messagebox.showerror("エラー", f"列画像の切り抜き領域が無効になりました。\n座標: [{crop_x1},{crop_y1},{crop_x2},{crop_y2}]", parent=None)
+            return False
+
+        # 3. 列画像切り出し
+        try:
+            new_col_img_pil = orig_img.crop((crop_x1, crop_y1, crop_x2, crop_y2))
+        except Exception as e:
+            messagebox.showerror("エラー", f"画像の切り出し中にエラーが発生しました:\n{e}", parent=None)
+            print(f"Error cropping image for new column: {e}")
+            return False
+
+        # 4. 新しい列画像のパス決定と保存
+        try:
+            # 保存先ディレクトリを決定 (書籍ID/ページID)
+            orig_path_obj = Path(original_image_path)
+            # 例: '100241706/images/100241706_00001.jpg'
+            book_id = orig_path_obj.parent.parent.stem # '100241706'
+            page_id = orig_path_obj.stem       # '100241706_00001'
+            save_dir = self.column_images_base_dir / book_id / page_id # data/processed/column_images/書籍ID/ページID
+            save_dir.mkdir(parents=True, exist_ok=True)
+
+            timestamp = pd.Timestamp.now().strftime('%Y%m%d%H%M%S%f')
+            # 新しいファイル名 (例: newcol_2025....jpg)
+            new_filename = f"newcol_{timestamp}.jpg"
+            new_col_abs_path = save_dir / new_filename # data/processed/column_images/書籍ID/ページID/newcol_....jpg
+
+            # 相対パス (processed/からのパス)
+            new_col_rel_path = f"column_images/{book_id}/{page_id}/{new_filename}"
+
+            new_col_img_pil.save(new_col_abs_path, "JPEG")
+            print(f"New column image saved to: {new_col_abs_path}")
+
+        except Exception as e:
+            messagebox.showerror("エラー", f"新しい列画像の保存中にエラーが発生しました:\n{new_col_abs_path}\n{e}", parent=None)
+            print(f"Error saving new column image {new_col_abs_path}: {e}")
+            return False
+
+        # 5. 新しい行データ作成 (文字情報は空)
+        new_data = {
+            "column_image": str(new_col_rel_path).replace("\\", "/"),
+            "original_image": original_image_path,
+            "box_in_original": [crop_x1, crop_y1, crop_x2, crop_y2], # マージン込みの座標
+            "char_boxes_in_column": [], # 新規列なので空
+            "unicode_ids": [],          # 新規列なので空
+            # 他の列があればデフォルト値などを設定
+        }
+
+        # 6. DataFrameに追加
+        try:
+            new_row_df = pd.DataFrame([new_data])
+            self.df = pd.concat([self.df, new_row_df], ignore_index=True)
+        except Exception as e:
+             messagebox.showerror("エラー", f"DataFrameへの追加中にエラーが発生しました: {e}", parent=None)
+             # ロールバック: 作成したファイルを削除
+             try: os.remove(new_col_abs_path)
+             except OSError as e_rm: print(f"Warning: Could not remove created file {new_col_abs_path}: {e_rm}")
+             return False
+
+        # 7. 変更を記録
+        self.changed_image_paths.add(original_image_path)
+        print(f"New column added: {new_col_rel_path}")
+        return True
+
 
     def _recreate_column_from_chars(self, chars_in_orig, u_ids, original_img_path, base_rel_path_str, suffix):
         # (省略 - エラーハンドリング強化)
@@ -1625,13 +1723,24 @@ class AnnotatorApp:
         self.selected_column_paths = []
         self.current_detail_column_path = None
         self.moving_characters_info = None
-        self.adding_character_info = None # 文字追加中の情報 {pos: (x,y)}
+
+        # --- ▼▼▼ 文字追加モード用状態変数 (リセット) ▼▼▼ ---
+        self.add_char_mode = None
+        self.first_click_pos = None
+        self.pending_unicode_id = None
+        # --- ▲▲▲ 文字追加モード用状態変数 ▲▲▲ ---
+
+        # --- ▼▼▼ 列追加モード用状態変数 ▼▼▼ ---
+        self.add_column_mode = None # None, 'waiting_first_click', 'waiting_second_click'
+        self.first_click_pos_orig = None # (canvas_x, canvas_y) - 元画像Canvas用
+        # --- ▲▲▲ 列追加モード用状態変数 ▲▲▲ ---
 
         # Canvasクリックのコールバックを設定
         self.orig_canvas.master.on_canvas_click = self.handle_orig_canvas_click
         self.detail_canvas.master.on_canvas_click = self.handle_detail_canvas_click
         # ★変更: 右クリックコールバック設定
-        self.detail_canvas.master.on_canvas_right_click = self.initiate_add_character
+        self.orig_canvas.master.on_canvas_right_click = self.initiate_add_column # 元画像右クリック
+        self.detail_canvas.master.on_canvas_right_click = self.initiate_add_character # 詳細右クリック
 
         self.load_current_image_data()
 
@@ -1642,8 +1751,34 @@ class AnnotatorApp:
         self.root.bind_all("<KeyPress>", self.handle_key_press)
 
     def handle_key_press(self, event):
-        # (省略 - 元コードと同じ)
+        # (省略 - 元コードと同じ + Escキー処理追加)
         if event.widget.winfo_class() in ('Entry', 'Text'): return # 入力中は無視
+
+        # --- ▼▼▼ Escキーで各種モードキャンセル ▼▼▼ ---
+        if event.keysym == "Escape":
+            cancelled = False
+            if self.add_char_mode:
+                print("文字追加モードをキャンセルしました (Escキー)。")
+                self.add_char_mode = None
+                self.first_click_pos = None
+                self.pending_unicode_id = None
+                cancelled = True
+            if self.add_column_mode: # 列追加モードのキャンセルを追加
+                print("列追加モードをキャンセルしました (Escキー)。")
+                self.add_column_mode = None
+                self.first_click_pos_orig = None
+                cancelled = True
+            if self.moving_characters_info:
+                print("文字移動モードをキャンセルしました (Escキー)。")
+                self.moving_characters_info = None
+                cancelled = True
+
+            if cancelled:
+                self.update_button_states() # カーソルを戻す
+                messagebox.showinfo("キャンセル", "操作をキャンセルしました。", parent=self.root)
+                return # 他のキー処理は行わない
+        # --- ▲▲▲ Escキーで各種モードキャンセル ▲▲▲ ---
+
         if event.keysym == "Left": self.prev_image()
         elif event.keysym == "Right": self.next_image()
         elif event.keysym == "Return":
@@ -1659,7 +1794,15 @@ class AnnotatorApp:
         self.selected_column_paths = []
         self.current_detail_column_path = None
         self.moving_characters_info = None
-        self.adding_character_info = None # リセット
+        # self.adding_character_info = None # 古い形式は削除
+
+        # --- ▼▼▼ 各種モード用状態変数 (リセット) ▼▼▼ ---
+        self.add_char_mode = None
+        self.first_click_pos = None
+        self.pending_unicode_id = None
+        self.add_column_mode = None # 列追加モードもリセット
+        self.first_click_pos_orig = None
+        # --- ▲▲▲ 各種モード用状態変数 ▲▲▲ ---
 
         current_image_path = self.data_manager.current_original_image
         all_images = self.data_manager.get_original_images()
@@ -1825,9 +1968,16 @@ class AnnotatorApp:
         # 文字追加ボタンはなくなった
         # self.add_char_button.config(state=tk.NORMAL if self.current_detail_column_path else tk.DISABLED)
 
-        if self.moving_characters_info: self.root.config(cursor="crosshair")
-        elif self.adding_character_info: self.root.config(cursor="plus") # 文字追加中は十字カーソル
-        else: self.root.config(cursor="")
+        # --- ▼▼▼ モードに応じたカーソル変更 ▼▼▼ ---
+        if self.moving_characters_info:
+            self.root.config(cursor="crosshair")
+        elif self.add_char_mode == 'waiting_first_click' or self.add_char_mode == 'waiting_second_click':
+            self.root.config(cursor="plus") # 文字追加のクリック待ち中は十字カーソル
+        elif self.add_column_mode == 'waiting_first_click' or self.add_column_mode == 'waiting_second_click': # 列追加モードのカーソル
+            self.root.config(cursor="tcross") # 列追加のクリック待ち中は太い十字カーソル
+        else:
+            self.root.config(cursor="") # 通常カーソル
+        # --- ▲▲▲ モードに応じたカーソル変更 ▲▲▲ ---
 
     # --- ボタンアクション ---
     def merge_selected_columns(self):
@@ -1895,7 +2045,83 @@ class AnnotatorApp:
         self.update_button_states()
 
     def handle_orig_canvas_click(self, canvas, clicked_tags, ctrl_pressed):
-        # (省略 - 元コードと同じ、リストボックス同期処理を少し修正)
+        # (省略 - 元コードと同じ + 列追加モードのクリック処理)
+        canvas_x = canvas.canvasx(canvas.winfo_pointerx() - canvas.winfo_rootx())
+        canvas_y = canvas.canvasy(canvas.winfo_pointery() - canvas.winfo_rooty())
+
+        # --- ▼▼▼ 列追加モード中の左クリック処理 ▼▼▼ ---
+        if self.add_column_mode == 'waiting_first_click':
+            self.first_click_pos_orig = (canvas_x, canvas_y)
+            self.add_column_mode = 'waiting_second_click'
+            print(f"列追加: 1点目クリック @ ({canvas_x:.1f}, {canvas_y:.1f})")
+            messagebox.showinfo("列追加", "新しい列の範囲の【右下】をクリックしてください。", parent=self.root)
+            return # 通常の列選択は行わない
+
+        elif self.add_column_mode == 'waiting_second_click':
+            if not self.first_click_pos_orig:
+                print("エラー: 1点目の座標が記録されていません。列追加モードをリセットします。")
+                self.add_column_mode = None
+                self.update_button_states()
+                return
+
+            x1_canvas, y1_canvas = self.first_click_pos_orig
+            x2_canvas, y2_canvas = canvas_x, canvas_y
+            print(f"列追加: 2点目クリック @ ({x2_canvas:.1f}, {y2_canvas:.1f})")
+
+            # スケールを考慮して元画像上の絶対座標に変換
+            scale = canvas.scale
+            x1_orig = x1_canvas / scale
+            y1_orig = y1_canvas / scale
+            x2_orig = x2_canvas / scale
+            y2_orig = y2_canvas / scale
+
+            # 座標の順序を正規化 (x1 < x2, y1 < y2)
+            final_x1 = min(x1_orig, x2_orig)
+            final_y1 = min(y1_orig, y2_orig)
+            final_x2 = max(x1_orig, x2_orig)
+            final_y2 = max(y1_orig, y2_orig)
+
+            # 整数座標に変換
+            new_box_in_original = [int(final_x1), int(final_y1), int(final_x2), int(final_y2)]
+
+            # 小さすぎるボックスは警告
+            min_box_dim = 5 # 最小幅/高さ (元画像上)
+            if (final_x2 - final_x1 < min_box_dim) or (final_y2 - final_y1 < min_box_dim):
+                 if not messagebox.askyesno("確認", f"作成された列範囲が非常に小さいです ({new_box_in_original[2]-new_box_in_original[0]}x{new_box_in_original[3]-new_box_in_original[1]}px)。\nこのまま追加しますか？", parent=self.root):
+                     messagebox.showinfo("やり直し", "再度、列範囲の【右下】をクリックしてください。", parent=self.root)
+                     return # 処理中断
+
+            print(f"新しい列を範囲 {new_box_in_original} で追加します。")
+
+            # --- ▼▼▼ DataManagerに処理を依頼 (要実装: add_column) ▼▼▼ ---
+            current_orig_image = self.data_manager.current_original_image
+            if not current_orig_image:
+                 messagebox.showerror("エラー", "現在の元画像情報がありません。", parent=self.root)
+                 self.add_column_mode = None
+                 self.first_click_pos_orig = None
+                 self.update_button_states()
+                 return
+
+            success = self.data_manager.add_column(current_orig_image, new_box_in_original)
+            # --- ▲▲▲ DataManagerに処理を依頼 ▲▲▲ ---
+
+
+            # モードと状態をリセット
+            self.add_column_mode = None
+            self.first_click_pos_orig = None
+            self.update_button_states() # カーソルを戻す
+
+            if success:
+                print("列追加成功。データを再読み込みします。")
+                self.load_current_image_data() # 成功したら再描画
+            else:
+                # DataManager側でエラーメッセージ表示済みのはず (実装後)
+                print("列追加に失敗しました。")
+            return # 通常の列選択は行わない
+        # --- ▲▲▲ 列追加モード中の左クリック処理 ▲▲▲ ---
+
+
+        # --- ▼▼▼ 通常のクリック処理 (文字移動 or 列選択) ▼▼▼ ---
         if self.moving_characters_info and clicked_tags:
             target_col_path = None
             for tag in clicked_tags:
@@ -1961,31 +2187,117 @@ class AnnotatorApp:
             self.update_button_states()
 
     def handle_detail_canvas_click(self, canvas, clicked_tags, ctrl_pressed):
-        # (省略 - 元コードと同じ)
-        # print(f"Detail canvas clicked. Tags: {clicked_tags}")
-        self.update_button_states()
+        # (省略 - 元コードと同じ + 文字追加モードのクリック処理)
+        canvas_x = canvas.canvasx(canvas.winfo_pointerx() - canvas.winfo_rootx())
+        canvas_y = canvas.canvasy(canvas.winfo_pointery() - canvas.winfo_rooty())
 
-    # ★変更: 文字追加開始メソッド (詳細エリア右クリック)
+        # --- ▼▼▼ 文字追加モード中の左クリック処理 ▼▼▼ ---
+        if self.add_char_mode == 'waiting_first_click':
+            self.first_click_pos = (canvas_x, canvas_y)
+            self.add_char_mode = 'waiting_second_click'
+            print(f"文字追加: 1点目クリック @ ({canvas_x:.1f}, {canvas_y:.1f})")
+            messagebox.showinfo("文字追加", "バウンディングボックスの【右下】をクリックしてください。", parent=self.root)
+            # update_button_states はカーソル更新のために呼ぶ必要はない (モードが変わっただけ)
+            return # 通常の文字選択は行わない
+
+        elif self.add_char_mode == 'waiting_second_click':
+            if not self.first_click_pos: # 念のためチェック
+                print("エラー: 1点目の座標が記録されていません。文字追加モードをリセットします。")
+                self.add_char_mode = None
+                self.update_button_states()
+                return
+
+            x1_canvas, y1_canvas = self.first_click_pos
+            x2_canvas, y2_canvas = canvas_x, canvas_y
+            print(f"文字追加: 2点目クリック @ ({x2_canvas:.1f}, {y2_canvas:.1f})")
+
+            # スケールを考慮して列画像内の座標に変換
+            scale = canvas.scale
+            x1_unscaled = x1_canvas / scale
+            y1_unscaled = y1_canvas / scale
+            x2_unscaled = x2_canvas / scale
+            y2_unscaled = y2_canvas / scale
+
+            # 座標の順序を正規化 (x1 < x2, y1 < y2)
+            final_x1 = min(x1_unscaled, x2_unscaled)
+            final_y1 = min(y1_unscaled, y2_unscaled)
+            final_x2 = max(x1_unscaled, x2_unscaled)
+            final_y2 = max(y1_unscaled, y2_unscaled)
+
+            # 整数座標に変換
+            new_char_box_in_col = [int(final_x1), int(final_y1), int(final_x2), int(final_y2)]
+
+            # 小さすぎるボックスは警告 (任意)
+            min_box_dim = 3 # 最小幅/高さ (非スケール時)
+            if (final_x2 - final_x1 < min_box_dim) or (final_y2 - final_y1 < min_box_dim):
+                 if not messagebox.askyesno("確認", f"作成されたボックスサイズが非常に小さいです ({new_char_box_in_col[2]-new_char_box_in_col[0]}x{new_char_box_in_col[3]-new_char_box_in_col[1]}px)。\nこのまま追加しますか？", parent=self.root):
+                     # キャンセルする場合、モードを1段階戻すか、完全にキャンセルするか選択
+                     # ここでは1段階戻す (再度右下をクリックさせる)
+                     messagebox.showinfo("やり直し", "再度バウンディングボックスの【右下】をクリックしてください。", parent=self.root)
+                     return # 処理中断
+
+            print(f"文字 '{self.pending_unicode_id}' をボックス {new_char_box_in_col} で列 {self.current_detail_column_path} に追加します。")
+
+            # DataManagerに処理を依頼
+            success = self.data_manager.add_character(self.current_detail_column_path, new_char_box_in_col, self.pending_unicode_id)
+
+            # モードと状態をリセット
+            self.add_char_mode = None
+            self.first_click_pos = None
+            self.pending_unicode_id = None
+            self.update_button_states() # カーソルを戻す
+
+            if success:
+                print("文字追加成功。データを再読み込みします。")
+                self.load_current_image_data() # 成功したら再描画
+            else:
+                # DataManager側でエラーメッセージ表示済みのはず
+                print("文字追加に失敗しました。")
+            return # 通常の文字選択は行わない
+        # --- ▲▲▲ 文字追加モード中の左クリック処理 ▲▲▲ ---
+
+        # --- ▼▼▼ 通常の文字選択処理 ▼▼▼ ---
+        # print(f"Detail canvas clicked (normal mode). Tags: {clicked_tags}")
+        self.update_button_states()
+        # --- ▲▲▲ 通常の文字選択処理 ▲▲▲ ---
+
+    # ★変更: 文字追加開始メソッド (詳細エリア右クリック) - ボックス描画対応
     def initiate_add_character(self, canvas, canvas_x, canvas_y):
-        """詳細表示エリアが右クリックされたときに文字追加プロセスを開始"""
+        """詳細表示エリアが右クリックされたときに文字追加プロセスを開始、またはキャンセル"""
+        # --- ▼▼▼ 文字追加モード中の右クリックはキャンセル ▼▼▼ ---
+        if self.add_char_mode:
+            print("文字追加モードをキャンセルしました (右クリック)。")
+            self.add_char_mode = None
+            self.first_click_pos = None
+            self.pending_unicode_id = None
+            self.update_button_states() # カーソルを戻す
+            messagebox.showinfo("キャンセル", "文字追加モードをキャンセルしました。", parent=self.root)
+            return
+        # --- ▲▲▲ 文字追加モード中の右クリックはキャンセル ▲▲▲ ---
+
         if not self.current_detail_column_path:
-            messagebox.showinfo("情報", "文字を追加する列を選択してください。")
+            messagebox.showinfo("情報", "文字を追加する列を選択してください。", parent=self.root)
             return
 
-        # すでに文字移動モードなどの場合は無視
+        # すでに文字移動モードの場合は無視
         if self.moving_characters_info:
             return
 
-        # クリックされた座標を保存
-        self.adding_character_info = {"pos": (canvas_x, canvas_y)}
-        print(f"Initiating add character at detail canvas pos: ({canvas_x:.2f}, {canvas_y:.2f})")
+        # --- ▼▼▼ 文字追加モード開始 ▼▼▼ ---
+        self.add_char_mode = 'waiting_unicode'
+        print(f"文字追加モード開始 (右クリック位置: {canvas_x:.1f}, {canvas_y:.1f})")
 
         # Unicode ID を入力させる
-        unicode_id = simpledialog.askstring("文字追加", "追加する文字のUnicode IDを入力してください (例: U+4E00):", parent=self.root)
+        unicode_id = simpledialog.askstring("文字追加", "追加する文字のUnicode IDを入力してください (例: U+4E00):\n(Escキーまたは右クリックでキャンセル)", parent=self.root)
+
+        # Unicode ID 入力中にキャンセルされたかチェック
+        if self.add_char_mode != 'waiting_unicode': # Escキーなどでキャンセルされた場合
+             print("Unicode入力中にキャンセルされました。")
+             return
 
         if not unicode_id:
-            print("Character addition cancelled.")
-            self.adding_character_info = None
+            print("文字追加をキャンセルしました (Unicode入力なし)。")
+            self.add_char_mode = None # モードリセット
             self.update_button_states()
             return
 
@@ -1993,36 +2305,53 @@ class AnnotatorApp:
         unicode_id = unicode_id.strip().upper()
         char = unicode_to_char(unicode_id)
         if char is None:
-            messagebox.showerror("入力エラー", f"無効なUnicode ID形式です: {unicode_id}\n'U+'に続けて16進数を入力してください。")
-            self.adding_character_info = None
+            messagebox.showerror("入力エラー", f"無効なUnicode ID形式です: {unicode_id}\n'U+'に続けて16進数を入力してください。", parent=self.root)
+            self.add_char_mode = None # モードリセット
             self.update_button_states()
             return
 
-        # ボックスサイズの決定 (仮: クリック位置中心の固定サイズ)
-        # スケールを考慮する必要がある
-        click_x_unscaled = canvas_x / canvas.scale
-        click_y_unscaled = canvas_y / canvas.scale
-        box_width_unscaled = 20 # 仮の幅 (ピクセル単位、非スケール時)
-        box_height_unscaled = 20 # 仮の高さ
-        x1 = click_x_unscaled - box_width_unscaled / 2
-        y1 = click_y_unscaled - box_height_unscaled / 2
-        x2 = x1 + box_width_unscaled
-        y2 = y1 + box_height_unscaled
-        new_char_box_in_col = [int(x1), int(y1), int(x2), int(y2)]
+        # Unicode ID 正常 -> 次のステップへ
+        self.pending_unicode_id = unicode_id
+        self.add_char_mode = 'waiting_first_click'
+        self.update_button_states() # カーソル変更
+        messagebox.showinfo("文字追加", f"文字 '{char}' ({unicode_id}) を追加します。\nバウンディングボックスの【左上】をクリックしてください。", parent=self.root)
+        # --- ▲▲▲ 文字追加モード開始 ▲▲▲ ---
 
-        print(f"Adding character '{char}' ({unicode_id}) with box {new_char_box_in_col} to {self.current_detail_column_path}")
+        # ★注意: ここでは DataManager.add_character は呼び出さない。
+        # ボックス座標は左クリックで決定する。
 
-        # DataManagerに処理を依頼
-        success = self.data_manager.add_character(self.current_detail_column_path, new_char_box_in_col, unicode_id)
 
-        # 状態リセット
-        self.adding_character_info = None
-        self.update_button_states()
+    # ★新規追加: 列追加開始メソッド (元画像エリア右クリック)
+    def initiate_add_column(self, canvas, canvas_x, canvas_y):
+        """元画像表示エリアが右クリックされたときに列追加プロセスを開始、またはキャンセル"""
+        # --- ▼▼▼ 各種モード中の右クリックはキャンセル ▼▼▼ ---
+        cancelled = False
+        if self.add_char_mode:
+            print("文字追加モードをキャンセルしました (右クリック)。")
+            self.add_char_mode = None; self.first_click_pos = None; self.pending_unicode_id = None; cancelled = True
+        if self.add_column_mode: # 列追加モード中の右クリックもキャンセル
+            print("列追加モードをキャンセルしました (右クリック)。")
+            self.add_column_mode = None; self.first_click_pos_orig = None; cancelled = True
+        if self.moving_characters_info:
+             print("文字移動モードをキャンセルしました (右クリック)。")
+             self.moving_characters_info = None; cancelled = True
 
-        if success:
-            # 成功したら再描画
-            self.load_current_image_data()
-            # 必要なら、追加された文字が表示されるようにスクロールするなどの処理を追加
+        if cancelled:
+            self.update_button_states() # カーソルを戻す
+            messagebox.showinfo("キャンセル", "操作をキャンセルしました。", parent=self.root)
+            return
+        # --- ▲▲▲ 各種モード中の右クリックはキャンセル ▲▲▲ ---
+
+        if not self.data_manager.current_original_image:
+            messagebox.showinfo("情報", "元画像が読み込まれていません。", parent=self.root)
+            return
+
+        # --- ▼▼▼ 列追加モード開始 ▼▼▼ ---
+        self.add_column_mode = 'waiting_first_click'
+        self.update_button_states() # カーソル変更
+        print(f"列追加モード開始 (右クリック位置: {canvas_x:.1f}, {canvas_y:.1f})")
+        messagebox.showinfo("列追加", "新しい列の範囲の【左上】をクリックしてください。\n(Escキーまたは右クリックでキャンセル)", parent=self.root)
+        # --- ▲▲▲ 列追加モード開始 ▲▲▲ ---
 
 
     def delete_selected_column(self):
