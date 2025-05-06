@@ -1,3 +1,9 @@
+"""
+列画像データセットを書籍単位で分割し、アノテーション情報を整理するスクリプト。
+- カラム画像を train/val/test ディレクトリにコピー
+- アノテーション情報 (column_info.csv) を train/val/test ごとに分割して保存
+- Unicode -> ID のマッピングファイルを作成
+"""
 import ast
 import json
 import logging
@@ -170,6 +176,47 @@ def prepare_column_dataset(
 
         # unicode_ids を評価してリスト形式に変換 (エラー時は空リスト)
         df["unicode_list"] = df["unicode_ids"].apply(safe_literal_eval)
+
+        # --- Filter by Column Width (from box_in_original) ---
+        logger.info("Filtering columns by width (min_width=64)...")
+        initial_rows_before_width_filter = len(df)
+
+        def calculate_column_width(box_str):
+            # box_str は safe_literal_eval で評価済みのリスト、または評価前の文字列
+            # まず box_in_original を評価
+            box_list = safe_literal_eval(box_str)
+            if isinstance(box_list, list) and len(box_list) == 4:
+                try:
+                    # x_min, y_min, x_max, y_max
+                    x_min, _, x_max, _ = map(float, box_list) # 数値に変換
+                    width = x_max - x_min
+                    return width
+                except (ValueError, TypeError) as e:
+                    logger.debug(f"Could not parse box coordinates from {box_list}: {e}. Marking as invalid width.")
+                    return -1 # 計算失敗を示す値
+            else:
+                logger.debug(f"Invalid format for box_in_original: {box_str}. Expected list of 4 elements. Marking as invalid width.")
+                return -1 # 不正な形式または計算失敗
+
+        # 'box_in_original' カラムが存在するか確認
+        if "box_in_original" in df.columns:
+            df["column_width"] = df["box_in_original"].apply(calculate_column_width)
+            
+            # 幅が64未満、または計算に失敗した行を除外
+            valid_width_mask = (df["column_width"] >= 64)
+            df = df[valid_width_mask]
+            
+            rows_after_width_filter = len(df)
+            removed_by_width = initial_rows_before_width_filter - rows_after_width_filter
+            if removed_by_width > 0:
+                logger.info(f"Removed {removed_by_width} columns with width < 64 pixels or invalid 'box_in_original' format.")
+        else:
+            logger.warning("'box_in_original' column not found. Skipping width-based filtering.")
+
+        if df.empty:
+            logger.error(f"Error: No valid data after width filtering from {column_info_path}")
+            return
+        # --- End Filter by Column Width ---
 
     except Exception as e:
         logger.error(f"Error reading or processing CSV file {column_info_path}: {e}")
@@ -438,6 +485,7 @@ def prepare_column_dataset(
 if __name__ == "__main__":
     # --- Configuration ---
     COLUMN_INFO_FILE = "data/processed/column_info.csv"
+    #COLUMN_INFO_FILE = "data/processed/unmatched_results.csv"
     # column_images ディレクトリのパスを指定
     COLUMN_IMAGE_DIR = "data/processed/column_images"
     # 出力ディレクトリ名を指定
