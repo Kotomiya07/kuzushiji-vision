@@ -197,19 +197,55 @@ def prepare_column_dataset(
             else:
                 logger.debug(f"Invalid format for box_in_original: {box_str}. Expected list of 4 elements. Marking as invalid width.")
                 return -1 # 不正な形式または計算失敗
+        
+        def calculate_column_height(box_str):
+            # box_str は safe_literal_eval で評価済みのリスト、または評価前の文字列
+            # まず box_in_original を評価
+            box_list = safe_literal_eval(box_str)
+            if isinstance(box_list, list) and len(box_list) == 4:
+                try:
+                    # x_min, y_min, x_max, y_max
+                    _, y_min, _, y_max = map(float, box_list) # 数値に変換
+                    height = y_max - y_min
+                    return height
+                except (ValueError, TypeError) as e:
+                    logger.debug(f"Could not parse box coordinates from {box_list}: {e}. Marking as invalid height.")
+                    return -1
+            else:
+                logger.debug(f"Invalid format for box_in_original: {box_str}. Expected list of 4 elements. Marking as invalid height.")
+                return -1
 
         # 'box_in_original' カラムが存在するか確認
         if "box_in_original" in df.columns:
+            #df["column_width"] = df["box_in_original"].apply(calculate_column_width)
+            
+            # # 幅が100未満、または計算に失敗した行を除外
+            # valid_width_mask = (df["column_width"] >= 100)
+            # df = df[valid_width_mask]
+            
+            # rows_after_width_filter = len(df)
+            # removed_by_width = initial_rows_before_width_filter - rows_after_width_filter
+            # if removed_by_width > 0:
+            #     logger.info(f"Removed {removed_by_width} columns with width < 64 pixels or invalid 'box_in_original' format.")
+            
+            # # 高さが4000以上の行を除外
+            # df["column_height"] = df["box_in_original"].apply(calculate_column_height)
+            # valid_height_mask = (df["column_height"] < 4000)
+            # df = df[valid_height_mask]
+            # rows_after_height_filter = len(df)
+            # removed_by_height = rows_after_width_filter - rows_after_height_filter
+            # if removed_by_height > 0:
+            #     logger.info(f"Removed {removed_by_height} columns with height >= 4000 pixels.")
+
+            # 高さが幅の16倍より大きい行を除外
+            df["column_height"] = df["box_in_original"].apply(calculate_column_height)
             df["column_width"] = df["box_in_original"].apply(calculate_column_width)
-            
-            # 幅が64未満、または計算に失敗した行を除外
-            valid_width_mask = (df["column_width"] >= 64)
-            df = df[valid_width_mask]
-            
-            rows_after_width_filter = len(df)
-            removed_by_width = initial_rows_before_width_filter - rows_after_width_filter
-            if removed_by_width > 0:
-                logger.info(f"Removed {removed_by_width} columns with width < 64 pixels or invalid 'box_in_original' format.")
+            valid_height_mask = (df["column_height"] <= 16 * df["column_width"])
+            df = df[valid_height_mask]
+            rows_after_height_filter = len(df)
+            removed_by_height = initial_rows_before_width_filter - rows_after_height_filter
+            if removed_by_height > 0:
+                logger.info(f"Removed {removed_by_height} columns with height >= 16 times the width.")
         else:
             logger.warning("'box_in_original' column not found. Skipping width-based filtering.")
 
