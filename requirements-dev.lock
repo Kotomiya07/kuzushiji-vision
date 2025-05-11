@@ -12,14 +12,16 @@
 -e file:.
 absl-py==2.1.0
     # via tensorboard
-accelerate==1.5.2
+accelerate==1.6.0
     # via kuzushiji-vision
+    # via transformers
 aiofiles==23.2.1
     # via gradio
 aiohappyeyeballs==2.6.1
     # via aiohttp
 aiohttp==3.11.18
-    # via torch-geometric
+    # via datasets
+    # via fsspec
 aiosignal==1.3.2
     # via aiohttp
 albucore==0.0.23
@@ -42,8 +44,6 @@ argon2-cffi-bindings==21.2.0
     # via argon2-cffi
 arrow==1.3.0
     # via isoduration
-astroid==3.3.9
-    # via pylint
 asttokens==3.0.0
     # via stack-data
 async-lru==2.0.5
@@ -60,6 +60,8 @@ beautifulsoup4==4.13.3
     # via nbconvert
 bleach==6.2.0
     # via nbconvert
+blobfile==3.0.0
+    # via kuzushiji-vision
 certifi==2022.12.7
     # via httpcore
     # via httpx
@@ -70,11 +72,10 @@ cffi==1.17.1
 charset-normalizer==2.1.1
     # via requests
 click==8.1.8
+    # via jiwer
     # via typer
     # via uvicorn
     # via wandb
-coloredlogs==15.0.1
-    # via onnxruntime-gpu
 comm==0.2.2
     # via ipykernel
     # via ipywidgets
@@ -82,16 +83,23 @@ contourpy==1.3.1
     # via matplotlib
 cycler==0.12.1
     # via matplotlib
+datasets==2.14.4
+    # via kuzushiji-vision
 debugpy==1.8.12
     # via ipykernel
 decorator==5.2.1
     # via ipython
 defusedxml==0.7.1
     # via nbconvert
-dill==0.3.9
-    # via pylint
+dill==0.3.7
+    # via datasets
+    # via multiprocess
 docker-pycreds==0.4.0
     # via wandb
+editables==0.5
+    # via kuzushiji-vision
+einops==0.8.1
+    # via kuzushiji-vision
 exceptiongroup==1.2.2
     # via anyio
     # via ipython
@@ -104,12 +112,11 @@ fastjsonschema==2.21.1
 ffmpy==0.5.0
     # via gradio
 filelock==3.13.1
+    # via blobfile
     # via huggingface-hub
     # via torch
     # via transformers
     # via triton
-flatbuffers==25.2.10
-    # via onnxruntime-gpu
 fonttools==4.56.0
     # via matplotlib
 fqdn==1.5.1
@@ -118,10 +125,10 @@ frozenlist==1.6.0
     # via aiohttp
     # via aiosignal
 fsspec==2024.6.1
+    # via datasets
     # via gradio-client
     # via huggingface-hub
     # via torch
-    # via torch-geometric
 gitdb==4.0.12
     # via gitpython
 gitpython==3.1.44
@@ -137,6 +144,10 @@ grpcio==1.70.0
 h11==0.14.0
     # via httpcore
     # via uvicorn
+hatchling==1.27.0
+    # via kuzushiji-vision
+hf-xet==1.1.0
+    # via huggingface-hub
 httpcore==1.0.7
     # via httpx
 httpx==0.28.1
@@ -144,15 +155,14 @@ httpx==0.28.1
     # via gradio-client
     # via jupyterlab
     # via safehttpx
-huggingface-hub==0.29.1
+huggingface-hub==0.31.1
     # via accelerate
+    # via datasets
     # via gradio
     # via gradio-client
     # via timm
     # via tokenizers
     # via transformers
-humanfriendly==10.0
-    # via coloredlogs
 hydra-core==1.3.2
     # via kuzushiji-vision
 idna==3.4
@@ -167,6 +177,7 @@ ipykernel==6.29.5
     # via jupyter
     # via jupyter-console
     # via jupyterlab
+    # via kuzushiji-vision
 ipython==8.32.0
     # via ipykernel
     # via ipywidgets
@@ -175,9 +186,8 @@ ipywidgets==8.1.5
     # via jupyter
 isoduration==20.11.0
     # via jsonschema
-isort==6.0.1
-    # via pylint
 japanize-matplotlib==1.1.3
+    # via kuzushiji-vision
 jedi==0.19.2
     # via ipython
 jinja2==3.1.4
@@ -187,7 +197,8 @@ jinja2==3.1.4
     # via jupyterlab-server
     # via nbconvert
     # via torch
-    # via torch-geometric
+jiwer==3.1.0
+    # via kuzushiji-vision
 joblib==1.4.2
     # via scikit-learn
 json5==0.10.0
@@ -201,6 +212,7 @@ jsonschema==4.23.0
 jsonschema-specifications==2024.10.1
     # via jsonschema
 jupyter==1.1.1
+    # via kuzushiji-vision
 jupyter-client==8.6.3
     # via ipykernel
     # via jupyter-console
@@ -247,6 +259,8 @@ lightning-utilities==0.11.8
     # via torchmetrics
 lmdb==1.6.2
     # via kuzushiji-vision
+lxml==5.4.0
+    # via blobfile
 markdown==3.7
     # via tensorboard
 markdown-it-py==3.0.0
@@ -258,13 +272,12 @@ markupsafe==2.1.5
     # via werkzeug
 matplotlib==3.10.0
     # via japanize-matplotlib
+    # via kuzushiji-vision
     # via seaborn
     # via ultralytics
 matplotlib-inline==0.1.7
     # via ipykernel
     # via ipython
-mccabe==0.7.0
-    # via pylint
 mdurl==0.1.2
     # via markdown-it-py
 mistune==3.1.3
@@ -274,6 +287,8 @@ mpmath==1.3.0
 multidict==6.4.3
     # via aiohttp
     # via yarl
+multiprocess==0.70.15
+    # via datasets
 nbclient==0.10.2
     # via nbconvert
 nbconvert==7.16.6
@@ -298,11 +313,10 @@ numpy==1.26.3
     # via albucore
     # via albumentations
     # via contourpy
+    # via datasets
     # via gradio
     # via imageio
     # via matplotlib
-    # via onnx
-    # via onnxruntime-gpu
     # via opencv-python
     # via opencv-python-headless
     # via pandas
@@ -312,7 +326,6 @@ numpy==1.26.3
     # via seaborn
     # via tensorboard
     # via tifffile
-    # via torch-geometric
     # via torchmetrics
     # via torchvision
     # via transformers
@@ -327,7 +340,6 @@ nvidia-cuda-cupti-cu12==12.4.127
 nvidia-cuda-nvrtc-cu12==12.4.127
     # via torch
 nvidia-cuda-runtime-cu12==12.4.127
-    # via tensorrt-cu12-libs
     # via torch
 nvidia-cudnn-cu12==9.1.0.70
     # via torch
@@ -350,13 +362,6 @@ nvidia-nvtx-cu12==12.4.127
     # via torch
 omegaconf==2.3.0
     # via hydra-core
-onnx==1.17.0
-    # via kuzushiji-vision
-    # via onnxslim
-onnxruntime-gpu==1.21.0
-    # via kuzushiji-vision
-onnxslim==0.1.48
-    # via kuzushiji-vision
 opencv-python==4.11.0.86
     # via kuzushiji-vision
     # via ultralytics
@@ -367,10 +372,12 @@ orjson==3.10.16
     # via gradio
 overrides==7.7.0
     # via jupyter-server
-packaging==24.1
+packaging==25.0
     # via accelerate
+    # via datasets
     # via gradio
     # via gradio-client
+    # via hatchling
     # via huggingface-hub
     # via hydra-core
     # via ipykernel
@@ -382,13 +389,12 @@ packaging==24.1
     # via lightning-utilities
     # via matplotlib
     # via nbconvert
-    # via onnxruntime-gpu
-    # via onnxslim
     # via scikit-image
     # via tensorboard
     # via torchmetrics
     # via transformers
 pandas==2.2.3
+    # via datasets
     # via gradio
     # via kuzushiji-vision
     # via seaborn
@@ -397,6 +403,8 @@ pandocfilters==1.5.1
     # via nbconvert
 parso==0.8.4
     # via jedi
+pathspec==0.12.1
+    # via hatchling
 pexpect==4.9.0
     # via ipython
 pillow==11.0.0
@@ -409,8 +417,9 @@ pillow==11.0.0
     # via ultralytics
 platformdirs==4.3.6
     # via jupyter-core
-    # via pylint
     # via wandb
+pluggy==1.5.0
+    # via hatchling
 prometheus-client==0.21.1
     # via jupyter-server
 prompt-toolkit==3.0.50
@@ -420,14 +429,11 @@ propcache==0.3.1
     # via aiohttp
     # via yarl
 protobuf==5.29.3
-    # via onnx
-    # via onnxruntime-gpu
     # via tensorboard
     # via wandb
 psutil==7.0.0
     # via accelerate
     # via ipykernel
-    # via torch-geometric
     # via ultralytics
     # via wandb
 ptyprocess==0.7.0
@@ -437,8 +443,12 @@ pure-eval==0.2.3
     # via stack-data
 py-cpuinfo==9.0.0
     # via ultralytics
+pyarrow==20.0.0
+    # via datasets
 pycparser==2.22
     # via cffi
+pycryptodomex==3.22.0
+    # via blobfile
 pydantic==2.10.6
     # via albumentations
     # via fastapi
@@ -453,10 +463,8 @@ pygments==2.19.1
     # via jupyter-console
     # via nbconvert
     # via rich
-pylint==3.3.6
 pyparsing==3.2.1
     # via matplotlib
-    # via torch-geometric
 python-dateutil==2.9.0.post0
     # via arrow
     # via jupyter-client
@@ -471,6 +479,7 @@ pytz==2025.1
 pyyaml==6.0.2
     # via accelerate
     # via albumentations
+    # via datasets
     # via gradio
     # via huggingface-hub
     # via jupyter-events
@@ -485,16 +494,20 @@ pyzmq==26.2.1
     # via jupyter-client
     # via jupyter-console
     # via jupyter-server
+rapidfuzz==3.13.0
+    # via jiwer
 referencing==0.36.2
     # via jsonschema
     # via jsonschema-specifications
     # via jupyter-events
 regex==2024.11.6
+    # via tiktoken
     # via transformers
 requests==2.28.1
+    # via datasets
     # via huggingface-hub
     # via jupyterlab-server
-    # via torch-geometric
+    # via tiktoken
     # via transformers
     # via ultralytics
     # via wandb
@@ -532,6 +545,8 @@ semantic-version==2.10.0
     # via gradio
 send2trash==1.8.3
     # via jupyter-server
+sentencepiece==0.1.99
+    # via kuzushiji-vision
 sentry-sdk==2.22.0
     # via wandb
 setproctitle==1.3.5
@@ -563,21 +578,11 @@ starlette==0.46.1
 stringzilla==3.12.0
     # via albucore
 sympy==1.13.1
-    # via onnxruntime-gpu
-    # via onnxslim
     # via torch
 tensorboard==2.19.0
     # via kuzushiji-vision
 tensorboard-data-server==0.7.2
     # via tensorboard
-tensorrt==10.9.0.34
-    # via kuzushiji-vision
-tensorrt-cu12==10.9.0.34
-    # via tensorrt
-tensorrt-cu12-bindings==10.9.0.34
-    # via tensorrt-cu12
-tensorrt-cu12-libs==10.9.0.34
-    # via tensorrt-cu12
 terminado==0.18.1
     # via jupyter-server
     # via jupyter-server-terminals
@@ -585,6 +590,8 @@ threadpoolctl==3.5.0
     # via scikit-learn
 tifffile==2025.3.30
     # via scikit-image
+tiktoken==0.9.0
+    # via kuzushiji-vision
 timm==1.0.15
     # via kuzushiji-vision
 tinycss2==1.4.0
@@ -592,24 +599,19 @@ tinycss2==1.4.0
 tokenizers==0.21.1
     # via transformers
 tomli==2.2.1
+    # via hatchling
     # via jupyterlab
-    # via pylint
 tomlkit==0.13.2
     # via gradio
-    # via pylint
 torch==2.5.1+cu124
     # via accelerate
     # via kuzushiji-vision
     # via timm
-    # via torchaudio
     # via torchmetrics
     # via torchvision
+    # via transformers
     # via ultralytics
     # via ultralytics-thop
-torch-geometric==2.6.1
-    # via kuzushiji-vision
-torchaudio==2.5.1+cu124
-    # via kuzushiji-vision
 torchmetrics==1.0.3
     # via kuzushiji-vision
 torchvision==0.20.1+cu124
@@ -624,9 +626,9 @@ tornado==6.4.2
     # via notebook
     # via terminado
 tqdm==4.66.5
+    # via datasets
     # via huggingface-hub
     # via kuzushiji-vision
-    # via torch-geometric
     # via transformers
     # via ultralytics
 traitlets==5.14.3
@@ -644,17 +646,18 @@ traitlets==5.14.3
     # via nbclient
     # via nbconvert
     # via nbformat
-transformers==4.50.0
+transformers==4.51.3
     # via kuzushiji-vision
 triton==3.1.0
     # via torch
+trove-classifiers==2025.5.9.12
+    # via hatchling
 typer==0.15.2
     # via gradio
 types-python-dateutil==2.9.0.20241206
     # via arrow
 typing-extensions==4.12.2
     # via anyio
-    # via astroid
     # via async-lru
     # via beautifulsoup4
     # via fastapi
@@ -682,6 +685,7 @@ ultralytics-thop==2.0.14
 uri-template==1.3.0
     # via jsonschema
 urllib3==1.26.13
+    # via blobfile
     # via requests
     # via sentry-sdk
 uvicorn==0.34.0
@@ -701,7 +705,11 @@ websockets==15.0.1
     # via gradio-client
 werkzeug==3.1.3
     # via tensorboard
+wheel==0.45.1
+    # via kuzushiji-vision
 widgetsnbextension==4.0.13
     # via ipywidgets
+xxhash==3.5.0
+    # via datasets
 yarl==1.20.0
     # via aiohttp

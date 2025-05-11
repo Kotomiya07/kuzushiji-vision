@@ -4,7 +4,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import yaml  # Add yaml import
+
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
@@ -104,7 +104,6 @@ def get_doc_id_from_original_path(original_image_path: str) -> str:
 
 def prepare_yolo_dataset(
     column_info_file: str,
-    not_use_data: str,
     output_dir: str,
     train_docs_count: int = 31,
     val_docs_count: int = 7,
@@ -124,7 +123,7 @@ def prepare_yolo_dataset(
         return
 
     # 出力ディレクトリの準備 (train, val, test)
-    for split in ["train", "val", "test"]:
+    for split in ["train", "val", "test", "no_use"]:
         for subdir in ["images", "labels"]:
             (output_path / split / subdir).mkdir(parents=True, exist_ok=True)
 
@@ -147,22 +146,6 @@ def prepare_yolo_dataset(
         print(f"Error reading or processing CSV file {column_info_path}: {e}")
         return
 
-    # --- Exclude doc_ids listed in not_use_data.yaml ---
-    not_use_yaml_path = Path(not_use_data)
-    not_use_doc_ids = set()
-    if not_use_yaml_path.exists():
-        try:
-            with open(not_use_yaml_path, 'r', encoding='utf-8') as f:
-                not_use_yaml = yaml.safe_load(f)
-            if not_use_yaml and 'dirs' in not_use_yaml:
-                not_use_doc_ids = set(str(d) for d in not_use_yaml['dirs'])
-            else:
-                print(f"Warning: 'dirs' key not found in {not_use_yaml_path}, no exclusions applied.")
-        except Exception as e:
-            print(f"Warning: Failed to load {not_use_yaml_path}, no exclusions applied. Error: {e}")
-    else:
-        print(f"Warning: {not_use_yaml_path} does not exist, no exclusions applied.")
-
     # ドキュメントIDを original_image パスから抽出
     doc_ids = []
     invalid_paths = []
@@ -178,12 +161,6 @@ def prepare_yolo_dataset(
     df["doc_id"] = doc_ids
     df.dropna(subset=["doc_id"], inplace=True)  # ID抽出に失敗した行を削除
 
-    # --- Exclude rows with doc_id in not_use_doc_ids ---
-    before_exclude_count = len(df)
-    df = df[~df["doc_id"].isin(not_use_doc_ids)]
-    excluded_count = before_exclude_count - len(df)
-    if excluded_count > 0:
-        print(f"Excluded {excluded_count} entries based on not_use_data.yaml.")
 
     if invalid_paths:
         print(f"Warning: Could not extract document ID from {len(invalid_paths)} paths. Examples:")
@@ -219,7 +196,7 @@ def prepare_yolo_dataset(
 
     # --- Split logic: use existing split info if present ---
     split_info_path = output_path / "dataset_split_info.csv"
-    doc_id_splits = {"train": set(), "val": set(), "test": set()}
+    doc_id_splits = {"train": set(), "val": set(), "test": set(), "no_use": set()}
     use_existing_split = False
     if split_info_path.exists():
         try:
@@ -227,7 +204,7 @@ def prepare_yolo_dataset(
             if not all(col in split_df_info.columns for col in ["doc_id", "split"]):
                 print(f"Error: {split_info_path} does not contain required columns ['doc_id', 'split']. Ignoring file.")
             else:
-                for split in ["train", "val", "test"]:
+                for split in ["train", "val", "test", "no_use"]:
                     doc_id_splits[split] = set(split_df_info[split_df_info["split"] == split]["doc_id"].astype(str))
                 use_existing_split = True
                 print(f"Using existing split info from {split_info_path}. Ignoring train/val/test_docs_count arguments.")
@@ -297,8 +274,8 @@ def prepare_yolo_dataset(
     # ------------------------------------
 
     # データセット準備ループ
-    processed_count = EasyDict({"train": 0, "val": 0, "test": 0})
-    skipped_count = EasyDict({"train": 0, "val": 0, "test": 0})
+    processed_count = EasyDict({"train": 0, "val": 0, "test": 0, "no_use": 0})
+    skipped_count = EasyDict({"train": 0, "val": 0, "test": 0, "no_use": 0})
 
     for split, target_doc_ids in doc_id_splits.items():
         if not target_doc_ids:
@@ -401,20 +378,19 @@ def prepare_yolo_dataset(
     print(f"Train images processed: {processed_count['train']}, skipped: {skipped_count['train']}")
     print(f"Validation images processed: {processed_count['val']}, skipped: {skipped_count['val']}")
     print(f"Test images processed: {processed_count['test']}, skipped: {skipped_count['test']}")
+    print(f"No_use images processed: {processed_count['no_use']}, skipped: {skipped_count['no_use']}")
     print(f"YOLO dataset (using page images) saved to: {output_path.resolve()}")
 
 
 if __name__ == "__main__":
     # --- 設定 ---
     COLUMN_INFO_FILE = "data/processed/column_info.csv"
-    # 使用しないデータ
-    NOT_USE_DATA = "data/raw/not_use_data.yaml"
     # 出力ディレクトリ名を変更して、以前のスクリプトの出力と区別する
     OUTPUT_YOLO_DIR = "data/yolo_dataset_page_images_by_book"
     # 指定された書籍数
-    TRAIN_DOCS_COUNT = 27
-    VAL_DOCS_COUNT = 4
-    TEST_DOCS_COUNT = 3
+    TRAIN_DOCS_COUNT = 31
+    VAL_DOCS_COUNT = 7
+    TEST_DOCS_COUNT = 6
     RANDOM_SEED = 42
     CLASS_ID = 0  # 列検出タスクなのでクラスは1つ (0)
     # -------------
@@ -422,7 +398,6 @@ if __name__ == "__main__":
     print("Starting YOLO dataset preparation (using page images, split by book)...")
     prepare_yolo_dataset(
         column_info_file=COLUMN_INFO_FILE,
-        not_use_data=NOT_USE_DATA,
         output_dir=OUTPUT_YOLO_DIR,
         train_docs_count=TRAIN_DOCS_COUNT,
         val_docs_count=VAL_DOCS_COUNT,
