@@ -12,3 +12,17 @@
 ## 概要
 
 このプロジェクトは、日本の古典籍に含まれるくずし字を認識するための深層学習モデルを実装したものです。
+
+## 環境構築
+仮想環境はuvを使用して以下のコマンドを実行することで構築されます。
+
+```bash
+# dev と flash-attn のグループを抜いて sync　する
+uv sync --no-group dev --no-group flash-attn
+
+# その後 dev のグループを sync する (実行環境の場合はなくても OK)
+uv sync --group dev
+
+# 最後に flash-attn のグループを sync する
+uv sync --group flash-attn
+```
