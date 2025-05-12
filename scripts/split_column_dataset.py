@@ -300,37 +300,37 @@ def prepare_column_dataset(
     unicode_to_id_map = create_unicode_map(all_unicode_lists)
 
     # Save Unicode map
-    unicode_map_path = output_path / "unicode_to_id.json"
-    try:
-        with open(unicode_map_path, "w", encoding="utf-8") as f:
-            json.dump(unicode_to_id_map, f, ensure_ascii=False, indent=4)
-        logger.info(f"Saved Unicode map to: {unicode_map_path}")
+    # unicode_map_path = output_path / "unicode_to_id.json"
+    # try:
+    #     with open(unicode_map_path, "w", encoding="utf-8") as f:
+    #         json.dump(unicode_to_id_map, f, ensure_ascii=False, indent=4)
+    #     logger.info(f"Saved Unicode map to: {unicode_map_path}")
 
-        # --- Create and Save id_to_unicode map ---
-        id_to_unicode_map = {v: k for k, v in unicode_to_id_map.items()}
-        id_map_path = output_path / "id_to_unicode.json"
-        with open(id_map_path, "w", encoding="utf-8") as f:
-            json.dump(id_to_unicode_map, f, ensure_ascii=False, indent=4)
-        logger.info(f"Saved ID to Unicode map to: {id_map_path}")
+    #     # --- Create and Save id_to_unicode map ---
+    #     id_to_unicode_map = {v: k for k, v in unicode_to_id_map.items()}
+    #     id_map_path = output_path / "id_to_unicode.json"
+    #     with open(id_map_path, "w", encoding="utf-8") as f:
+    #         json.dump(id_to_unicode_map, f, ensure_ascii=False, indent=4)
+    #     logger.info(f"Saved ID to Unicode map to: {id_map_path}")
 
-        # --- Create and Save unicode_to_character map ---
-        unicode_to_char_map = {}
-        for unicode_str in unicode_to_id_map.keys():
-            try:
-                # 'U+XXXX' から文字へ変換
-                char_code = int(unicode_str[2:], 16)
-                character = chr(char_code)
-                unicode_to_char_map[unicode_str] = character
-            except ValueError:
-                logger.warning(f"Could not convert Unicode string '{unicode_str}' to character. Skipping.")
-        char_map_path = output_path / "unicode_to_character.json"
-        with open(char_map_path, "w", encoding="utf-8") as f:
-            json.dump(unicode_to_char_map, f, ensure_ascii=False, indent=4)
-        logger.info(f"Saved Unicode to Character map to: {char_map_path}")
+    #     # --- Create and Save unicode_to_character map ---
+    #     unicode_to_char_map = {}
+    #     for unicode_str in unicode_to_id_map.keys():
+    #         try:
+    #             # 'U+XXXX' から文字へ変換
+    #             char_code = int(unicode_str[2:], 16)
+    #             character = chr(char_code)
+    #             unicode_to_char_map[unicode_str] = character
+    #         except ValueError:
+    #             logger.warning(f"Could not convert Unicode string '{unicode_str}' to character. Skipping.")
+    #     char_map_path = output_path / "unicode_to_character.json"
+    #     with open(char_map_path, "w", encoding="utf-8") as f:
+    #         json.dump(unicode_to_char_map, f, ensure_ascii=False, indent=4)
+    #     logger.info(f"Saved Unicode to Character map to: {char_map_path}")
 
-    except Exception as e:
-        logger.error(f"Error saving Unicode maps: {e}")
-        # マップ作成失敗は致命的ではないかもしれないが、警告は出す
+    # except Exception as e:
+    #     logger.error(f"Error saving Unicode maps: {e}")
+    #     # マップ作成失敗は致命的ではないかもしれないが、警告は出す
 
     # --- Split Documents ---
     unique_doc_ids = df["doc_id"].unique()

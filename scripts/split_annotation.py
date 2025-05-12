@@ -1,3 +1,9 @@
+"""
+アノテーションCSVファイルを読み込み、書籍IDごとに分割して保存するスクリプト
+このスクリプトは、指定されたCSVファイルを読み込み、各行の書籍IDに基づいて新しいCSVファイルを作成します。
+各書籍IDごとに1つのCSVファイルが作成され、元のCSVファイルのヘッダー行も含まれます。
+書籍IDは、column_image列のパスから抽出されます。
+"""
 import csv
 import os
 from pathlib import Path

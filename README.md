@@ -26,3 +26,10 @@ uv sync --group dev
 # 最後に flash-attn のグループを sync する
 uv sync --group flash-attn
 ```
+
+## 言語モデルの事前学習
+```bash
+python scripts/concatenate_files.py
+python train_tokenizer_one_char.py
+python train_language_model.py
+```

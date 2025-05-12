@@ -1,18 +1,11 @@
 """
-Script for pre-processing data for column and character detection models.
-
-It takes a dataframe with path to images and corresponding annotations, and
-generates a new dataframe with the following:
-
-- path to the images
-- bounding box coordinates of the characters in the images
-- unicode IDs of the characters in the images
-- path to the pre-processed images (resized and normalized)
-
-This script also performs clustering on the character bounding boxes to
-generate column annotations.
-
-The output dataframe is saved as a CSV file.
+文字のバウンディングボックスを検出し、DBSCANを使用して列ごとにクラスタリングするスクリプト
+- 文字のバウンディングボックスを検出
+- DBSCANを使用して文字を列ごとにクラスタリング
+- 列ごとに画像を切り出し、指定されたディレクトリに保存
+- 列情報をCSVファイルとして保存
+- 設定ファイルを使用してパラメータを調整
+- 文字のバウンディングボックスの座標を相対座標に変換
 """
 import re
 from dataclasses import dataclass
@@ -203,7 +196,7 @@ def detect_text_columns_with_gap_check(
 
 
 def process_page_image(
-    image_path: str, coordinate_file: str, output_dir: str, eps_ratio: float = 0.5, min_samples: int = 5
+    image_path: str, coordinate_file: str, output_dir: str, eps_ratio: float = 0.5, min_samples: int = 1
 ) -> tuple[str, list[dict]]:
     """ページ画像から縦方向の列を検出して切り出す (Pillowを使用)
 
@@ -248,11 +241,25 @@ def process_page_image(
                 print(f"Warning: Invalid coordinate data for {row.get('Unicode', 'N/A')} in {image_stem}: {e}. Skipping row.")
                 continue
 
-        # 文字数に応じてmin_samplesを動的に設定
-        adaptive_min_samples = 2 if len(char_boxes) <= 20 else min_samples
         # 列の検出
-        #text_columns = detect_text_columns(char_boxes, eps_ratio=eps_ratio, min_samples=adaptive_min_samples)
-        text_columns = detect_text_columns_with_gap_check(char_boxes, eps_ratio, min_samples, max_vertical_gap_ratio=1.5)
+        # esp_ratioを0.1, 0.3, 0.5で試してみて、最も列数が少ないものを選ぶ
+        text_columns_01 = detect_text_columns(char_boxes, eps_ratio=0.1, min_samples=min_samples)
+        text_columns_03 = detect_text_columns(char_boxes, eps_ratio=0.3, min_samples=min_samples)
+        text_columns_05 = detect_text_columns(char_boxes, eps_ratio=0.5, min_samples=min_samples)
+        # それぞれの列数を比較して、最も列数が少ないものを選択
+        text_columns = min(
+            [text_columns_01, text_columns_03, text_columns_05],
+            key=lambda cols: len(cols),
+        )
+        # 最小の列数となったときのeps_ratioを表示
+        # if len(text_columns) == len(text_columns_01):
+        #     print(f"Using eps_ratio=0.1 for {image_stem} with {len(text_columns)} columns.")
+        # elif len(text_columns) == len(text_columns_03):
+        #     print(f"Using eps_ratio=0.3 for {image_stem} with {len(text_columns)} columns.")
+        # else:
+        #     print(f"Using eps_ratio=0.5 for {image_stem} with {len(text_columns)} columns.")
+
+        #text_columns = detect_text_columns_with_gap_check(char_boxes, eps_ratio, min_samples, max_vertical_gap_ratio=1.5)
 
         # 出力ディレクトリの作成
         image_id_parts = image_stem.split("_")
