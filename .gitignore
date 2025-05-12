@@ -159,10 +159,13 @@ Thumbs.db
 
 # Project-specific
 .cursurrules
+.cursor/
 .roo/
 .roorules/
 memory-bank/
 data/raw/
+data/oneline/
+data/honkoku/
 data/processed/
 data/processed_padded/
 data/column_dataset/
@@ -196,3 +199,8 @@ ndl-minhon-ocrdataset/src/v2/
 
 # yatanavi honkoku
 honkoku_yatanavi/
+
+vit_pytorch/
+enhancing-transformers/
+
+**/*.zip

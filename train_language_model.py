@@ -5,7 +5,7 @@
 import argparse
 import glob
 import os
-
+from datetime import datetime
 import torch
 from datasets import Dataset
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
@@ -22,7 +22,7 @@ from transformers import (
 def main():
     parser = argparse.ArgumentParser(description="Pretrain a language model for Kuzushiji recognition.")
     parser.add_argument(
-        "--model_name", type=str, default="nlp-waseda/roberta-large-japanese", help="Pretrained model name or path."
+        "--model_name", type=str, default="KoichiYasuoka/roberta-small-japanese-aozora-char", help="Pretrained model name or path."
     )
     parser.add_argument(
         "--dataset_dirs",
@@ -30,7 +30,8 @@ def main():
         default=[
             "ndl-minhon-ocrdataset/src/honkoku_oneline_v1",
             "ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
-            "honkoku_yatanavi/honkoku_oneline,",
+            "honkoku_yatanavi/honkoku_oneline",
+            "data/oneline",
         ],
         help="Directory containing the text dataset files.",
     )
@@ -69,8 +70,15 @@ def main():
     # 2. Load and Preprocess Dataset
     print(f"Loading dataset from {args.dataset_dirs}")
     text_files = []
+    # dataset_dirsの各ディレクトリ以下を再帰的に検索
     for dataset_dir in args.dataset_dirs:
-        text_files.extend(glob.glob(os.path.join(dataset_dir, "*.txt")))
+        text_files_iterator = glob.iglob(os.path.join(dataset_dir, "**/*.txt"), recursive=True)
+        count = 0
+        for text_file in text_files_iterator:
+            text_files.append(text_file)
+            count += 1
+        print(f"Found {count} text files in {dataset_dir}")
+
 
     texts = []
     for file_path in text_files:
@@ -111,7 +119,7 @@ def main():
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=True, mlm_probability=args.mask_probability)
     print(f"Using DataCollatorForLanguageModeling with mask probability: {args.mask_probability}")
 
-    output_dir = os.path.join(args.output_dir, args.model_name.split("/")[-1])
+    output_dir = os.path.join(args.output_dir, args.model_name.split("/")[-1], datetime.now().strftime("%Y%m%d_%H%M%S"))
     os.makedirs(output_dir, exist_ok=True)
     # 5. Training Arguments
     training_args = TrainingArguments(
@@ -217,17 +225,24 @@ if __name__ == "__main__":
 
 # How to run
 """
-python pretrain_language_model.py \
+python train_language_model.py \
     --output_dir experiments/pretrain_language_model \
-    --vocab_size 32000 \
-    --model_type bpe \
-    --num_train_epochs 100 \
-    --per_device_train_batch_size 128 \
+    --num_train_epochs 1000 \
+    --per_device_train_batch_size 1024 \
     --per_device_eval_batch_size 2 \
-    --learning_rate 4e-5 \
+    --learning_rate 1e-4 \
     --mask_probability 0.1 \
     --test_size 0.01 \
     --save_steps 10000 \
     --eval_steps 10000 \
-    --logging_steps 100
+    --logging_steps 100 \
+    --gradient_accumulation_steps 2
 """
+
+"""
+Found 66537 text files in ndl-minhon-ocrdataset/src/honkoku_oneline_v1
+Found 360052 text files in ndl-minhon-ocrdataset/src/honkoku_oneline_v2
+Found 84990 text files in honkoku_yatanavi/honkoku_oneline
+Found 29603 text files in data/oneline
+"""
+
