@@ -186,7 +186,7 @@ def main():
         greater_is_better=True,
         auto_find_batch_size=args.auto_find_batch_size,
         resume_from_checkpoint=args.resume_from_checkpoint,
-        optimizer="schedule_free_adamw",  # Schedule-Free Optimizer の指定
+        optim="schedule_free_adamw",  # Schedule-Free Optimizer の指定
         lr_scheduler_type="constant",
     )
     if args.gradient_accumulation_steps:
