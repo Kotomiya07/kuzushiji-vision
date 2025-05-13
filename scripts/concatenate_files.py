@@ -36,4 +36,6 @@ if __name__ == "__main__":
         "data/oneline",
     ]
     file_list = get_all_text_files(DATA_DIRS)
-    concatenate_files(file_list, "data/honkoku")
+    output_dir = "data/honkoku"
+    os.makedirs(output_dir, exist_ok=True)
+    concatenate_files(file_list, output_dir)

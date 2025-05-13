@@ -6,7 +6,42 @@ import argparse
 import glob
 import os
 from datetime import datetime
+
+import numpy as np
 import torch
+from numpy import dtype, ndarray
+
+# _reconstruct を直接インポート
+from numpy.core.multiarray import _reconstruct
+
+# 安全なグローバルとして登録
+torch.serialization.add_safe_globals([_reconstruct])
+torch.serialization.add_safe_globals([ndarray])
+torch.serialization.add_safe_globals([dtype])
+
+# NumPy のデータ型クラスをインポート (正確なパスは NumPy のバージョンによる可能性があります)
+# 多くの場合、np.dtype('uint32') の型そのものを取得するか、
+# 型クラスを直接指定します。
+# まず UInt32DType を試す
+try:
+    from numpy import UInt32DType
+    dtype_to_add = UInt32DType
+except ImportError:
+    # 古い NumPy や別のアクセス方法の場合
+    try:
+        from numpy.dtypes import UInt32DType as NumpyUInt32DType  # エイリアスを使う
+        dtype_to_add = NumpyUInt32DType
+    except ImportError:
+        # dtypeオブジェクト自体を登録することも試せる
+        dtype_to_add = np.dtype('uint32').type
+        print(f"Warning: Using np.dtype('uint32').type ({dtype_to_add}) for safe globals.")
+
+# 安全なグローバルとして登録
+if dtype_to_add:
+    torch.serialization.add_safe_globals([dtype_to_add])
+else:
+    print("Error: Could not find UInt32DType to add to safe globals.")
+
 from datasets import Dataset
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from transformers import (
@@ -17,6 +52,7 @@ from transformers import (
     Trainer,
     TrainingArguments,
 )
+from transformers.trainer_utils import get_last_checkpoint
 
 
 def main():
@@ -54,6 +90,7 @@ def main():
     )
     parser.add_argument("--gradient_accumulation_steps", type=int, default=None, help="Gradient accumulation steps.")
     parser.add_argument("--auto_find_batch_size", action="store_true", help="Auto find batch size.")
+    parser.add_argument("--resume_from_checkpoint", type=str, default=None, help="Resume from checkpoint.")
 
     args = parser.parse_args()
 
@@ -119,19 +156,24 @@ def main():
     data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=True, mlm_probability=args.mask_probability)
     print(f"Using DataCollatorForLanguageModeling with mask probability: {args.mask_probability}")
 
-    output_dir = os.path.join(args.output_dir, args.model_name.split("/")[-1], datetime.now().strftime("%Y%m%d_%H%M%S"))
-    os.makedirs(output_dir, exist_ok=True)
+    if args.resume_from_checkpoint is None:
+        output_dir = os.path.join(args.output_dir, args.model_name.split("/")[-1], datetime.now().strftime("%Y%m%d_%H%M%S"))
+        os.makedirs(output_dir, exist_ok=True)
+        run_name = output_dir.split("/")[-1]
+    else:
+        output_dir = args.resume_from_checkpoint
+        run_name = args.resume_from_checkpoint.split("/")[-1]+"_resume"
     # 5. Training Arguments
     training_args = TrainingArguments(
+        run_name=run_name,
         output_dir=output_dir,
         overwrite_output_dir=True,
         dataloader_pin_memory=True,
-        dataloader_num_workers=24,
+        dataloader_num_workers=os.cpu_count(),
         torch_compile=True,
         num_train_epochs=args.num_train_epochs,
         per_device_train_batch_size=args.per_device_train_batch_size if not args.auto_find_batch_size else 512,
         per_device_eval_batch_size=args.per_device_eval_batch_size,
-        learning_rate=args.learning_rate,
         eval_strategy="steps" if eval_dataset is not None else "no",
         eval_steps=args.eval_steps if eval_dataset is not None else None,
         save_steps=args.save_steps,
@@ -143,10 +185,16 @@ def main():
         metric_for_best_model="f1",
         greater_is_better=True,
         auto_find_batch_size=args.auto_find_batch_size,
+        resume_from_checkpoint=args.resume_from_checkpoint,
+        optim="schedule_free_adamw",  # Schedule-Free Optimizer の指定
+        lr_scheduler_type="constant",
     )
     if args.gradient_accumulation_steps:
         training_args.gradient_accumulation_steps = args.gradient_accumulation_steps
     print("TrainingArguments configured.")
+
+    if args.resume_from_checkpoint is None:
+        training_args.learning_rate = args.learning_rate
 
     # 6. Evaluation Metrics
     def compute_metrics(p):
@@ -200,7 +248,15 @@ def main():
 
     # 8. Train
     print("Starting training...")
-    trainer.train()
+    print(f"output_dir: {training_args.output_dir}")
+    last_checkpoint = get_last_checkpoint(training_args.output_dir)
+    if last_checkpoint is not None:
+        print(f"最新のチェックポイント: {last_checkpoint} から再開します。")
+        trainer.train(resume_from_checkpoint=last_checkpoint)
+    else:
+        print("チェックポイントが見つかりませんでした。最初から学習します。")
+        trainer.train()
+
     print("Training finished.")
 
     # 9. Save model and tokenizer
@@ -227,16 +283,16 @@ if __name__ == "__main__":
 """
 python train_language_model.py \
     --output_dir experiments/pretrain_language_model \
-    --num_train_epochs 1000 \
+    --num_train_epochs 10000 \
     --per_device_train_batch_size 1024 \
     --per_device_eval_batch_size 2 \
-    --learning_rate 1e-4 \
-    --mask_probability 0.1 \
+    --learning_rate 0.0001 \
+    --mask_probability 0.15 \
     --test_size 0.01 \
     --save_steps 10000 \
     --eval_steps 10000 \
     --logging_steps 100 \
-    --gradient_accumulation_steps 2
+    --resume_from_checkpoint experiments/pretrain_language_model/roberta-small-japanese-aozora-char/20250511_192051
 """
 
 """
