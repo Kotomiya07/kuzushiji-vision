@@ -9,10 +9,22 @@ from datetime import datetime
 
 import numpy as np
 import torch
+from datasets import Dataset
 from numpy import dtype, ndarray
 
 # _reconstruct を直接インポート
 from numpy.core.multiarray import _reconstruct
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+from transformers import (
+    AutoModelForMaskedLM,
+    AutoTokenizer,
+    DataCollatorForLanguageModeling,
+    EarlyStoppingCallback,
+    Trainer,
+    TrainerCallback,
+    TrainingArguments,
+)
+from transformers.trainer_utils import get_last_checkpoint
 
 # 安全なグローバルとして登録
 torch.serialization.add_safe_globals([_reconstruct])
@@ -25,15 +37,17 @@ torch.serialization.add_safe_globals([dtype])
 # まず UInt32DType を試す
 try:
     from numpy import UInt32DType
+
     dtype_to_add = UInt32DType
 except ImportError:
     # 古い NumPy や別のアクセス方法の場合
     try:
         from numpy.dtypes import UInt32DType as NumpyUInt32DType  # エイリアスを使う
+
         dtype_to_add = NumpyUInt32DType
     except ImportError:
         # dtypeオブジェクト自体を登録することも試せる
-        dtype_to_add = np.dtype('uint32').type
+        dtype_to_add = np.dtype("uint32").type
         print(f"Warning: Using np.dtype('uint32').type ({dtype_to_add}) for safe globals.")
 
 # 安全なグローバルとして登録
@@ -42,32 +56,75 @@ if dtype_to_add:
 else:
     print("Error: Could not find UInt32DType to add to safe globals.")
 
-from datasets import Dataset
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support
-from transformers import (
-    AutoModelForMaskedLM,
-    AutoTokenizer,
-    DataCollatorForLanguageModeling,
-    EarlyStoppingCallback,
-    Trainer,
-    TrainingArguments,
-)
-from transformers.trainer_utils import get_last_checkpoint
+
+# Custom Callback for training data metrics
+class TrainMetricsCallback(TrainerCallback):
+    def __init__(self, train_dataset_for_metrics, compute_metrics_fn, metric_key_prefix="train", max_samples_for_metrics=None):
+        self.train_dataset_for_metrics = train_dataset_for_metrics
+        self.compute_metrics_fn = compute_metrics_fn
+        self.metric_key_prefix = metric_key_prefix
+        self.trainer = None
+        self.max_samples_for_metrics = max_samples_for_metrics
+
+    def on_evaluate(self, args, state, control, model=None, **kwargs):
+        if self.trainer is None:
+            print("Warning: Trainer instance not available in TrainMetricsCallback. Skipping train metrics.")
+            return
+
+        if state.is_world_process_zero:  # Only run on the main process
+            if self.train_dataset_for_metrics is None:
+                print("Train dataset for metrics is not available in callback.")
+                return
+            if self.compute_metrics_fn is None:
+                print("Compute metrics function is not available in callback.")
+                return
+
+            print(f"Evaluating on training data (or a subset) at step {state.global_step}...")
+
+            eval_dataset = self.train_dataset_for_metrics
+            if self.max_samples_for_metrics is not None and self.max_samples_for_metrics < len(self.train_dataset_for_metrics):
+                # Randomly select a subset of the training data for evaluation
+                indices = np.random.choice(len(self.train_dataset_for_metrics), self.max_samples_for_metrics, replace=False)
+                eval_dataset = self.train_dataset_for_metrics.select(indices)
+                print(f"Using a random subset of {len(eval_dataset)} samples from training data for metrics calculation.")
+            else:
+                print(f"Using the full training dataset ({len(eval_dataset)} samples) for metrics calculation.")
+
+            # trainer.predict を使用して訓練データセット（またはサブセット）で予測を実行
+            predictions_output = self.trainer.predict(eval_dataset, metric_key_prefix=self.metric_key_prefix)
+            metrics_from_predict = predictions_output.metrics
+
+            custom_metrics_input = (predictions_output.predictions, predictions_output.label_ids)
+            custom_metrics = self.compute_metrics_fn(custom_metrics_input)
+
+            log_metrics = {}
+            if metrics_from_predict:
+                for k, v in metrics_from_predict.items():
+                    log_metrics[k] = v
+
+            for k, v in custom_metrics.items():
+                log_metrics[f"{self.metric_key_prefix}_{k}"] = v
+
+            self.trainer.log(log_metrics)
+            print(f"Train data metrics logged: {log_metrics}")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Pretrain a language model for Kuzushiji recognition.")
     parser.add_argument(
-        "--model_name", type=str, default="KoichiYasuoka/roberta-small-japanese-aozora-char", help="Pretrained model name or path."
+        "--model_name",
+        type=str,
+        default="KoichiYasuoka/roberta-small-japanese-aozora-char",
+        help="Pretrained model name or path.",
     )
     parser.add_argument(
         "--dataset_dirs",
         type=list,
         default=[
             "ndl-minhon-ocrdataset/src/honkoku_oneline_v1",
-            "ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
-            "honkoku_yatanavi/honkoku_oneline",
-            "data/oneline",
+            # "ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
+            # "honkoku_yatanavi/honkoku_oneline",
+            # "data/oneline",
         ],
         help="Directory containing the text dataset files.",
     )
@@ -116,7 +173,6 @@ def main():
             count += 1
         print(f"Found {count} text files in {dataset_dir}")
 
-
     texts = []
     for file_path in text_files:
         with open(file_path, encoding="utf-8") as f:
@@ -145,7 +201,7 @@ def main():
 
     # 3. Model
     print(f"Loading model: {args.model_name}")
-    #model = AutoModelForMaskedLM.from_pretrained(args.model_name, attn_implementation="flash_attention_2")
+    # model = AutoModelForMaskedLM.from_pretrained(args.model_name, attn_implementation="flash_attention_2")
     model = AutoModelForMaskedLM.from_pretrained(args.model_name)
     # Resize token embeddings if we used a custom tokenizer or added tokens to AutoTokenizer
     # This is crucial if the vocab size of the tokenizer is different from the model's original vocab size
@@ -162,7 +218,7 @@ def main():
         run_name = output_dir.split("/")[-1]
     else:
         output_dir = args.resume_from_checkpoint
-        run_name = args.resume_from_checkpoint.split("/")[-1]+"_resume"
+        run_name = args.resume_from_checkpoint.split("/")[-1] + "_resume"
     # 5. Training Arguments
     training_args = TrainingArguments(
         run_name=run_name,
@@ -225,13 +281,12 @@ def main():
     print("Compute_metrics function defined.")
 
     # EarlyStoppingCallbackの設定
+    callbacks_list = []
     if args.early_stopping_patience is not None:
         early_stopping_callback = EarlyStoppingCallback(
             early_stopping_patience=args.early_stopping_patience,
         )
-        callbacks = [early_stopping_callback]
-    else:
-        callbacks = []
+        callbacks_list.append(early_stopping_callback)
 
     # 7. Trainer
     trainer = Trainer(
@@ -242,9 +297,25 @@ def main():
         tokenizer=tokenizer,
         data_collator=data_collator,
         compute_metrics=compute_metrics if eval_dataset is not None else None,
-        callbacks=callbacks,
+        callbacks=callbacks_list,
     )
     print("Trainer initialized.")
+
+    # Add custom callback for training metrics
+    if trainer.train_dataset is not None and (compute_metrics if eval_dataset is not None else None) is not None:
+        train_metrics_callback = TrainMetricsCallback(
+            train_dataset_for_metrics=trainer.train_dataset, compute_metrics_fn=compute_metrics, max_samples_for_metrics=2000
+        )
+        train_metrics_callback.trainer = trainer
+        trainer.add_callback(train_metrics_callback)
+        print("TrainMetricsCallback registered.")
+    else:
+        if trainer.train_dataset is None:
+            print("TrainMetricsCallback not registered because train_dataset is None.")
+        if (compute_metrics if eval_dataset is not None else None) is None:
+            print(
+                "TrainMetricsCallback not registered because compute_metrics is None (likely no eval_dataset or eval_strategy='no')."
+            )
 
     # 8. Train
     print("Starting training...")
@@ -290,7 +361,7 @@ python train_language_model.py \
     --mask_probability 0.15 \
     --test_size 0.01 \
     --save_steps 10000 \
-    --eval_steps 10000 \
+    --eval_steps 1000 \
     --logging_steps 100 \
     --resume_from_checkpoint experiments/pretrain_language_model/roberta-small-japanese-aozora-char/20250511_192051
 """
@@ -301,4 +372,3 @@ Found 360052 text files in ndl-minhon-ocrdataset/src/honkoku_oneline_v2
 Found 84990 text files in honkoku_yatanavi/honkoku_oneline
 Found 29603 text files in data/oneline
 """
-
