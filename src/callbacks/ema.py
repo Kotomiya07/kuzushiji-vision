@@ -1,11 +1,15 @@
-import pytorch_lightning as pl
-import torch
-from typing import Optional, List, Union
+import lightning as L
 
-class EMACallback(pl.Callback):
-    """Exponential Moving Average (EMA) callback for model parameters"""
 
-    def __init__(self, decay: float = 0.9999, target_module_names: Optional[Union[str, List[str]]] = None):
+class EMACallback(L.Callback):
+    """
+    Exponential Moving Average (EMA) callback for model parameters
+    
+    Usage:
+    ema_callback = EMACallback(decay=0.9999, target_module_names=["generator"])
+    """
+
+    def __init__(self, decay: float = 0.9999, target_module_names: str | list[str] | None = None):
         """
         Args:
             decay: EMAの減衰率
@@ -19,7 +23,7 @@ class EMACallback(pl.Callback):
         self.shadow = {}
         self.backup = {}
 
-    def _get_target_parameters(self, pl_module: pl.LightningModule):
+    def _get_target_parameters(self, pl_module: L.LightningModule):
         """EMAを適用するパラメータを取得"""
         if self.target_module_names is None:
             # モジュール指定がない場合はpl_module全体のパラメータを対象
@@ -39,13 +43,13 @@ class EMACallback(pl.Callback):
                     print(f"Warning: Module '{module_name}' not found in LightningModule. Skipping EMA for this module.")
 
 
-    def on_fit_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule):
+    def on_fit_start(self, trainer: L.Trainer, pl_module: L.LightningModule):
         """訓練開始時にEMAパラメータを初期化"""
         self.shadow.clear() # 念のためクリア
         for name, param in self._get_target_parameters(pl_module):
              self.shadow[name] = param.data.clone()
 
-    def on_train_batch_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule, outputs, batch, batch_idx):
+    def on_train_batch_end(self, trainer: L.Trainer, pl_module: L.LightningModule, outputs, batch, batch_idx):
         """各バッチ後にEMAを更新"""
         for name, param in self._get_target_parameters(pl_module):
              if name in self.shadow: # on_fit_startで初期化されたものだけ更新
@@ -54,7 +58,7 @@ class EMACallback(pl.Callback):
                     param.data * (1 - self.decay)
                 )
 
-    def on_validation_start(self, trainer: pl.Trainer, pl_module: pl.LightningModule):
+    def on_validation_start(self, trainer: L.Trainer, pl_module: L.LightningModule):
         """検証開始時にモデルのパラメータをEMAに置き換え"""
         self.backup.clear() # 念のためクリア
         for name, param in self._get_target_parameters(pl_module):
@@ -62,19 +66,19 @@ class EMACallback(pl.Callback):
                 self.backup[name] = param.data.clone()
                 param.data.copy_(self.shadow[name])
 
-    def on_validation_end(self, trainer: pl.Trainer, pl_module: pl.LightningModule):
+    def on_validation_end(self, trainer: L.Trainer, pl_module: L.LightningModule):
         """検証終了時にモデルのパラメータを元に戻す"""
         for name, param in self._get_target_parameters(pl_module):
              if name in self.backup: # backupしたものだけ復元
                 param.data.copy_(self.backup[name])
         self.backup.clear()
 
-    def on_save_checkpoint(self, trainer: pl.Trainer, pl_module: pl.LightningModule, checkpoint: dict) -> dict:
+    def on_save_checkpoint(self, trainer: L.Trainer, pl_module: L.LightningModule, checkpoint: dict) -> dict:
         """チェックポイント保存時にEMAの状態も保存"""
         # checkpoint辞書に直接追加する方が一般的
         checkpoint['ema_shadow'] = self.shadow
 
-    def on_load_checkpoint(self, trainer: pl.Trainer, pl_module: pl.LightningModule, checkpoint: dict):
+    def on_load_checkpoint(self, trainer: L.Trainer, pl_module: L.LightningModule, checkpoint: dict):
         """チェックポイント読み込み時にEMAの状態を復元"""
         # checkpointにema_shadowキーが存在するか確認
         if 'ema_shadow' in checkpoint:
