@@ -34,6 +34,7 @@ if __name__ == "__main__":
         "ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
         "honkoku_yatanavi/honkoku_oneline",
         "data/oneline",
+        "kokubunken_repo/text",
     ]
     file_list = get_all_text_files(DATA_DIRS)
     output_dir = "data/honkoku"
