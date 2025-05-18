@@ -26,7 +26,6 @@ from transformers import (
 )
 from transformers.trainer_utils import get_last_checkpoint
 
-
 # 安全なグローバルとして登録
 torch.serialization.add_safe_globals([_reconstruct])
 torch.serialization.add_safe_globals([ndarray])
@@ -158,7 +157,7 @@ def main():
     DEFAULT_MODEL_TYPE = args.model_type
     BASE_EXPERIMENT_DIR = "experiments/kuzushiji_tokenizer_one_char"
     MODEL_SPECIFIC_DIR_NAME = f"vocab{DEFAULT_VOCAB_SIZE}_{DEFAULT_MODEL_TYPE}"
-    TOKENIZER_FILE_PATH = os.path.join(BASE_EXPERIMENT_DIR, MODEL_SPECIFIC_DIR_NAME)
+    os.path.join(BASE_EXPERIMENT_DIR, MODEL_SPECIFIC_DIR_NAME)
 
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
 

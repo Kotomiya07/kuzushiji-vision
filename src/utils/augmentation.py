@@ -37,7 +37,9 @@ def get_column_detection_transforms(config: dict) -> A.Compose:
             A.RandomRotate90(p=0.0),  # 日本語の文書なので90度回転は不要
             A.Rotate(limit=aug_config["rotation"], p=0.5),
             A.RandomScale(scale_limit=(aug_config["scale"][0] - 1.0, aug_config["scale"][1] - 1.0), p=0.5),
-            A.RandomBrightnessContrast(brightness_limit=aug_config["brightness"], contrast_limit=aug_config["contrast"], p=0.5),
+            A.RandomBrightnessContrast(
+                brightness_limit=aug_config["brightness"], contrast_limit=aug_config["contrast"], p=0.5
+            ),
             A.GaussNoise(p=0.3),  # デフォルトのパラメータを使用
             A.GaussNoise(p=0.3),  # デフォルトのパラメータを使用
         ],
@@ -62,7 +64,9 @@ def get_character_detection_train_transforms(config: dict) -> A.Compose:
             # Resize is now handled in the Dataset __getitem__ before this transform
             # 1. Geometric and Color Augmentations (applied to image and bboxes)
             A.Rotate(limit=aug_config["rotation"], p=0.5, border_mode=cv2.BORDER_CONSTANT, value=0),  # Pad with 0
-            A.RandomBrightnessContrast(brightness_limit=aug_config["brightness"], contrast_limit=aug_config["contrast"], p=0.5),
+            A.RandomBrightnessContrast(
+                brightness_limit=aug_config["brightness"], contrast_limit=aug_config["contrast"], p=0.5
+            ),
             A.GaussNoise(p=0.3),
             A.MotionBlur(p=0.2, blur_limit=7),
             A.ImageCompression(quality_lower=80, quality_upper=100, p=0.3),  # Updated args

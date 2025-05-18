@@ -7,6 +7,7 @@
 - 設定ファイルを使用してパラメータを調整
 - 文字のバウンディングボックスの座標を相対座標に変換
 """
+
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -111,8 +112,8 @@ def detect_text_columns(
 def detect_text_columns_with_gap_check(
     char_boxes: list[CharacterBox],
     eps_ratio: float = 0.2,
-    min_samples: int = 1, # デフォルトを1に戻すか、ユースケースに合わせて調整
-    max_vertical_gap_ratio: float = 1.5 # 新しいパラメータ: 垂直ギャップの許容割合 (文字高比)
+    min_samples: int = 1,  # デフォルトを1に戻すか、ユースケースに合わせて調整
+    max_vertical_gap_ratio: float = 1.5,  # 新しいパラメータ: 垂直ギャップの許容割合 (文字高比)
 ) -> list[list[CharacterBox]]:
     """DBSCANと後処理を用いて文字を列ごとにクラスタリングし、垂直方向のギャップで分割"""
     if not char_boxes:
@@ -135,10 +136,10 @@ def detect_text_columns_with_gap_check(
     labels = clustering.labels_
 
     # クラスタごとに文字をグループ化
-    initial_columns: Dict[int, List[CharacterBox]] = {}
+    initial_columns: dict[int, list[CharacterBox]] = {}
     noise_label_start = max(labels) + 1 if any(label != -1 for label in labels) else 0
     noise_count = 0
-    for label, box in zip(labels, char_boxes, strict=True): # strict=True推奨 (要素数が違う場合エラー)
+    for label, box in zip(labels, char_boxes, strict=True):  # strict=True推奨 (要素数が違う場合エラー)
         current_label = label
         if label == -1:
             current_label = noise_label_start + noise_count
@@ -148,8 +149,8 @@ def detect_text_columns_with_gap_check(
         initial_columns[current_label].append(box)
 
     # --- ここから後処理 ---
-    final_columns: List[List[CharacterBox]] = []
-    for label in sorted(initial_columns.keys()): # ラベル順に処理
+    final_columns: list[list[CharacterBox]] = []
+    for label in sorted(initial_columns.keys()):  # ラベル順に処理
         column = initial_columns[label]
         if not column:
             continue
@@ -165,15 +166,15 @@ def detect_text_columns_with_gap_check(
         # 分割のための閾値（クラスタ内の文字高の中央値を使用）
         heights = [box.height for box in column if box.height > 0]
         if not heights:
-            median_height = 10 # デフォルト値
+            median_height = 10  # デフォルト値
         else:
             median_height = np.median(heights)
         gap_threshold = median_height * max_vertical_gap_ratio
 
-        current_sub_column: List[CharacterBox] = [column[0]]
+        current_sub_column: list[CharacterBox] = [column[0]]
         for i in range(len(column) - 1):
             char_above = column[i]
-            char_below = column[i+1]
+            char_below = column[i + 1]
             vertical_gap = char_below.y1 - char_above.y2
 
             if vertical_gap > gap_threshold:
@@ -197,7 +198,7 @@ def detect_text_columns_with_gap_check(
 
 def process_page_image(
     image_path: str, coordinate_file: str, output_dir: str, eps_ratio: float = 0.5, min_samples: int = 1
-) -> tuple[str, list[dict]]:
+) -> tuple[str, list[dict[str, str | list[list[int]] | list[str]]]]:
     """ページ画像から縦方向の列を検出して切り出す (Pillowを使用)
 
     Args:
@@ -259,7 +260,7 @@ def process_page_image(
         # else:
         #     print(f"Using eps_ratio=0.5 for {image_stem} with {len(text_columns)} columns.")
 
-        #text_columns = detect_text_columns_with_gap_check(char_boxes, eps_ratio, min_samples, max_vertical_gap_ratio=1.5)
+        # text_columns = detect_text_columns_with_gap_check(char_boxes, eps_ratio, min_samples, max_vertical_gap_ratio=1.5)
 
         # 出力ディレクトリの作成
         image_id_parts = image_stem.split("_")
@@ -267,7 +268,7 @@ def process_page_image(
         doc_id = image_id_parts[0] if image_id_parts else image_stem
         # 数字以外がdoc_idに含まれている場合は数値部分を'00000'にする
         if not doc_id.isdigit():
-            doc_id = re.sub(r'\d+', '00000', doc_id)
+            doc_id = re.sub(r"\d+", "00000", doc_id)
         output_subdir = Path(output_dir) / doc_id / image_stem
         output_subdir.mkdir(parents=True, exist_ok=True)
 
@@ -400,7 +401,13 @@ def main():
         # 各画像の処理
         for image_path in tqdm(image_files, desc=f"Images in {doc_dir.name}", leave=False):
             try:
-                _, column_info = process_page_image(str(image_path), str(coord_file), str(column_images_dir), eps_ratio=config.preprocessing.eps_ratio, min_samples=config.preprocessing.min_samples)
+                _, column_info = process_page_image(
+                    str(image_path),
+                    str(coord_file),
+                    str(column_images_dir),
+                    eps_ratio=config.preprocessing.eps_ratio,
+                    min_samples=config.preprocessing.min_samples,
+                )
                 # 列情報の保存
                 all_column_info.extend(column_info)
             except Exception as e:

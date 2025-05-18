@@ -3,8 +3,6 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 
-import japanize_matplotlib
-
 
 def count_images_in_directories(base_dir):
     char_counts = {}
@@ -61,6 +59,7 @@ def main():
     print(f"1枚しかない文字の総数: {sum(1 for count in char_counts.values() if count == 1)}")
     # 文字の総数: 4328
     # 1枚しかない文字の総数: 790
+
 
 if __name__ == "__main__":
     main()

@@ -3,7 +3,7 @@ import pstats
 from pstats import SortKey
 
 # プロファイルデータをロード
-p = pstats.Stats('padding_data_fix1.prof')
+p = pstats.Stats("padding_data_fix1.prof")
 
 # 不要なパス情報を削除して表示を短縮
 p.strip_dirs()

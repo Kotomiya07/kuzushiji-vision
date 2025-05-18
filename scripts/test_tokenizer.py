@@ -38,9 +38,11 @@
 #             print(f"モデル: {model_name}, タイプ: {model_type}, 語彙サイズ: {vocab_size}")
 #             print(f"トークン化結果: {decode_sentence}\n")
 # %%
-import os
 import argparse
+import os
+
 from tokenizers import Tokenizer
+
 
 def test_hf_tokenizer(tokenizer_path, sample_texts):
     """
@@ -57,7 +59,7 @@ def test_hf_tokenizer(tokenizer_path, sample_texts):
     # 1. トークナイザーのロード
     try:
         tokenizer = Tokenizer.from_file(tokenizer_path)
-        #print(f"トークナイザーを正常にロードしました: {tokenizer_path}\n")
+        # print(f"トークナイザーを正常にロードしました: {tokenizer_path}\n")
     except Exception as e:
         print(f"トークナイザーのロード中にエラーが発生しました: {e}")
         return
@@ -66,12 +68,12 @@ def test_hf_tokenizer(tokenizer_path, sample_texts):
     print("--- トークナイザー情報 ---")
     print(f"語彙サイズ: {tokenizer.get_vocab_size()}")
     print(f"UNKトークン: ID={tokenizer.token_to_id(tokenizer.model.unk_token)}, Token='{tokenizer.model.unk_token}'")
-    
+
     # Normalizer, PreTokenizer, Decoder の情報を表示 (デバッグ用)
     # print(f"Normalizer: {tokenizer.normalizer}")
     # print(f"PreTokenizer: {tokenizer.pre_tokenizer}")
     # print(f"Decoder: {tokenizer.decoder}")
-    
+
     # 特殊トークンの確認 (もし明示的に追加されていれば)
     # added_tokens = tokenizer.get_added_vocab() # add_special_tokensなどで追加されたもの
     # if added_tokens:
@@ -82,19 +84,18 @@ def test_hf_tokenizer(tokenizer_path, sample_texts):
     print("-" * 25)
     print("\n")
 
-
     # 3. サンプルテキストのエンコードとデコード
     for i, text in enumerate(sample_texts):
-        print(f"--- サンプルテキスト {i+1} ---")
+        print(f"--- サンプルテキスト {i + 1} ---")
         print(f"原文: '{text}'")
 
         # エンコード
         try:
             encoding = tokenizer.encode(text)
-            print(f"エンコード結果:")
-            #print(f"  IDs    : {encoding.ids}")
+            print("エンコード結果:")
+            # print(f"  IDs    : {encoding.ids}")
             print(f"  Tokens : {encoding.tokens}")
-            #print(f"  Offsets: {encoding.offsets}") # 各トークンの元テキスト中の位置
+            # print(f"  Offsets: {encoding.offsets}") # 各トークンの元テキスト中の位置
 
             # デコード
             try:
@@ -105,7 +106,7 @@ def test_hf_tokenizer(tokenizer_path, sample_texts):
 
         except Exception as e:
             print(f"エンコード中にエラー: {e}")
-        
+
         print("-" * 25 + "\n")
 
 
@@ -113,13 +114,11 @@ if __name__ == "__main__":
     # 学習スクリプトの出力設定に合わせてパスを構成
     # この部分は、実際の学習済みトークナイザーの場所に合わせて調整してください。
     parser = argparse.ArgumentParser(description="学習済みHugging Faceトークナイザーのテスト")
-    parser.add_argument(
-        "--tokenizer_file", 
-        type=str,
-        help="テストするトークナイザーの .json ファイルへのパス。"
-    )
+    parser.add_argument("--tokenizer_file", type=str, help="テストするトークナイザーの .json ファイルへのパス。")
     parser.add_argument("--vocab_size", type=int, default=32000, help="学習時の語彙サイズ (パスの推測用)")
-    parser.add_argument("--model_type", type=str, default="bpe", choices=["bpe", "unigram"], help="学習時のモデルタイプ (パスの推測用)")
+    parser.add_argument(
+        "--model_type", type=str, default="bpe", choices=["bpe", "unigram"], help="学習時のモデルタイプ (パスの推測用)"
+    )
 
     args = parser.parse_args()
 
@@ -127,19 +126,16 @@ if __name__ == "__main__":
         TOKENIZER_FILE_PATH = args.tokenizer_file
     else:
         # 学習スクリプトのデフォルト設定からパスを推測
-        #print("tokenizer_fileが指定されていないため、学習スクリプトのデフォルト設定からパスを推測します。")
+        # print("tokenizer_fileが指定されていないため、学習スクリプトのデフォルト設定からパスを推測します。")
         DEFAULT_VOCAB_SIZE = args.vocab_size
         DEFAULT_MODEL_TYPE = args.model_type
         BASE_EXPERIMENT_DIR = "experiments/kuzushiji_tokenizer_hf"
         MODEL_SPECIFIC_DIR_NAME = f"vocab{DEFAULT_VOCAB_SIZE}_{DEFAULT_MODEL_TYPE}"
         MODEL_FILENAME_STEM = "kuzushiji_tokenizer"
-        TOKENIZER_FILE_PATH = os.path.join(
-            BASE_EXPERIMENT_DIR, MODEL_SPECIFIC_DIR_NAME, f"{MODEL_FILENAME_STEM}.json"
-        )
-        #print(f"推測されたトークナイザーパス: {TOKENIZER_FILE_PATH}")
+        TOKENIZER_FILE_PATH = os.path.join(BASE_EXPERIMENT_DIR, MODEL_SPECIFIC_DIR_NAME, f"{MODEL_FILENAME_STEM}.json")
+        # print(f"推測されたトークナイザーパス: {TOKENIZER_FILE_PATH}")
 
-
-    # テスト用のサンプルテキスト 
+    # テスト用のサンプルテキスト
     SAMPLE_TEXTS = [
         "御使に竹取出あひてなく事限なし",
         # "いろはにほへとちりぬるを",

@@ -1,10 +1,11 @@
+import argparse
 import glob
 import os
 import tempfile
-import argparse
 
-from tokenizers import Tokenizer, models, normalizers, pre_tokenizers, trainers, decoders
+from tokenizers import Tokenizer, decoders, models, normalizers, pre_tokenizers, trainers
 from transformers import DebertaV2TokenizerFast
+
 
 # --- Functions ---
 def get_all_text_files(data_dirs):
@@ -35,7 +36,7 @@ def concatenate_files(file_list, output_dir):
                 with open(filepath, encoding="utf-8") as infile:
                     for line in infile:
                         temp_file.write(line)
-                    temp_file.write("\n") # 各ファイルの内容を書き込んだ後に改行を追加
+                    temp_file.write("\n")  # 各ファイルの内容を書き込んだ後に改行を追加
             except Exception as e:
                 print(f"ファイル {filepath} の読み込み中にエラー: {e}")
         temp_file.close()
@@ -48,14 +49,14 @@ def concatenate_files(file_list, output_dir):
 
 
 def train_hf_tokenizer(
-    input_file_path, # SentencePieceのinput_fileに相当
-    model_output_dir, # 保存ディレクトリ
-    model_filename_stem, # 保存ファイル名の幹 (例: "kuzushiji_tokenizer")
+    input_file_path,  # SentencePieceのinput_fileに相当
+    model_output_dir,  # 保存ディレクトリ
+    model_filename_stem,  # 保存ファイル名の幹 (例: "kuzushiji_tokenizer")
     vocab_size,
-    model_type, # "bpe" or "unigram"
-    normalization_rule_name, # "nfkc_cf"など
-    unk_token_surface, # UNKトークンの表現
-    special_tokens_list=None # 特殊トークンのリスト (例: ["[UNK]", "[PAD]"])
+    model_type,  # "bpe" or "unigram"
+    normalization_rule_name,  # "nfkc_cf"など
+    unk_token_surface,  # UNKトークンの表現
+    special_tokens_list=None,  # 特殊トークンのリスト (例: ["[UNK]", "[PAD]"])
 ):
     """Hugging Faceトークナイザーをトレーニングします。"""
     output_path = os.path.join(model_output_dir, f"{model_filename_stem}.json")
@@ -70,19 +71,20 @@ def train_hf_tokenizer(
     normalizer_list = []
     if "nfkc" in normalization_rule_name.lower():
         normalizer_list.append(normalizers.NFKC())
-    if "cf" in normalization_rule_name.lower(): # Case Folding
+    if "cf" in normalization_rule_name.lower():  # Case Folding
         normalizer_list.append(normalizers.Lowercase())
     # SentencePieceのnfkc_cfは追加の空白処理も含む場合があるが、ここではNFKCとLowercaseのみ
-    if not normalizer_list: # デフォルトとしてNFC正規化と小文字化を追加することも検討できる
-        print(f"警告: normalization_rule_name '{normalization_rule_name}' に基づくノーマライザが設定されませんでした。BertNormalizerを使用します。")
+    if not normalizer_list:  # デフォルトとしてNFC正規化と小文字化を追加することも検討できる
+        print(
+            f"警告: normalization_rule_name '{normalization_rule_name}' に基づくノーマライザが設定されませんでした。BertNormalizerを使用します。"
+        )
         # BertNormalizerはNFD, Lowercase, StripAccentsを含む。
         # 必要に応じて、より単純なものやカスタムシーケンスに変更してください。
         current_normalizer = normalizers.BertNormalizer(lowercase=False, handle_chinese_chars=False, strip_accents=True)
     else:
-        normalizer_list.append(normalizers.StripAccents()) # アクセント除去を追加
-        normalizer_list.append(normalizers.Replace(r'\s+', ' ')) # 連続する空白を1つに (文字列パターンを直接使用)
+        normalizer_list.append(normalizers.StripAccents())  # アクセント除去を追加
+        normalizer_list.append(normalizers.Replace(r"\s+", " "))  # 連続する空白を1つに (文字列パターンを直接使用)
         current_normalizer = normalizers.Sequence(normalizer_list)
-
 
     # 2. Pre-tokenizer の設定
     # SentencePieceのBPEはMetaspaceに似た動作をします。
@@ -91,32 +93,30 @@ def train_hf_tokenizer(
     # これは、単語の最初のトークンとそれ以降のトークンを区別するのに役立ちます。
     # (例: "Hello world" -> " Hello", " world")
     # `\u2581` は SentencePiece でよく使われる Metaspace 文字です。
-    current_pre_tokenizer = pre_tokenizers.Metaspace(replacement='\u2581', prepend_scheme="always")
-
+    current_pre_tokenizer = pre_tokenizers.Metaspace(replacement="\u2581", prepend_scheme="always")
 
     # 3. Model と Tokenizer の初期化
     if model_type.lower() == "bpe":
-        tokenizer_model = models.BPE(unk_token=str(unk_token_surface)) # unk_tokenは文字列型
+        tokenizer_model = models.BPE(unk_token=str(unk_token_surface))  # unk_tokenは文字列型
         tokenizer = Tokenizer(tokenizer_model)
         tokenizer.pre_tokenizer = current_pre_tokenizer
         # BPE 用デコーダー (Metaspaceの逆処理)
-        tokenizer.decoder = decoders.Metaspace(replacement='\u2581', prepend_scheme="always")
+        tokenizer.decoder = decoders.Metaspace(replacement="\u2581", prepend_scheme="always")
 
     elif model_type.lower() == "unigram":
         # Unigramモデルでは、unk_tokenはtrainerではなくモデルの初期化時に渡すことが推奨される場合がある
         # しかし、UnigramTrainerにもunk_tokenパラメータがある。整合性を取る。
         # models.Unigram() は list of (token, score) で初期化もできるが、ここでは空で。
-        tokenizer_model = models.Unigram() # scores, unk_idなしで初期化
+        tokenizer_model = models.Unigram()  # scores, unk_idなしで初期化
         tokenizer = Tokenizer(tokenizer_model)
         # Unigramの場合も、Metaspaceで初期分割を行うことが一般的
         tokenizer.pre_tokenizer = current_pre_tokenizer
         # Unigram 用デコーダー (多くの場合BPEと同様のMetaspaceで対応可能)
-        tokenizer.decoder = decoders.Metaspace(replacement='\u2581', prepend_scheme="always")
+        tokenizer.decoder = decoders.Metaspace(replacement="\u2581", prepend_scheme="always")
     else:
         raise ValueError(f"サポートされていないモデルタイプ: {model_type}")
 
     tokenizer.normalizer = current_normalizer
-
 
     # 4. Trainer の設定とトレーニング
     # 特殊トークンは unk_token を含め、ユーザーが指定するリストで上書きまたは追加
@@ -126,7 +126,7 @@ def train_hf_tokenizer(
             if st not in actual_special_tokens:
                 actual_special_tokens.append(st)
 
-    print(f"トレーニングパラメータ:")
+    print("トレーニングパラメータ:")
     print(f"  Input file: {input_file_path}")
     print(f"  Output path: {output_path}")
     print(f"  Vocab size: {vocab_size}")
@@ -136,20 +136,19 @@ def train_hf_tokenizer(
     print(f"  UNK token: {unk_token_surface}")
     print(f"  Special tokens for trainer: {actual_special_tokens}")
 
-
     if model_type.lower() == "bpe":
         trainer = trainers.BpeTrainer(
             vocab_size=vocab_size,
-            min_frequency=2, # SentencePieceのデフォルトに近い値 (調整可能)
+            min_frequency=2,  # SentencePieceのデフォルトに近い値 (調整可能)
             show_progress=True,
-            special_tokens=actual_special_tokens, # UNKトークンや他の特殊トークン
+            special_tokens=actual_special_tokens,  # UNKトークンや他の特殊トークン
             # initial_alphabet=pre_tokenizers.ByteLevel.alphabet() # 全てのバイトを初期候補とする場合
-                                                                # 日本語など文字種が多い場合は注意
+            # 日本語など文字種が多い場合は注意
         )
     elif model_type.lower() == "unigram":
         trainer = trainers.UnigramTrainer(
             vocab_size=vocab_size,
-            unk_token=str(unk_token_surface), # UnigramTrainerにもunk_tokenがある
+            unk_token=str(unk_token_surface),  # UnigramTrainerにもunk_tokenがある
             special_tokens=actual_special_tokens,
             show_progress=True,
             # SentencePieceのUnigramTrainerのパラメータに対応するものを設定
@@ -157,7 +156,7 @@ def train_hf_tokenizer(
             # max_piece_length=16,
             # n_sub_iterations=2,
         )
-    else: # 上で捕捉済みだが念のため
+    else:  # 上で捕捉済みだが念のため
         raise ValueError(f"サポートされていないモデルタイプ: {model_type}")
 
     try:
@@ -175,7 +174,7 @@ def train_hf_tokenizer(
 
         # オプション: .vocab ファイルをSentencePiece風に保存する場合
         vocab_output_path = os.path.join(model_output_dir, f"{model_filename_stem}.vocab")
-        vocab_with_scores = tokenizer.get_vocab(with_added_tokens=True) # スコアはUnigramの場合のみ意味がある
+        vocab_with_scores = tokenizer.get_vocab(with_added_tokens=True)  # スコアはUnigramの場合のみ意味がある
         with open(vocab_output_path, "w", encoding="utf-8") as f:
             for token, token_id in sorted(vocab_with_scores.items(), key=lambda item: item[1]):
                 # Unigramモデルの場合、スコアも保存できるが、BPEの場合はスコアがない
@@ -185,7 +184,6 @@ def train_hf_tokenizer(
                 # Hugging Face get_vocab は id を返すので、ここでは token <tab> id にする
                 f.write(f"{token}\t{token_id}\n")
         print(f"語彙ファイル (Hugging Face形式) は {vocab_output_path} に保存されました。")
-
 
     except RuntimeError as e:
         print(f"Hugging Face トークナイザーのトレーニング中にランタイムエラーが発生しました: {e}")
@@ -199,7 +197,9 @@ def train_hf_tokenizer(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Hugging Face トークナイザーのトレーニング")
     parser.add_argument("--vocab_size", type=int, default=32000, help="語彙サイズ")
-    parser.add_argument("--model_type", type=str, default="bpe", choices=["bpe", "unigram"], help="モデルタイプ (bpe, unigram)")
+    parser.add_argument(
+        "--model_type", type=str, default="bpe", choices=["bpe", "unigram"], help="モデルタイプ (bpe, unigram)"
+    )
     args = parser.parse_args()
 
     # --- Configuration ---
@@ -213,13 +213,13 @@ if __name__ == "__main__":
     VOCAB_SIZE = args.vocab_size
     MODEL_TYPE = args.model_type
 
-    BASE_EXPERIMENT_DIR = "experiments/kuzushiji_tokenizer_hf" # 出力先ディレクトリ変更
+    BASE_EXPERIMENT_DIR = "experiments/kuzushiji_tokenizer_hf"  # 出力先ディレクトリ変更
     MODEL_SPECIFIC_DIR_NAME = f"vocab{VOCAB_SIZE}_{MODEL_TYPE}"
     MODEL_OUTPUT_DIR = os.path.join(BASE_EXPERIMENT_DIR, MODEL_SPECIFIC_DIR_NAME)
-    MODEL_FILENAME_STEM = "tokenizer" # .jsonや.vocabの前の部分
+    MODEL_FILENAME_STEM = "tokenizer"  # .jsonや.vocabの前の部分
 
     # SentencePieceパラメータ (Hugging Faceにマッピングまたは参考情報として)
-    NORMALIZATION_RULE_NAME = "nfkc" # NFKC正規化 + Case Folding
+    NORMALIZATION_RULE_NAME = "nfkc"  # NFKC正規化 + Case Folding
     UNK_SURFACE = "[UNK]"
 
     # Hugging Face 用の特殊トークンリスト (UNKはtrainer/modelに渡すので重複しないように)
@@ -230,7 +230,6 @@ if __name__ == "__main__":
         "[PAD]",
         "[MASK]",
     ]
-
 
     print("Hugging Face トークナイザーのトレーニングを開始します...")
     print(f"設定: VOCAB_SIZE={VOCAB_SIZE}, MODEL_TYPE='{MODEL_TYPE}'")
@@ -255,12 +254,12 @@ if __name__ == "__main__":
             model_type=MODEL_TYPE,
             normalization_rule_name=NORMALIZATION_RULE_NAME,
             unk_token_surface=UNK_SURFACE,
-            special_tokens_list=HF_SPECIAL_TOKENS
+            special_tokens_list=HF_SPECIAL_TOKENS,
         )
         print("トークナイザーのトレーニングが完了しました。")
 
         tokenizer = DebertaV2TokenizerFast(
-            tokenizer_file=os.path.join(MODEL_OUTPUT_DIR, MODEL_FILENAME_STEM + '.json'),
+            tokenizer_file=os.path.join(MODEL_OUTPUT_DIR, MODEL_FILENAME_STEM + ".json"),
             unk_token="[UNK]",
             pad_token="[PAD]",
             cls_token="[CLS]",
@@ -268,7 +267,7 @@ if __name__ == "__main__":
             mask_token="[MASK]",
             bos_token="[CLS]",
             eos_token="[SEP]",
-            vocab_file=os.path.join(MODEL_OUTPUT_DIR, MODEL_FILENAME_STEM + '.vocab'),
+            vocab_file=os.path.join(MODEL_OUTPUT_DIR, MODEL_FILENAME_STEM + ".vocab"),
             do_lower_case=False,
         )
         tokenizer.save_pretrained(MODEL_OUTPUT_DIR)

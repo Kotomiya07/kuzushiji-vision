@@ -20,8 +20,9 @@ CONTENT_AREA_IN_TEMP_SIZE: tuple[int, int] = (120, 120)
 
 # 元画像の平均色を背景として使用する際に、明るくする度合い (BGR各値に加算)
 # 0を指定すると明るさ調整なし。マイナスも可能だが、通常は正の値を想定。
-BACKGROUND_BRIGHTNESS_ADJUSTMENT: int = 20 # 少し明るくする
+BACKGROUND_BRIGHTNESS_ADJUSTMENT: int = 20  # 少し明るくする
 # ----------------
+
 
 def process_image(
     input_path: Path,
@@ -29,7 +30,7 @@ def process_image(
     final_target_size: tuple[int, int],
     temp_canvas_size: tuple[int, int],
     content_area_in_temp_size: tuple[int, int],
-    bg_brightness_adjustment: int
+    bg_brightness_adjustment: int,
 ) -> str:
     """
     個々の画像を処理し、指定された形式で保存する関数。
@@ -75,16 +76,22 @@ def process_image(
         resized_content_h: int = int(h_orig * scale)
 
         if resized_content_w == 0 or resized_content_h == 0:
-            return (f"Error: Resized content dimension became zero for {input_path}. "
-                    f"Original: ({w_orig},{h_orig}), TargetContent: {content_area_in_temp_size}, Scale: {scale:.4f}")
+            return (
+                f"Error: Resized content dimension became zero for {input_path}. "
+                f"Original: ({w_orig},{h_orig}), TargetContent: {content_area_in_temp_size}, Scale: {scale:.4f}"
+            )
 
-        pic1_resized_content: np.ndarray = cv2.resize(pic1_original, (resized_content_w, resized_content_h), interpolation=cv2.INTER_AREA)
+        pic1_resized_content: np.ndarray = cv2.resize(
+            pic1_original, (resized_content_w, resized_content_h), interpolation=cv2.INTER_AREA
+        )
 
         # 3. 一時的な大きなキャンバスを調整後の背景色で作成
         temp_canvas_w, temp_canvas_h = temp_canvas_size
         if temp_canvas_w < resized_content_w or temp_canvas_h < resized_content_h:
-            return (f"Error: temp_canvas_size {temp_canvas_size} is smaller than resized content "
-                    f"({resized_content_w},{resized_content_h}) for {input_path}.")
+            return (
+                f"Error: temp_canvas_size {temp_canvas_size} is smaller than resized content "
+                f"({resized_content_w},{resized_content_h}) for {input_path}."
+            )
 
         temp_canvas: np.ndarray = np.full((temp_canvas_h, temp_canvas_w, 3), adjusted_background_color, dtype=np.uint8)
 
@@ -93,16 +100,14 @@ def process_image(
         paste_y_start: int = (temp_canvas_h - resized_content_h) // 2
 
         temp_canvas[
-            paste_y_start : paste_y_start + resized_content_h,
-            paste_x_start : paste_x_start + resized_content_w,
-            :
+            paste_y_start : paste_y_start + resized_content_h, paste_x_start : paste_x_start + resized_content_w, :
         ] = pic1_resized_content
 
         # 5. 一時キャンバスをグレースケールに変換
         temp_canvas_gray: np.ndarray = cv2.cvtColor(temp_canvas, cv2.COLOR_BGR2GRAY)
 
         # 6. 大津の2値化を一時キャンバスグレースケール画像に対して行う
-        _ , img_otsu_on_temp = cv2.threshold(temp_canvas_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        _, img_otsu_on_temp = cv2.threshold(temp_canvas_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
         # 7. 平均輝度値が127.5より大きい場合、画像を反転 (文字を黒、背景を白に近づけるため)
         if cv2.mean(img_otsu_on_temp)[0] > 127.5:
@@ -115,7 +120,7 @@ def process_image(
         h_final, w_final = final_target_size
         h_start = (temp_canvas_h - h_final) // 2
         w_start = (temp_canvas_w - w_final) // 2
-        final_image_binary = img_otsu_on_temp[h_start:h_start+h_final, w_start:w_start+w_final]
+        final_image_binary = img_otsu_on_temp[h_start : h_start + h_final, w_start : w_start + w_final]
 
         # 出力ディレクトリが存在しない場合は作成
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -127,13 +132,14 @@ def process_image(
     except Exception as e:
         return f"Error processing {input_path}: {type(e).__name__} - {str(e)}"
 
+
 def find_image_files_and_prepare_args(
     input_root: Path,
     output_root: Path,
     final_target_size: tuple[int, int],
     temp_canvas_size: tuple[int, int],
     content_area_in_temp_size: tuple[int, int],
-    bg_brightness_adjustment: int
+    bg_brightness_adjustment: int,
 ) -> list[tuple[Path, Path, tuple[int, int], tuple[int, int], tuple[int, int], int]]:
     """
     処理対象の画像ファイルを見つけ、process_image関数用の引数リストを作成する。
@@ -158,15 +164,18 @@ def find_image_files_and_prepare_args(
                 output_unicode_dir: Path = output_root / unicode_val
                 output_filename: str = f"{book_id}-{unicode_val}-{original_filename_stem}.jpg"
                 output_path: Path = output_unicode_dir / output_filename
-                args_list.append((
-                    img_file_path,
-                    output_path,
-                    final_target_size,
-                    temp_canvas_size,
-                    content_area_in_temp_size,
-                    bg_brightness_adjustment
-                ))
+                args_list.append(
+                    (
+                        img_file_path,
+                        output_path,
+                        final_target_size,
+                        temp_canvas_size,
+                        content_area_in_temp_size,
+                        bg_brightness_adjustment,
+                    )
+                )
     return args_list
+
 
 def main() -> None:
     """
@@ -180,14 +189,13 @@ def main() -> None:
     print(f"一時キャンバス内コンテンツ目標サイズ: {CONTENT_AREA_IN_TEMP_SIZE}")
     print(f"背景輝度調整値: {BACKGROUND_BRIGHTNESS_ADJUSTMENT}")
 
-
     tasks_args = find_image_files_and_prepare_args(
         INPUT_ROOT_DIR,
         OUTPUT_ROOT_DIR,
         FINAL_TARGET_SIZE,
         TEMP_CANVAS_SIZE,
         CONTENT_AREA_IN_TEMP_SIZE,
-        BACKGROUND_BRIGHTNESS_ADJUSTMENT
+        BACKGROUND_BRIGHTNESS_ADJUSTMENT,
     )
 
     if not tasks_args:
@@ -214,6 +222,7 @@ def main() -> None:
             if "Error" in r:
                 print(f"  - {r}")
     print(f"処理済み画像は {OUTPUT_ROOT_DIR} に保存されています。")
+
 
 if __name__ == "__main__":
     main()

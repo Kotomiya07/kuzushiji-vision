@@ -109,6 +109,8 @@ ignore = [
     "W191",  # indentation contains tabs
     "B904", # raise ... from ... になっていない場合のエラーを無視
     "E741",  # ambiguous variable name
+    "W293",  # blank line contains whitespace
+    "W291",  # trailing whitespace
 ]
 
 # ファイルごとのエラー除外

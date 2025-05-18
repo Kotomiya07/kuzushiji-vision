@@ -1,9 +1,10 @@
+import argparse
 import glob
 import os
 import tempfile
-import argparse
 
 import sentencepiece as spm
+
 
 # --- Functions ---
 def get_all_text_files(data_dirs):
@@ -64,7 +65,7 @@ def train_sentencepiece_tokenizer(
         print(f"ディレクトリを作成しました: {output_dir}")
 
     # パラメータを文字列として結合するのではなく、キーワード引数として渡す
-    train_params = f" \
+    f" \
         --input={input_file} \
         --model_prefix={model_prefix} \
         --vocab_size={vocab_size} \
@@ -135,7 +136,7 @@ if __name__ == "__main__":
     ]
 
     VOCAB_SIZE = args.vocab_size
-    MODEL_TYPE = args.model_type # "bpe", "unigram", "char", or "word"
+    MODEL_TYPE = args.model_type  # "bpe", "unigram", "char", or "word"
 
     # 動的な出力ディレクトリとモデルプレフィックス
     BASE_EXPERIMENT_DIR = "experiments/kuzushiji_tokenizer"  # ベースの実験ディレクトリ

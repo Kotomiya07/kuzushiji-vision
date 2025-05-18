@@ -4,10 +4,10 @@
 各書籍IDごとに1つのCSVファイルが作成され、元のCSVファイルのヘッダー行も含まれます。
 書籍IDは、column_image列のパスから抽出されます。
 """
+
 import csv
-import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 # --- 設定 ---
 # 入力CSVファイルのパス (スクリプトからの相対パスまたは絶対パス)
@@ -24,6 +24,7 @@ COLUMN_IMAGE_INDEX = 0
 # "processed/column_images/" の後に続く部分をIDとする
 PATH_PREFIX_PARTS = ["processed", "column_images"]
 # --- 設定ここまで ---
+
 
 def split_annotations_by_book(input_csv_path: Path, output_dir: Path):
     """
@@ -49,7 +50,7 @@ def split_annotations_by_book(input_csv_path: Path, output_dir: Path):
 
     try:
         print(f"入力ファイルを開いています: {input_csv_path}")
-        with open(input_csv_path, 'r', newline='', encoding='utf-8') as infile:
+        with open(input_csv_path, newline="", encoding="utf-8") as infile:
             reader = csv.reader(infile)
 
             # ヘッダーを読み込む
@@ -57,7 +58,10 @@ def split_annotations_by_book(input_csv_path: Path, output_dir: Path):
                 header = next(reader)
                 print(f"ヘッダーを読み込みました: {header}")
                 if len(header) <= COLUMN_IMAGE_INDEX:
-                    print(f"エラー: ヘッダーに十分な列がありません。column_image列 (インデックス {COLUMN_IMAGE_INDEX}) が存在しません。", file=sys.stderr)
+                    print(
+                        f"エラー: ヘッダーに十分な列がありません。column_image列 (インデックス {COLUMN_IMAGE_INDEX}) が存在しません。",
+                        file=sys.stderr,
+                    )
                     sys.exit(1)
             except StopIteration:
                 print("エラー: 入力ファイルが空です。", file=sys.stderr)
@@ -65,7 +69,7 @@ def split_annotations_by_book(input_csv_path: Path, output_dir: Path):
 
             # 各行を処理
             for i, row in enumerate(reader):
-                if not row: # 空行はスキップ
+                if not row:  # 空行はスキップ
                     skipped_rows += 1
                     continue
 
@@ -78,11 +82,15 @@ def split_annotations_by_book(input_csv_path: Path, output_dir: Path):
                     # 書籍IDを抽出
                     book_id = None
                     # partsが ('processed', 'column_images', 'BOOK_ID', ...) の形式かチェック
-                    if len(parts) > len(PATH_PREFIX_PARTS) and \
-                       all(parts[j] == PATH_PREFIX_PARTS[j] for j in range(len(PATH_PREFIX_PARTS))):
+                    if len(parts) > len(PATH_PREFIX_PARTS) and all(
+                        parts[j] == PATH_PREFIX_PARTS[j] for j in range(len(PATH_PREFIX_PARTS))
+                    ):
                         book_id = parts[len(PATH_PREFIX_PARTS)]
                     else:
-                        print(f"警告: 行 {i+2}: 予期しないパス形式のため書籍IDを抽出できませんでした: {image_path_str}", file=sys.stderr)
+                        print(
+                            f"警告: 行 {i + 2}: 予期しないパス形式のため書籍IDを抽出できませんでした: {image_path_str}",
+                            file=sys.stderr,
+                        )
                         skipped_rows += 1
                         continue
 
@@ -90,21 +98,21 @@ def split_annotations_by_book(input_csv_path: Path, output_dir: Path):
                         # 新しい書籍IDの場合、新しいファイルを開く
                         output_filename = output_dir / f"{book_id}_annotations.csv"
                         print(f"新しい書籍IDが見つかりました: {book_id} -> {output_filename}")
-                        outfile = open(output_filename, 'w', newline='', encoding='utf-8')
+                        outfile = open(output_filename, "w", newline="", encoding="utf-8")
                         writer = csv.writer(outfile)
-                        writer.writerow(header) # ヘッダーを書き込む
-                        output_files[book_id] = {'file': outfile, 'writer': writer}
+                        writer.writerow(header)  # ヘッダーを書き込む
+                        output_files[book_id] = {"file": outfile, "writer": writer}
                         book_ids_found.add(book_id)
 
                     # 対応するファイルに行を書き込む
-                    output_files[book_id]['writer'].writerow(row)
+                    output_files[book_id]["writer"].writerow(row)
                     processed_rows += 1
 
                 except IndexError:
-                    print(f"警告: 行 {i+2}: 列数が足りません。スキップします。データ: {row}", file=sys.stderr)
+                    print(f"警告: 行 {i + 2}: 列数が足りません。スキップします。データ: {row}", file=sys.stderr)
                     skipped_rows += 1
                 except Exception as e:
-                    print(f"警告: 行 {i+2} の処理中にエラーが発生しました: {e}。データ: {row}", file=sys.stderr)
+                    print(f"警告: 行 {i + 2} の処理中にエラーが発生しました: {e}。データ: {row}", file=sys.stderr)
                     skipped_rows += 1
 
     except FileNotFoundError:
@@ -118,20 +126,21 @@ def split_annotations_by_book(input_csv_path: Path, output_dir: Path):
         closed_count = 0
         for book_id, data in output_files.items():
             try:
-                if data['file'] and not data['file'].closed:
-                    data['file'].close()
+                if data["file"] and not data["file"].closed:
+                    data["file"].close()
                     closed_count += 1
             except Exception as e:
                 print(f"警告: ファイル '{book_id}_annotations.csv' のクローズ中にエラー: {e}", file=sys.stderr)
         print(f"\n処理が完了しました。{closed_count} 個のファイルを閉じました。")
 
-    print(f"\n--- 結果 ---")
+    print("\n--- 結果 ---")
     print(f"処理された行数: {processed_rows}")
     print(f"スキップされた行数: {skipped_rows}")
     print(f"見つかった書籍IDの数: {len(book_ids_found)}")
     if book_ids_found:
-        print(f"書籍IDの例: {list(book_ids_found)[:5]}...") # 最初の5つを表示
+        print(f"書籍IDの例: {list(book_ids_found)[:5]}...")  # 最初の5つを表示
     print(f"出力ファイルはディレクトリ '{output_dir.resolve()}' に保存されました。")
+
 
 if __name__ == "__main__":
     # スクリプトを実行

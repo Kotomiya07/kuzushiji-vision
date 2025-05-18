@@ -6,7 +6,7 @@ import argparse
 import glob
 import os
 from datetime import datetime
-import torch
+
 from datasets import Dataset
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from transformers import (
@@ -22,7 +22,10 @@ from transformers import (
 def main():
     parser = argparse.ArgumentParser(description="Pretrain a language model for Kuzushiji recognition.")
     parser.add_argument(
-        "--model_name", type=str, default="KoichiYasuoka/roberta-small-japanese-aozora-char", help="Pretrained model name or path."
+        "--model_name",
+        type=str,
+        default="KoichiYasuoka/roberta-small-japanese-aozora-char",
+        help="Pretrained model name or path.",
     )
     parser.add_argument(
         "--dataset_dirs",
@@ -62,7 +65,7 @@ def main():
     DEFAULT_MODEL_TYPE = args.model_type
     BASE_EXPERIMENT_DIR = "experiments/kuzushiji_tokenizer_one_char"
     MODEL_SPECIFIC_DIR_NAME = f"vocab{DEFAULT_VOCAB_SIZE}_{DEFAULT_MODEL_TYPE}"
-    TOKENIZER_FILE_PATH = os.path.join(BASE_EXPERIMENT_DIR, MODEL_SPECIFIC_DIR_NAME)
+    os.path.join(BASE_EXPERIMENT_DIR, MODEL_SPECIFIC_DIR_NAME)
 
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
@@ -78,7 +81,6 @@ def main():
             text_files.append(text_file)
             count += 1
         print(f"Found {count} text files in {dataset_dir}")
-
 
     texts = []
     for file_path in text_files:
@@ -108,7 +110,7 @@ def main():
 
     # 3. Model
     print(f"Loading model: {args.model_name}")
-    #model = AutoModelForMaskedLM.from_pretrained(args.model_name, attn_implementation="flash_attention_2")
+    # model = AutoModelForMaskedLM.from_pretrained(args.model_name, attn_implementation="flash_attention_2")
     model = AutoModelForMaskedLM.from_pretrained(args.model_name)
     # Resize token embeddings if we used a custom tokenizer or added tokens to AutoTokenizer
     # This is crucial if the vocab size of the tokenizer is different from the model's original vocab size
@@ -243,4 +245,3 @@ Found 360052 text files in ndl-minhon-ocrdataset/src/honkoku_oneline_v2
 Found 84990 text files in honkoku_yatanavi/honkoku_oneline
 Found 29603 text files in data/oneline
 """
-

@@ -243,6 +243,7 @@ class SimpleCVAELitModule(L.LightningModule):
         optimizer.eval()
         return optimizer
 
+
 # --- Unicode マッピングの準備とメイン処理 (prepare_unicode_dataは変更なし) ---
 def prepare_unicode_data(data_root_path):
     global NUM_UNICODES, UNICODE_TO_INT, INT_TO_UNICODE  # Ensure these are global
@@ -258,7 +259,7 @@ def prepare_unicode_data(data_root_path):
 
     NUM_UNICODES = len(unicode_dirs)
     UNICODE_TO_INT = {name: i for i, name in enumerate(unicode_dirs)}
-    INT_TO_UNICODE = {i: name for i, name in enumerate(unicode_dirs)}
+    INT_TO_UNICODE = dict(enumerate(unicode_dirs))
     print(f"Unicodeマッピング完了: {NUM_UNICODES} 種類の文字を発見。")
     return True
 
@@ -277,7 +278,9 @@ if __name__ == "__main__":
     Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
     Path(LOG_DIR).mkdir(parents=True, exist_ok=True)
 
-    dataset = CharUnicodeDataset(data_root=DATA_ROOT, unicode_to_int_map=UNICODE_TO_INT, image_size=IMG_SIZE, channels=CHANNELS)
+    dataset = CharUnicodeDataset(
+        data_root=DATA_ROOT, unicode_to_int_map=UNICODE_TO_INT, image_size=IMG_SIZE, channels=CHANNELS
+    )
     if len(dataset) == 0:
         print("エラー: データセットが空です。 DATA_ROOT とその中の画像ファイルを確認してください。")
         exit(1)
@@ -395,9 +398,7 @@ if __name__ == "__main__":
     print(f"ログは {LOG_DIR} に、成果物は {OUTPUT_DIR} に保存されます。")
 
     try:
-        trainer.fit(
-            model=vae_model, train_dataloaders=train_dataloader
-        )  # Using same dataloader for val for simplicity
+        trainer.fit(model=vae_model, train_dataloaders=train_dataloader)  # Using same dataloader for val for simplicity
     except Exception as e:
         print(f"学習中にエラーが発生しました: {e}")
         import traceback

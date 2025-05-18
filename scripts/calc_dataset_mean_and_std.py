@@ -1,9 +1,10 @@
-# coding: utf-8
+import sys
 from pathlib import Path
+
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
-import sys
+
 
 def calculate_mean_std(base_dir: Path):
     """
@@ -23,9 +24,9 @@ def calculate_mean_std(base_dir: Path):
                None: 画像が見つからなかった場合、または処理中にエラーが発生した場合。
     """
     image_paths = []
-    valid_extensions = ('.jpg', '.jpeg', '.png', '.bmp', '.tif', '.tiff')
+    valid_extensions = (".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff")
     # base_dir の直下のサブディレクトリ(*)の中の'images'ディレクトリの中のファイル(*)を検索
-    search_pattern = '*/images/*'
+    search_pattern = "*/images/*"
 
     print(f"Searching for images in: {base_dir} using pattern '{search_pattern}'")
 
@@ -53,14 +54,14 @@ def calculate_mean_std(base_dir: Path):
     for img_path in tqdm(image_paths, desc="Processing images"):
         try:
             # 画像を開き、RGBに変換 (Pathオブジェクトを渡せる)
-            img = Image.open(img_path).convert('RGB')
+            img = Image.open(img_path).convert("RGB")
             # NumPy配列に変換し、値を[0, 1]の範囲に正規化 (float32で十分)
             img_np = np.array(img, dtype=np.float32) / 255.0
 
             # 予期せぬ形状の画像をスキップ (例: グレースケール画像が紛れ込んでいる場合など)
             if img_np.ndim != 3 or img_np.shape[2] != 3:
-                 print(f"Warning: Skipping image with unexpected shape {img_np.shape}: {img_path}", file=sys.stderr)
-                 continue
+                print(f"Warning: Skipping image with unexpected shape {img_np.shape}: {img_path}", file=sys.stderr)
+                continue
 
             h, w, c = img_np.shape
             current_pixels = h * w
@@ -83,10 +84,10 @@ def calculate_mean_std(base_dir: Path):
     # 3. 平均と標準偏差を計算
     mean = channel_sum / pixel_count
     # 分散 = E[X^2] - (E[X])^2
-    variance = (channel_sum_sq / pixel_count) - (mean ** 2)
+    variance = (channel_sum_sq / pixel_count) - (mean**2)
 
     # 浮動小数点誤差により分散が微小な負の値になる可能性に対処
-    variance = np.maximum(variance, 0) # 負の値を0にクリップ
+    variance = np.maximum(variance, 0)  # 負の値を0にクリップ
 
     # 標準偏差 = sqrt(分散)
     std = np.sqrt(variance)
@@ -95,6 +96,7 @@ def calculate_mean_std(base_dir: Path):
     std = np.maximum(std, 1e-7)
 
     return mean, std
+
 
 # --- メインの実行部分 ---
 if __name__ == "__main__":
@@ -105,7 +107,7 @@ if __name__ == "__main__":
 
     if not data_directory.is_dir():
         print(f"Error: Base directory not found or is not a directory: {data_directory}")
-        sys.exit(1) # エラーで終了
+        sys.exit(1)  # エラーで終了
 
     results = calculate_mean_std(data_directory)
 
@@ -120,8 +122,8 @@ if __name__ == "__main__":
         print("\nUsage Example (PyTorch):")
         print("```python")
         print("from torchvision import transforms")
-        print(f"mean = {mean.tolist()}") # リスト形式で表示
-        print(f"std = {std.tolist()}") # リスト形式で表示
+        print(f"mean = {mean.tolist()}")  # リスト形式で表示
+        print(f"std = {std.tolist()}")  # リスト形式で表示
         print("normalize = transforms.Normalize(mean=mean, std=std)")
         print("```")
 
@@ -134,7 +136,7 @@ if __name__ == "__main__":
         print("normalized_tensor = (input_tensor - mean) / std")
         print("# Or using tf.keras.layers.Normalization:")
         print("# Note: layers.Normalization expects mean and variance (std**2)")
-        print(f"# variance = { (std**2).tolist() }")
+        print(f"# variance = {(std**2).tolist()}")
         print("# For image data (batch, height, width, channel): axis=[1, 2]")
         print("# layer = tf.keras.layers.Normalization(mean=mean, variance=std**2, axis=[1, 2])")
         print("```")

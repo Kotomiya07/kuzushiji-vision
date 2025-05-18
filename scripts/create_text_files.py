@@ -132,7 +132,7 @@ for csv_file_name in csv_files:
                     continue  # continue from the outer loop
 
                 temp_extracted_texts = []
-                for i, row in enumerate(reader):
+                for _i, row in enumerate(reader):
                     text = row.get(column_to_extract)
                     if text and text.strip():
                         processed_text = process_text(text.strip())
@@ -151,7 +151,7 @@ for csv_file_name in csv_files:
                         continue  # continue from the outer loop
 
                     temp_extracted_texts = []
-                    for i, row in enumerate(reader):
+                    for _i, row in enumerate(reader):
                         text = row.get(column_to_extract)
                         if text and text.strip():
                             processed_text = process_text(text.strip())
@@ -169,7 +169,7 @@ for csv_file_name in csv_files:
             continue  # continue from the outer loop
 
         if extracted_texts:
-            for i, text_content in enumerate(extracted_texts):
+            for _i, text_content in enumerate(extracted_texts):
                 # 出力ファイル名 (例: 00001.txt)
                 output_txt_file_name = f"{file_counter:05d}.txt"
                 output_txt_path = os.path.join(output_dir_for_book, output_txt_file_name)

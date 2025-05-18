@@ -1,7 +1,9 @@
-import os
-from PIL import Image
-import concurrent.futures
 import argparse
+import concurrent.futures
+import os
+
+from PIL import Image
+
 
 def check_image(image_path):
     """
@@ -13,10 +15,11 @@ def check_image(image_path):
         img.verify()  # verify() はヘッダー情報をチェックし、破損していれば例外を発生させる
         # verify() の後、再度openする必要がある場合がある
         img_reopen = Image.open(image_path)
-        img_reopen.load() # load() は画像データを実際に読み込み、破損していれば例外を発生させる
+        img_reopen.load()  # load() は画像データを実際に読み込み、破損していれば例外を発生させる
         return None
-    except (IOError, SyntaxError, Image.DecompressionBombError) as e:
+    except (OSError, SyntaxError, Image.DecompressionBombError):
         return image_path
+
 
 def find_jpg_files(directory):
     """
@@ -28,6 +31,7 @@ def find_jpg_files(directory):
             if file.lower().endswith(".jpg"):
                 jpg_files.append(os.path.join(root, file))
     return jpg_files
+
 
 def main():
     parser = argparse.ArgumentParser(description="指定されたディレクトリ内のJPG画像が破損していないかチェックします。")
@@ -63,7 +67,6 @@ def main():
             if result:
                 corrupted_files.append(result)
 
-
     if corrupted_files:
         print("\n破損している可能性のある画像ファイル:")
         for file_path in corrupted_files:
@@ -71,5 +74,6 @@ def main():
     else:
         print("\nすべてのJPG画像は正常に開けました。")
 
+
 if __name__ == "__main__":
-    main() 
+    main()
