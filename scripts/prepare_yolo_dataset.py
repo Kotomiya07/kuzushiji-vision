@@ -6,13 +6,13 @@ YOLOフォーマットのデータセットを準備するスクリプト
 各画像に対して、アノテーションが1つ以上書かれた場合はその画像を保存し、アノテーションが一つも書かれなかった場合は画像と空のラベルファイルを削除する。
 このスクリプトは、YOLOフォーマットのデータセットを準備するためのものであり、特に書籍単位での分割に対応しています。
 """
+
 import ast
 import shutil
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-
 from PIL import Image
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
@@ -169,7 +169,6 @@ def prepare_yolo_dataset(
     df["doc_id"] = doc_ids
     df.dropna(subset=["doc_id"], inplace=True)  # ID抽出に失敗した行を削除
 
-
     if invalid_paths:
         print(f"Warning: Could not extract document ID from {len(invalid_paths)} paths. Examples:")
         for i, p in enumerate(invalid_paths):
@@ -242,7 +241,10 @@ def prepare_yolo_dataset(
 
         # ドキュメントIDを train, val, test に分割
         train_doc_ids, temp_doc_ids = train_test_split(
-            unique_doc_ids, test_size=(val_docs_count + test_docs_count), train_size=train_docs_count, random_state=random_state
+            unique_doc_ids,
+            test_size=(val_docs_count + test_docs_count),
+            train_size=train_docs_count,
+            random_state=random_state,
         )
 
         if val_docs_count + test_docs_count > 0 and len(temp_doc_ids) > 0:
@@ -262,7 +264,11 @@ def prepare_yolo_dataset(
             test_doc_ids = temp_doc_ids if test_docs_count > 0 and val_docs_count == 0 else np.array([])
 
         print(f"Actual split: Train={len(train_doc_ids)}, Val={len(val_doc_ids)}, Test={len(test_doc_ids)}")
-        if len(train_doc_ids) != train_docs_count or len(val_doc_ids) != val_docs_count or len(test_doc_ids) != test_docs_count:
+        if (
+            len(train_doc_ids) != train_docs_count
+            or len(val_doc_ids) != val_docs_count
+            or len(test_doc_ids) != test_docs_count
+        ):
             print("Warning: The final split counts do not exactly match the requested counts.")
 
         doc_id_splits = {"train": set(train_doc_ids), "val": set(val_doc_ids), "test": set(test_doc_ids)}

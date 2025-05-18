@@ -1,6 +1,7 @@
 import glob
 import os
 
+
 def get_all_text_files(data_dirs):
     """指定されたディレクトリ内のすべての.txtファイルへのパスのリストを取得します。"""
     all_files = []
@@ -12,6 +13,7 @@ def get_all_text_files(data_dirs):
         raise FileNotFoundError(f"指定されたディレクトリにテキストファイルが見つかりませんでした: {data_dirs}")
     return all_files
 
+
 def concatenate_files(file_list, output_dir):
     """指定されたファイルリストの内容を1つの一時ファイルに結合します。"""
     try:
@@ -21,12 +23,13 @@ def concatenate_files(file_list, output_dir):
                     with open(filepath, encoding="utf-8") as infile:
                         for line in infile:
                             outfile.write(line)
-                        outfile.write("\n") # 各ファイルの内容を書き込んだ後に改行を追加
+                        outfile.write("\n")  # 各ファイルの内容を書き込んだ後に改行を追加
                 except Exception as e:
                     print(f"ファイル {filepath} の読み込み中にエラー: {e}")
     except Exception as e:
         print(f"一時ファイルの作成中にエラーが発生しました: {e}")
         raise
+
 
 if __name__ == "__main__":
     DATA_DIRS = [
@@ -34,6 +37,7 @@ if __name__ == "__main__":
         "ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
         "honkoku_yatanavi/honkoku_oneline",
         "data/oneline",
+        "kokubunken_repo/text",
     ]
     file_list = get_all_text_files(DATA_DIRS)
     output_dir = "data/honkoku"

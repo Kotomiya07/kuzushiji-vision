@@ -2,6 +2,7 @@
 import argparse
 from pathlib import Path
 
+
 def count_pages(dataset_dir: Path):
     """
     指定されたデータセットディレクトリ内の各書籍のページ数をカウントし、
@@ -44,6 +45,7 @@ def count_pages(dataset_dir: Path):
         print(f"書籍ID: {book_name}, ページ数: {count}")
 
     print("-" * 30)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="データセット内の各書籍のページ数をカウントし、ページ数で昇順に表示します。")

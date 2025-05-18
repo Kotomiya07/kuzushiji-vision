@@ -2,9 +2,9 @@ import torch
 import yaml
 from tqdm import tqdm
 
+from data.dataset import CharacterDetectionDataset, ColumnDetectionDataset
 from models.character_detection.model import CharacterDetectionModel
 from models.column_extraction.model import ColumnDetectionModel
-from data.dataset import CharacterDetectionDataset, ColumnDetectionDataset
 from utils.metrics import compute_character_accuracy, compute_map
 from utils.util import EasyDict
 

@@ -40,6 +40,7 @@ dependencies = [
     "wheel>=0.45.1",
     "lightning>=2.5.1.post0",
     "schedulefree>=1.4.1",
+    "pykakasi>=2.3.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
@@ -108,6 +109,8 @@ ignore = [
     "W191",  # indentation contains tabs
     "B904", # raise ... from ... になっていない場合のエラーを無視
     "E741",  # ambiguous variable name
+    "W293",  # blank line contains whitespace
+    "W291",  # trailing whitespace
 ]
 
 # ファイルごとのエラー除外
