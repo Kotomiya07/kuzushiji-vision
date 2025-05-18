@@ -40,6 +40,7 @@ dependencies = [
     "wheel>=0.45.1",
     "lightning>=2.5.1.post0",
     "schedulefree>=1.4.1",
+    "pykakasi>=2.3.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"

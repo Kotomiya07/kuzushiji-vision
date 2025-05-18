@@ -201,7 +201,9 @@ ndl-minhon-ocrdataset/src/v2/
 # yatanavi honkoku
 honkoku_yatanavi/
 
-vit_pytorch/
-enhancing-transformers/
+# kokubunken
+kokubunken_repo/
 
 **/*.zip
+
+tasks.md
