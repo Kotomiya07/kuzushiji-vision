@@ -26,7 +26,6 @@ from transformers import (
 )
 from transformers.trainer_utils import get_last_checkpoint
 
-import wandb
 
 # 安全なグローバルとして登録
 torch.serialization.add_safe_globals([_reconstruct])
@@ -319,11 +318,6 @@ def main():
             print(
                 "TrainMetricsCallback not registered because compute_metrics is None (likely no eval_dataset or eval_strategy='no')."
             )
-
-    # wandb.config に dataset_dirs を記録
-    if training_args.report_to and "wandb" in training_args.report_to:
-        wandb.config.update({"dataset_dirs": args.dataset_dirs}, allow_val_change=True)
-        print(f"Recorded dataset_dirs to wandb.config: {args.dataset_dirs}")
 
     # 8. Train
     print("Starting training...")
