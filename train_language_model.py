@@ -7,6 +7,7 @@ import glob
 import os
 from datetime import datetime
 
+# typingからList, Optionalをインポート
 import numpy as np
 import torch
 from datasets import Dataset
@@ -55,6 +56,60 @@ if dtype_to_add:
     torch.serialization.add_safe_globals([dtype_to_add])
 else:
     print("Error: Could not find UInt32DType to add to safe globals.")
+
+
+# CustomTrainer Class Definition
+class CustomTrainer(Trainer):
+    def evaluate(
+        self,
+        eval_dataset: Dataset | None = None,
+        ignore_keys: list[str] | None = None,
+        metric_key_prefix: str = "eval",
+    ):
+        num_eval_samples: int = 1000  # サンプリングする件数
+
+        # trainer.evaluate() が引数なしで呼ばれた場合は self.eval_dataset を使う
+        # trainer.evaluate(my_eval_dataset) のように呼ばれた場合は my_eval_dataset を使う
+        actual_eval_dataset = eval_dataset if eval_dataset is not None else self.eval_dataset
+
+        if actual_eval_dataset is None:
+            # 評価データセットがない場合は、そのまま親クラスのメソッドを呼び出す
+            return super().evaluate(eval_dataset=None, ignore_keys=ignore_keys, metric_key_prefix=metric_key_prefix)
+
+        # 通常の評価時（metric_key_prefix が 'eval'）かつ、
+        # データセットのサイズが指定したサンプリング数より大きい場合にサンプリングを実行
+        if metric_key_prefix == "eval" and len(actual_eval_dataset) > num_eval_samples:
+            indices = np.random.choice(len(actual_eval_dataset), num_eval_samples, replace=False)
+            sampled_dataset = actual_eval_dataset.select(indices)
+            print(
+                f"Evaluation ({metric_key_prefix}): Using a random subset of {len(sampled_dataset)} samples "
+                f"({num_eval_samples} requested) from the evaluation dataset."
+            )
+
+            # evaluate メソッドが eval_dataset=None で呼ばれた場合 (self.eval_dataset を使うケース)
+            # self.eval_dataset を一時的に差し替える必要がある
+            if eval_dataset is None:
+                original_self_eval_dataset = self.eval_dataset
+                self.eval_dataset = sampled_dataset
+                try:
+                    results = super().evaluate(eval_dataset=None, ignore_keys=ignore_keys, metric_key_prefix=metric_key_prefix)
+                finally:
+                    self.eval_dataset = original_self_eval_dataset  # 必ず元に戻す
+                return results
+            else:
+                # evaluate メソッドが eval_dataset=some_dataset で呼ばれた場合
+                return super().evaluate(
+                    eval_dataset=sampled_dataset, ignore_keys=ignore_keys, metric_key_prefix=metric_key_prefix
+                )
+        else:
+            # サンプリングしない場合 (データセットが小さい、または metric_key_prefix が 'eval' でないなど)
+            if metric_key_prefix == "eval" and actual_eval_dataset:
+                print(
+                    f"Evaluation ({metric_key_prefix}): Using the full evaluation dataset ({len(actual_eval_dataset)} samples)."
+                )
+            return super().evaluate(
+                eval_dataset=actual_eval_dataset, ignore_keys=ignore_keys, metric_key_prefix=metric_key_prefix
+            )
 
 
 # Custom Callback for training data metrics
@@ -130,11 +185,14 @@ def main():
         help="Directory containing the text dataset files.",
     )
     parser.add_argument(
-        "--output_dir", type=str, default="./pretrain_output", help="Output directory for a_model_name and checkpoints."
+        "--output_dir",
+        type=str,
+        default="experiments/pretrain_language_model",
+        help="Output directory for a_model_name and checkpoints.",
     )
     parser.add_argument("--num_train_epochs", type=int, default=3, help="Number of training epochs.")
-    parser.add_argument("--per_device_train_batch_size", type=int, default=8, help="Batch size for training.")
-    parser.add_argument("--per_device_eval_batch_size", type=int, default=8, help="Batch size for evaluation.")
+    parser.add_argument("--per_device_train_batch_size", type=int, default=4, help="Batch size for training.")
+    parser.add_argument("--per_device_eval_batch_size", type=int, default=4, help="Batch size for evaluation.")
     parser.add_argument("--learning_rate", type=float, default=5e-5, help="Learning rate.")
     parser.add_argument("--mask_probability", type=float, default=0.15, help="Probability of masking tokens.")
     parser.add_argument("--test_size", type=float, default=0.1, help="Proportion of the dataset to include in the test split.")
@@ -157,7 +215,7 @@ def main():
     DEFAULT_MODEL_TYPE = args.model_type
     BASE_EXPERIMENT_DIR = "experiments/kuzushiji_tokenizer_one_char"
     MODEL_SPECIFIC_DIR_NAME = f"vocab{DEFAULT_VOCAB_SIZE}_{DEFAULT_MODEL_TYPE}"
-    os.path.join(BASE_EXPERIMENT_DIR, MODEL_SPECIFIC_DIR_NAME)
+    TOKENIZER_FILE_PATH = os.path.join(BASE_EXPERIMENT_DIR, MODEL_SPECIFIC_DIR_NAME)
 
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
@@ -240,8 +298,6 @@ def main():
         bf16=torch.cuda.is_available(),
         load_best_model_at_end=True,
         metric_for_best_model="f1",
-        greater_is_better=True,
-        auto_find_batch_size=args.auto_find_batch_size,
         resume_from_checkpoint=args.resume_from_checkpoint,
         optim="schedule_free_adamw",  # Schedule-Free Optimizer の指定
         lr_scheduler_type="constant",
@@ -290,7 +346,7 @@ def main():
         callbacks_list.append(early_stopping_callback)
 
     # 7. Trainer
-    trainer = Trainer(
+    trainer = CustomTrainer(
         model=model,
         args=training_args,
         train_dataset=train_dataset,
@@ -354,13 +410,12 @@ if __name__ == "__main__":
 # How to run
 """
 python train_language_model.py \
-    --output_dir experiments/pretrain_language_model \
     --num_train_epochs 10000 \
-    --per_device_train_batch_size 1024 \
+    --per_device_train_batch_size 512 \
     --per_device_eval_batch_size 2 \
     --learning_rate 0.0001 \
     --mask_probability 0.15 \
-    --test_size 0.01 \
+    --test_size 0.1 \
     --save_steps 10000 \
     --eval_steps 10000 \
     --logging_steps 100 \
