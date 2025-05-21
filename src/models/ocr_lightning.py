@@ -21,11 +21,21 @@ class LitOCRModel(pl.LightningModule):
         decoder_config_obj = AutoConfig.from_pretrained(decoder_config_path)
         decoder_config_obj.is_decoder = True
         decoder_config_obj.add_cross_attention = True  # Enable cross-attention
+        decoder_config_obj.output_hidden_states = True  # Ensure hidden_states are outputted
         # Important: Tie decoder vocabulary size to our tokenizer
         decoder_config_obj.vocab_size = len(self.vocab)
         self.decoder = AutoModelForCausalLM.from_pretrained(decoder_config_path, config=decoder_config_obj)
         # Resize token embeddings in case the pretrained model's vocab size differs
         self.decoder.resize_token_embeddings(len(self.vocab))
+
+        # Configure the decoder's generation config directly
+        self.decoder.generation_config.max_length = self.model_config.get("max_gen_len", 128)
+        self.decoder.generation_config.pad_token_id = self.vocab.pad_token_id
+        self.decoder.generation_config.eos_token_id = self.vocab.eos_token_id
+        # Assuming bos_token_id is the bos_token_id for generation
+        self.decoder.generation_config.bos_token_id = self.vocab.bos_token_id
+        self.decoder.generation_config.output_hidden_states = True
+        self.decoder.generation_config.return_dict_in_generate = True
 
         # Encoder (UNetTransformerEncoder)
         # The out_channels_decoder of the encoder must match the decoder's hidden_size
@@ -62,10 +72,17 @@ class LitOCRModel(pl.LightningModule):
             # Teacher forcing: provide target_ids as decoder_input_ids
             # encoder_output from UNetTransformerEncoder is already (B, N, D_encoder)
             # This is the expected shape for encoder_hidden_states.
+
+            # Create attention_mask from target_ids (mask out padding tokens)
+            # target_ids shape: (batch_size, seq_len)
+            # attention_mask shape: (batch_size, seq_len)
+            attention_mask = (target_ids != self.vocab.pad_token_id).long()
             token_type_ids = torch.zeros_like(target_ids, device=target_ids.device)
+
             decoder_outputs = self.decoder(
                 input_ids=target_ids,
-                token_type_ids=token_type_ids,  # Add token_type_ids
+                attention_mask=attention_mask,  # Pass the attention_mask
+                token_type_ids=token_type_ids,
                 encoder_hidden_states=encoder_output,  # Directly use encoder_output
                 # encoder_attention_mask can be passed if needed.
                 # If encoder_output has padding, a mask is crucial.
@@ -78,29 +95,26 @@ class LitOCRModel(pl.LightningModule):
             # Inference: use generate method
             # encoder_output from UNetTransformerEncoder is (B, N, D_encoder)
             # This is the expected shape for encoder_hidden_states in generate method.
-            dummy_input_ids = torch.full((images.size(0), 1), self.vocab.bos_token_id, dtype=torch.long, device=self.device)
-            # For generate, token_type_ids are often not explicitly needed or handled internally.
-            # If an error occurs here related to token_type_ids, it might need to be addressed.
-            generated_ids = self.decoder.generate(
-                input_ids=dummy_input_ids,
-                encoder_hidden_states=encoder_output,  # Directly use encoder_output
-                max_length=self.model_config.get("max_gen_len", 50),  # Max length of generated sequence
-                pad_token_id=self.vocab.pad_token_id,
-                eos_token_id=self.vocab.eos_token_id,
-                # Other generation parameters can be added here
+            dummy_input_ids = torch.full(
+                (images.size(0), 1), fill_value=self.vocab.bos_token_id, dtype=torch.long, device=self.device
             )
-            # Get logits for the generated ids (optional, might not be straightforward with generate)
-            # For simplicity, we might skip direct logit output during inference here
-            # and focus on generated_ids for CER calculation.
-            # If logits are needed, a separate forward pass with generated_ids might be required.
-            char_logits = None  # Or find a way to get them from generate if needed
+            generation_output = self.decoder.generate(
+                input_ids=dummy_input_ids,
+                encoder_hidden_states=encoder_output,
+                # Removed explicit generation_config, model's own config will be used
+            )
+
+            if hasattr(generation_output, "sequences"):
+                char_logits = None  # Or find a way to get them from generate if needed
+            else:
+                char_logits = None  # Or find a way to get them from generate if needed
 
         # Bounding box prediction
         # Use the decoder's last hidden state or specific output for bbox prediction
         # Assuming decoder_outputs.last_hidden_state is available if target_ids were passed
         if target_ids is not None:
             # hidden_states shape: [batch_size, seq_len, hidden_size]
-            predicted_bboxes = self.bbox_predictor(decoder_outputs.last_hidden_state)
+            predicted_bboxes = self.bbox_predictor(decoder_outputs.hidden_states[-1])
         else:
             # For generation, bbox prediction is more complex.
             # One way is to take the hidden states from the `generate` method if it returns them,
@@ -189,15 +203,19 @@ class LitOCRModel(pl.LightningModule):
 
         # Generate IDs for CER
         encoder_output_val = self.encoder(images)
-        generated_ids = self.decoder.generate(
+        generated_ids_output = self.decoder.generate(
             input_ids=torch.full((images.size(0), 1), self.vocab.bos_token_id, dtype=torch.long, device=self.device),
             encoder_hidden_states=encoder_output_val,
-            max_length=self.model_config.get("max_gen_len", 50),
+            max_length=self.model_config.get("max_gen_len", 128),  # Use 128 consistent with other parts
             pad_token_id=self.vocab.pad_token_id,
             eos_token_id=self.vocab.eos_token_id,
+            # bos_token_id=self.vocab.go_token_id, # Already part of input_ids
+            # output_hidden_states=True, # Already set in generation_config
+            # return_dict_in_generate=True # Already set in generation_config
         )
+        actual_generated_ids = generated_ids_output.sequences  # Access sequences attribute
 
-        pred_texts = [self.vocab.decode(ids.tolist(), join=True) for ids in generated_ids]
+        pred_texts = [self.vocab.decode(ids.tolist(), join=True) for ids in actual_generated_ids]
         gt_texts = [self.vocab.decode(ids.tolist(), join=True) for ids in target_char_ids]  # Use target_char_ids here
 
         val_cer = 0.0
@@ -271,15 +289,19 @@ class LitOCRModel(pl.LightningModule):
 
         # Inference for CER and IoU
         encoder_output_test = self.encoder(images)
-        generated_ids = self.decoder.generate(
+        generated_ids_output = self.decoder.generate(
             input_ids=torch.full((images.size(0), 1), self.vocab.bos_token_id, dtype=torch.long, device=self.device),
             encoder_hidden_states=encoder_output_test,
-            max_length=self.model_config.get("max_gen_len", 50),
+            max_length=self.model_config.get("max_gen_len", 128),  # Use 128
             pad_token_id=self.vocab.pad_token_id,
             eos_token_id=self.vocab.eos_token_id,
+            # bos_token_id=self.vocab.go_token_id,
+            # output_hidden_states=True,
+            # return_dict_in_generate=True
         )
+        actual_generated_ids = generated_ids_output.sequences  # Access sequences attribute
 
-        pred_texts = [self.vocab.decode(ids.tolist(), join=True) for ids in generated_ids]
+        pred_texts = [self.vocab.decode(ids.tolist(), join=True) for ids in actual_generated_ids]
         gt_texts = [self.vocab.decode(ids.tolist(), join=True) for ids in target_char_ids]
 
         test_cer = 0.0
