@@ -4,6 +4,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping, LearningRateMonitor
 from pytorch_lightning.loggers import WandbLogger, TensorBoardLogger
 from torch.utils.data import DataLoader
+from datetime import datetime
 import os
 import pandas as pd # For loading chars from CSV
 
