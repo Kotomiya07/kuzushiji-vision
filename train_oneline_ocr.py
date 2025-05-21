@@ -4,6 +4,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping, LearningRateMonitor
 from pytorch_lightning.loggers import WandbLogger, TensorBoardLogger
 from torch.utils.data import DataLoader
+from datetime import datetime
 import os
 import pandas as pd # For loading chars from CSV
 
@@ -20,7 +21,7 @@ def setup_parser():
     parser.add_argument("--data_root_dir", type=str, default="data/column_dataset_padded", help="Root directory containing train, val, test split folders (each with BookID subfolders).")
     parser.add_argument("--train_dir_name", type=str, default="train", help="Name of the training data folder under data_root_dir.")
     parser.add_argument("--val_dir_name", type=str, default="val", help="Name of the validation data folder under data_root_dir.")
-    parser.add_argument("--test_dir_name", type=str, default=None, help="Optional: Name of the test data folder under data_root_dir.")
+    parser.add_argument("--test_dir_name", type=str, default="test", help="Name of the test data folder under data_root_dir.")
     parser.add_argument("--unicode_csv_path", type=str, default="data/unicode_translation.csv", help="Path to unicode_translation.csv for Vocab.")
 
     # Image arguments
@@ -82,6 +83,7 @@ def main(args):
     # Datasets
     train_data_path = os.path.join(args.data_root_dir, args.train_dir_name)
     val_data_path = os.path.join(args.data_root_dir, args.val_dir_name)
+    test_data_path = os.path.join(args.data_root_dir, args.test_dir_name)
 
     train_dataset = OneLineOCRDataset(
         data_root_dir=train_data_path,
