@@ -47,7 +47,7 @@ def setup_parser():
     )
 
     # Label and Tokenizer arguments
-    parser.add_argument("--max_label_len", type=int, default=256, help="Maximum length of a label sequence.")
+    parser.add_argument("--max_label_len", type=int, default=128, help="Maximum length of a label sequence.")
 
     # Training arguments
     parser.add_argument("--batch_size", type=int, default=16, help="Batch size for training and evaluation.")
