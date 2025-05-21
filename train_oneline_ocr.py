@@ -17,16 +17,16 @@ def setup_parser():
     parser = argparse.ArgumentParser(description="Train One-Line OCR Model")
 
     # Data arguments
-    parser.add_argument("--data_root_dir", type=str, required=True, help="Root directory containing train, val, test split folders (each with BookID subfolders).")
+    parser.add_argument("--data_root_dir", type=str, default="data/column_dataset_padded", help="Root directory containing train, val, test split folders (each with BookID subfolders).")
     parser.add_argument("--train_dir_name", type=str, default="train", help="Name of the training data folder under data_root_dir.")
     parser.add_argument("--val_dir_name", type=str, default="val", help="Name of the validation data folder under data_root_dir.")
     parser.add_argument("--test_dir_name", type=str, default=None, help="Optional: Name of the test data folder under data_root_dir.")
-    parser.add_argument("--unicode_csv_path", type=str, required=True, help="Path to unicode_translation.csv for Vocab.")
+    parser.add_argument("--unicode_csv_path", type=str, default="data/unicode_translation.csv", help="Path to unicode_translation.csv for Vocab.")
 
     # Image arguments
-    parser.add_argument("--image_height", type=int, default=64, help="Target image height.")
-    parser.add_argument("--image_width", type=int, default=1024, help="Target image width.")
-    parser.add_argument("--image_channels", type=int, default=1, choices=[1, 3], help="Number of image channels (1 for grayscale, 3 for RGB).")
+    parser.add_argument("--image_height", type=int, default=1024, help="Target image height.")
+    parser.add_argument("--image_width", type=int, default=64, help="Target image width.")
+    parser.add_argument("--image_channels", type=int, default=3, choices=[1, 3], help="Number of image channels (1 for grayscale, 3 for RGB).")
 
     # Label and Tokenizer arguments
     parser.add_argument("--max_label_len", type=int, default=256, help="Maximum length of a label sequence.")
@@ -43,21 +43,21 @@ def setup_parser():
     parser.add_argument("--bbox_loss_weight", type=float, default=0.05, help="Weight for the bounding box loss component.")
     
     # Encoder specific arguments (from UNetTransformerEncoder)
-    parser.add_argument("--encoder_in_channels", type=int, default=1, help="Input channels for encoder (should match image_channels).")
+    parser.add_argument("--encoder_in_channels", type=int, default=3, help="Input channels for encoder (should match image_channels).")
     parser.add_argument("--encoder_initial_filters", type=int, default=64, help="Initial filters in the U-Net encoder.")
     parser.add_argument("--encoder_num_unet_layers", type=int, default=4, help="Number of U-Net downsampling layers in encoder.")
-    parser.add_argument("--encoder_num_transformer_layers", type=int, default=4, help="Number of Transformer layers in encoder.")
+    parser.add_argument("--encoder_num_transformer_layers", type=int, default=2, help="Number of Transformer layers in encoder.")
     parser.add_argument("--encoder_transformer_heads", type=int, default=8, help="Number of attention heads in encoder's Transformer.")
     parser.add_argument("--encoder_transformer_mlp_dim", type=int, default=2048, help="Dimension of the MLP in encoder's Transformer.")
 
     # Decoder specific arguments (HuggingFace based)
-    parser.add_argument("--decoder_model_name", type=str, default="KoichiYasuoka/roberta-small-japanese-aozora-char", help="Path or name of the HuggingFace decoder model.")
-    parser.add_argument("--max_gen_len", type=int, default=50, help="Max length for sequence generation in decoder.")
+    parser.add_argument("--decoder_model_name", type=str, default="", help="Path or name of the HuggingFace decoder model.")
+    parser.add_argument("--max_gen_len", type=int, default=90, help="Max length for sequence generation in decoder.")
 
 
     # Logging and Callbacks
-    parser.add_argument("--wandb_project", type=str, default=None, help="WandB project name. If None, TensorBoardLogger is used.")
-    parser.add_argument("--wandb_entity", type=str, default=None, help="WandB entity name.")
+    parser.add_argument("--wandb_project", type=str, default="oneline-ocr", help="WandB project name. If None, TensorBoardLogger is used.")
+    parser.add_argument("--wandb_entity", type=str, default=f"{datetime.now().strftime('%Y%m%d')}", help="WandB entity name.")
     parser.add_argument("--patience_early_stopping", type=int, default=10, help="Patience for EarlyStopping.")
     parser.add_argument("--checkpoint_monitor_metric", type=str, default="val_cer", help="Metric to monitor for ModelCheckpoint (e.g., val_loss, val_cer, val_iou).")
     parser.add_argument("--checkpoint_mode", type=str, default="min", choices=["min", "max"], help="Mode for ModelCheckpoint ('min' for loss/error, 'max' for accuracy/iou).")
@@ -174,7 +174,7 @@ def main(args):
     checkpoint_callback = ModelCheckpoint(
         monitor=args.checkpoint_monitor_metric,
         mode=args.checkpoint_mode,
-        save_top_k=1,
+        save_top_k=3,
         save_last=True, # Good for resuming
         filename='oneline-ocr-{epoch:02d}-{' + args.checkpoint_monitor_metric + ':.4f}'
     )
@@ -263,3 +263,17 @@ if __name__ == '__main__':
     #    raise ValueError("encoder_in_channels must match image_channels")
         
     main(args)
+
+"""
+python train_oneline_ocr.py \
+--batch_size 16 \
+--max_epochs 100 \
+--learning_rate 1e-4 \
+--devices 1 \
+--bbox_loss_weight 0.05 \
+--encoder_num_unet_layers 4 \
+--encoder_num_transformer_layers 2 \
+--encoder_transformer_heads 8 \
+--decoder_model_name experiments/pretrain_language_model/roberta-small-japanese-aozora-char/20250517_091839/final_model \
+--patience_early_stopping 10 
+"""
