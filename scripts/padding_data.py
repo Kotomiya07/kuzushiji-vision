@@ -9,6 +9,7 @@
 
 import concurrent.futures
 import os
+import shutil
 import sys
 from functools import partial
 
@@ -111,7 +112,27 @@ def _process_single_image(
                 background.paste(resized_img_pil, (0, 0))
 
             relative_path = os.path.relpath(image_path, input_dir)
-            output_path = os.path.join(output_dir, relative_path)
+
+            # --- 出力パス変更ロジック START ---
+            filename = os.path.basename(relative_path)
+            parent_dir = os.path.dirname(relative_path)
+
+            if parent_dir and parent_dir != ".":  # 親ディレクトリが存在し、カレントディレクトリでない場合
+                grandparent_dir = os.path.dirname(parent_dir)
+                # grandparent_dir が空文字列になるのは、parent_dir がルート直下のディレクトリの場合
+                # 例: relative_path = "subdir1/file.jpg" -> parent_dir = "subdir1", grandparent_dir = ""
+                # この場合、出力は OUTPUT_DIR/file.jpg となるべき
+                # relative_path = "subdir1/subdir2/file.jpg" -> parent_dir = "subdir1/subdir2", grandparent_dir = "subdir1"
+                # この場合、出力は OUTPUT_DIR/subdir1/file.jpg となるべき
+                if grandparent_dir:  # grandparent_dir が空でない場合のみ結合
+                    modified_relative_path = os.path.join(grandparent_dir, filename)
+                else:  # grandparent_dir が空 = 元のパスが input_dir 直下より1階層深いだけだった場合
+                    modified_relative_path = filename  # ファイル名のみ（OUTPUT_DIR 直下に配置）
+            else:  # 親ディレクトリがない、またはカレントディレクトリの場合 (例: input_dir 直下のファイル)
+                modified_relative_path = filename
+            # --- 出力パス変更ロジック END ---
+
+            output_path = os.path.join(output_dir, modified_relative_path)  # 変更！
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
             output_format_str = os.path.splitext(image_path)[1].lower()
@@ -223,6 +244,12 @@ def process_images_parallel(input_dir: str, output_dir: str, target_width: int):
             else:
                 error_count += 1
                 print(f"  エラー: ファイル '{img_path_result}' の処理中に問題: {error_msg}", file=sys.stderr)
+    
+    # 最後に data/column_dataset/{train/val/test/{train/val/test}_column_info.csvをコピーする
+    for split in ["train", "val", "test"]:
+        src_path = os.path.join(INPUT_DIR, split, f"{split}_column_info.csv")
+        dst_path = os.path.join(OUTPUT_DIR, split, f"{split}_column_info.csv")
+        shutil.copy(src_path, dst_path)
 
     print("\n--- すべての処理が完了しました ---")
     print(f"処理成功: {processed_count} 個")
