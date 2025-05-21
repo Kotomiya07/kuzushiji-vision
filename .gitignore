@@ -183,6 +183,7 @@ logs/
 *.pt
 wandb/
 tensorboard/
+tb_logs/
 
 # PyPI configuration file
 .pypirc
