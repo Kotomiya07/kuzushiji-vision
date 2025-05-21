@@ -90,7 +90,7 @@ def setup_parser():
     parser.add_argument("--max_gen_len", type=int, default=128, help="Max length for sequence generation in decoder.")
 
     # Logging and Callbacks
-    parser.add_argument("--wandb", type=bool, default=False, help="Whether to use WandB for logging.")
+    parser.add_argument("--wandb", type=bool, default=True, help="Whether to use WandB for logging.")
     parser.add_argument(
         "--wandb_project", type=str, default="oneline-ocr", help="WandB project name. If None, TensorBoardLogger is used."
     )

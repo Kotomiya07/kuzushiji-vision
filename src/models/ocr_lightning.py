@@ -1,4 +1,5 @@
 import pytorch_lightning as pl
+import schedulefree
 import torch
 import torch.nn as nn
 from jiwer import compute_measures
@@ -338,16 +339,29 @@ class LitOCRModel(pl.LightningModule):
 
     def configure_optimizers(self):
         # Example optimizer, replace with one from optimizer_config if needed
-        optimizer = torch.optim.AdamW(
+        optimizer = schedulefree.RAdamScheduleFree(
             self.parameters(),
             lr=self.optimizer_config.get("lr", 1e-4),
             weight_decay=self.optimizer_config.get("weight_decay", 0.01),
         )
-        # Learning rate scheduler (optional)
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer,
-            mode="min",
-            factor=self.optimizer_config.get("lr_scheduler_factor", 0.1),
-            patience=self.optimizer_config.get("lr_scheduler_patience", 10),
-        )
-        return {"optimizer": optimizer, "lr_scheduler": {"scheduler": scheduler, "monitor": "val_loss"}}
+        return optimizer
+
+    def on_train_epoch_start(self) -> None:
+        optimizer = self.optimizers()
+        if optimizer and hasattr(optimizer, "train"):
+            optimizer.train()
+
+    def on_validation_epoch_start(self) -> None:
+        optimizer = self.optimizers()
+        if optimizer and hasattr(optimizer, "eval"):
+            optimizer.eval()
+
+    def on_test_epoch_start(self) -> None:
+        optimizer = self.optimizers()
+        if optimizer and hasattr(optimizer, "eval"):
+            optimizer.eval()
+
+    def on_predict_epoch_start(self) -> None:
+        optimizer = self.optimizers()
+        if optimizer and hasattr(optimizer, "eval"):
+            optimizer.eval()
