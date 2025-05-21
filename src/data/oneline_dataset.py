@@ -1,14 +1,15 @@
-import torch
-import os
 import glob
+import os
+
+import torch
 from PIL import Image
 from torch.utils.data import Dataset
-from torchvision import transforms # Added for default transformations
-# Assuming src is in PYTHONPATH, adjust if necessary for your environment
-from ..utils.tokenizer import Vocab, PAD_ID, GO_ID, EOS_ID
+from torchvision import transforms
+from transformers import AutoTokenizer
+
 
 class OneLineOCRDataset(Dataset):
-    def __init__(self, data_root_dir: str, tokenizer: Vocab, transform=None, 
+    def __init__(self, data_root_dir: str, tokenizer: AutoTokenizer, transform=None, 
                  max_label_len: int = 256, image_height: int = 64, 
                  image_width: int = 1024, image_channels: int = 1):
         super().__init__()
@@ -26,11 +27,11 @@ class OneLineOCRDataset(Dataset):
         if not os.path.isdir(self.data_root_dir):
             raise FileNotFoundError(f"Data root directory not found: {self.data_root_dir}")
 
-        book_ids = [d for d in os.listdir(self.data_root_dir) if os.path.isdir(os.path.join(self.data_root_dir, d))]
+        book_ids = [d for d in os.listdir(os.path.join(self.data_root_dir, "images")) if os.path.isdir(os.path.join(self.data_root_dir, "images", d))]
 
         for book_id in book_ids:
-            image_dir = os.path.join(self.data_root_dir, book_id, "images")
-            label_dir = os.path.join(self.data_root_dir, book_id, "labels")
+            image_dir = os.path.join(self.data_root_dir, "images", book_id)
+            label_dir = os.path.join(self.data_root_dir, "labels", book_id)
 
             if not os.path.isdir(image_dir):
                 # print(f"Warning: Image directory not found for BookID {book_id}, skipping.")
@@ -51,7 +52,6 @@ class OneLineOCRDataset(Dataset):
                 
                 # Assume label file has .txt extension
                 label_file_path = os.path.join(label_dir, f"{img_name_no_ext}.txt")
-
                 if os.path.exists(label_file_path):
                     self.image_label_pairs.append((img_path, label_file_path))
                 else:
@@ -128,7 +128,7 @@ class OneLineOCRDataset(Dataset):
         tokenized_label = self.tokenizer.encode(label_text) 
         
         # Pad sequence
-        padded_label = torch.full((self.max_label_len,), fill_value=PAD_ID, dtype=torch.long)
+        padded_label = torch.full((self.max_label_len,), fill_value=self.tokenizer.pad_token_id, dtype=torch.long)
         
         # Truncate if tokenized_label is longer than max_label_len
         # Ensure EOS is at the end if truncated, and GO at the start
@@ -137,13 +137,13 @@ class OneLineOCRDataset(Dataset):
         padded_label[:seq_len] = torch.tensor(tokenized_label[:seq_len], dtype=torch.long)
 
         # If truncation happened before EOS, ensure EOS is the last token.
-        if seq_len < self.max_label_len and tokenized_label[seq_len-1] != EOS_ID :
+        if seq_len < self.max_label_len and tokenized_label[seq_len-1] != self.tokenizer.eos_token_id :
              if seq_len > 0 : #Only add EOS if there is space and it's not already there
-                 padded_label[seq_len-1] = EOS_ID # Overwrite last token with EOS if truncated before EOS
+                 padded_label[seq_len-1] = self.tokenizer.eos_token_id # Overwrite last token with EOS if truncated before EOS
              # If seq_len is 0 (empty label), it will be all PAD_IDs, which is fine.
-        elif seq_len == self.max_label_len and padded_label[self.max_label_len-1] != EOS_ID:
+        elif seq_len == self.max_label_len and padded_label[self.max_label_len-1] != self.tokenizer.eos_token_id:
              # If full and last token is not EOS, force it to be EOS
-             padded_label[self.max_label_len-1] = EOS_ID
+             padded_label[self.max_label_len-1] = self.tokenizer.eos_token_id
 
 
         label_tensor = padded_label
