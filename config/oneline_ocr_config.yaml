@@ -44,16 +44,16 @@ data:
   # test_dir_name: null # Example if no test set initially
   unicode_csv_path: data/unicode_translation.csv # Path to the CSV defining characters for the Vocab
 
-  image_height: 64          # Target height for images
-  image_width: 1024         # Target width for images
-  image_channels: 1         # 1 for grayscale, 3 for RGB
+  image_height: 1024          # Target height for images
+  image_width: 64         # Target width for images
+  image_channels: 3         # 1 for grayscale, 3 for RGB
   max_label_len: 128        # Maximum sequence length for labels (including GO/EOS tokens)
 
 # Training Configuration
 training:
   batch_size: 16
   num_workers: 4            # Number of CPU workers for DataLoader
-  max_epochs: 100
+  max_epochs: 1000
   learning_rate: 0.0001     # Initial learning rate for AdamW optimizer
   accelerator: gpu          # "cpu", "gpu", "tpu", "ipu", "auto"
   devices: "[0]"            # Devices to use, e.g., "[0]" for GPU 0, "[0, 1]" for GPUs 0 and 1, or 1 for 1 device count.
