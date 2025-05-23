@@ -58,6 +58,98 @@ else:
     print("Error: Could not find UInt32DType to add to safe globals.")
 
 
+def restore_masked_text(model, tokenizer, input_ids, labels, max_examples=10):
+    """
+    マスクされたトークンをモデルのTop1予測で復元し、元の文、マスクされた文、復元された文を返す
+
+    Args:
+        model: 学習済みのAutoModelForMaskedLM
+        tokenizer: 対応するトークナイザー
+        input_ids: マスクされたinput_ids [batch_size, seq_len]
+        labels: 元のラベル（-100でマスクされていない部分を示す） [batch_size, seq_len]
+        max_examples: 表示する例の最大数
+
+    Returns:
+        list: 復元結果の辞書のリスト
+            - original_text: 元の文
+            - masked_text: マスクされた文
+            - restored_text: 復元された文
+    """
+    model.eval()
+    device = next(model.parameters()).device
+
+    # バッチサイズを制限
+    batch_size = min(input_ids.size(0), max_examples)
+    input_ids = input_ids[:batch_size].to(device)
+    labels = labels[:batch_size].to(device)
+
+    results = []
+
+    with torch.no_grad():
+        # モデルで予測
+        outputs = model(input_ids=input_ids)
+        predictions = outputs.logits.argmax(dim=-1)  # Top1予測
+
+        for i in range(batch_size):
+            # 元の文を復元（labelsから-100でない部分を取得）
+            original_tokens = input_ids[i].clone()
+            mask_positions = labels[i] != -100
+            original_tokens[mask_positions] = labels[i][mask_positions]
+
+            # マスクされた文
+            masked_tokens = input_ids[i].clone()
+
+            # 復元された文（マスク位置のみ予測で置換）
+            restored_tokens = input_ids[i].clone()
+            restored_tokens[mask_positions] = predictions[i][mask_positions]
+
+            # テキストに変換
+            original_text = tokenizer.decode(original_tokens, skip_special_tokens=True)
+            masked_text = tokenizer.decode(masked_tokens, skip_special_tokens=False)
+            # PADトークンを削除
+            masked_text = masked_text.replace(tokenizer.pad_token, "")
+            restored_text = tokenizer.decode(restored_tokens, skip_special_tokens=True)
+
+            results.append(
+                {
+                    "original_text": original_text,
+                    "masked_text": masked_text,
+                    "restored_text": restored_text,
+                    "mask_count": mask_positions.sum().item(),
+                }
+            )
+
+    return results
+
+
+def print_restoration_examples(restoration_results, max_display=5):
+    """
+    復元結果を見やすい形式で表示する
+
+    Args:
+        restoration_results: restore_masked_text関数の戻り値
+        max_display: 表示する例の最大数
+    """
+    print("\n" + "=" * 80)
+    print("マスクされたトークンの復元結果 (Top1予測)")
+    print("=" * 80)
+
+    for i, result in enumerate(restoration_results[:max_display]):
+        print(f"\n例 {i + 1} (マスクされたトークン数: {result['mask_count']})")
+        print("-" * 60)
+        print(f"元の文:     {result['original_text']}")
+        print(f"マスク文:   {result['masked_text']}")
+        print(f"復元文:     {result['restored_text']}")
+
+        # 復元の正確性を簡単にチェック
+        if result["original_text"] == result["restored_text"]:
+            print("✓ 完全復元成功")
+        else:
+            print("△ 部分的復元")
+
+    print("\n" + "=" * 80)
+
+
 # CustomTrainer Class Definition
 class CustomTrainer(Trainer):
     def evaluate(
@@ -111,6 +203,40 @@ class CustomTrainer(Trainer):
                 eval_dataset=actual_eval_dataset, ignore_keys=ignore_keys, metric_key_prefix=metric_key_prefix
             )
 
+    def show_restoration_examples(self, eval_dataset=None, num_examples=5):
+        """
+        評価データセットからサンプルを選択してマスクされたトークンの復元例を表示する
+
+        Args:
+            eval_dataset: 評価データセット（Noneの場合はself.eval_datasetを使用）
+            num_examples: 表示する例の数
+        """
+        if eval_dataset is None:
+            eval_dataset = self.eval_dataset
+
+        if eval_dataset is None:
+            print("評価データセットが利用できません。復元例の表示をスキップします。")
+            return
+
+        # 少数のサンプルを選択
+        sample_size = min(num_examples, len(eval_dataset))
+        indices = np.random.choice(len(eval_dataset), sample_size, replace=False)
+        sample_dataset = eval_dataset.select(indices)
+
+        # データコレーターを使用してマスクされたデータを生成
+        sample_batch = self.data_collator([sample_dataset[i] for i in range(sample_size)])
+
+        # デバイスに移動
+        device = next(self.model.parameters()).device
+        input_ids = sample_batch["input_ids"].to(device)
+        labels = sample_batch["labels"].to(device)
+
+        # 復元を実行
+        restoration_results = restore_masked_text(self.model, self.tokenizer, input_ids, labels, max_examples=num_examples)
+
+        # 結果を表示
+        print_restoration_examples(restoration_results, max_display=num_examples)
+
 
 # Custom Callback for training data metrics
 class TrainMetricsCallback(TrainerCallback):
@@ -120,6 +246,7 @@ class TrainMetricsCallback(TrainerCallback):
         self.metric_key_prefix = metric_key_prefix
         self.trainer = None
         self.max_samples_for_metrics = max_samples_for_metrics
+        self.eval_count = 0  # 評価回数をカウント
 
     def on_evaluate(self, args, state, control, model=None, **kwargs):
         if self.trainer is None:
@@ -163,6 +290,17 @@ class TrainMetricsCallback(TrainerCallback):
             self.trainer.log(log_metrics)
             print(f"Train data metrics logged: {log_metrics}")
 
+            # 復元例を定期的に表示（5回に1回）
+            self.eval_count += 1
+            if self.eval_count % 5 == 1:  # 最初の評価と5回に1回表示
+                print(f"\n復元例を表示します（評価回数: {self.eval_count}）...")
+                if hasattr(self.trainer, "show_restoration_examples"):
+                    # 評価データセットがある場合はそれを使用、なければ訓練データセットを使用
+                    display_dataset = self.trainer.eval_dataset if self.trainer.eval_dataset is not None else eval_dataset
+                    self.trainer.show_restoration_examples(eval_dataset=display_dataset, num_examples=3)
+                else:
+                    print("復元例表示機能が利用できません。")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Pretrain a language model for Kuzushiji recognition.")
@@ -176,8 +314,8 @@ def main():
         "--dataset_dirs",
         type=list,
         default=[
-            "ndl-minhon-ocrdataset/src/honkoku_oneline_v1",
-            "ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
+            # "ndl-minhon-ocrdataset/src/honkoku_oneline_v1",
+            # "ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
             # "honkoku_yatanavi/honkoku_oneline",
             # "data/oneline",
             "kokubunken_repo/text",
@@ -400,6 +538,10 @@ def main():
         print("Evaluation results:")
         for key, value in eval_results.items():
             print(f"  {key}: {value}")
+
+        # 最終評価後に復元例を表示
+        print("\n最終評価後の復元例表示:")
+        trainer.show_restoration_examples(eval_dataset=eval_dataset, num_examples=5)
     else:
         print("No evaluation dataset provided. Skipping final evaluation.")
 
@@ -411,7 +553,7 @@ if __name__ == "__main__":
 """
 python train_language_model.py \
     --num_train_epochs 10000 \
-    --per_device_train_batch_size 512 \
+    --per_device_train_batch_size 256 \
     --per_device_eval_batch_size 2 \
     --learning_rate 0.0001 \
     --mask_probability 0.15 \
