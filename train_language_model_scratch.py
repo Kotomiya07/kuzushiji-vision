@@ -17,8 +17,8 @@ from numpy import dtype, ndarray
 from numpy.core.multiarray import _reconstruct
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from transformers import (
-    AutoConfig,
-    AutoModelForMaskedLM,
+    RobertaConfig,
+    RobertaForMaskedLM,
     AutoTokenizer,
     DataCollatorForLanguageModeling,
     EarlyStoppingCallback,
@@ -308,7 +308,7 @@ def main():
     parser.add_argument(
         "--model_name",
         type=str,
-        default="KoichiYasuoka/roberta-small-japanese-aozora-char",
+        default="Kotomiya07/roberta-small-kuzushiji-char",
         help="Pretrained model name or path.",
     )
     parser.add_argument(
@@ -383,7 +383,7 @@ def main():
     # Tokenize the dataset
     def tokenize_function(examples):
         # Tokenize the texts. The tokenizer will automatically add CLS and SEP if configured.
-        return tokenizer(examples["text"], truncation=True)
+        return tokenizer(examples["text"], truncation=True, max_length=128)
 
     tokenized_dataset = dataset.map(tokenize_function, batched=True, remove_columns=["text"])
     print(f"Dataset tokenized. Number of examples: {len(tokenized_dataset)}")
@@ -398,7 +398,7 @@ def main():
         print(f"Using full dataset for training ({len(train_dataset)}). No evaluation set created.")
 
     # 3. モデル設定の作成
-    config = AutoConfig(
+    config = RobertaConfig(
         vocab_size=tokenizer.vocab_size, # トークナイザの語彙サイズに合わせる
         max_position_embeddings=128,
         num_hidden_layers=12, 
@@ -425,7 +425,7 @@ def main():
     
     # 3. Model
     # model = AutoModelForMaskedLM.from_pretrained(args.model_name, attn_implementation="flash_attention_2")
-    model = AutoModelForMaskedLM.from_config(config)
+    model = RobertaForMaskedLM(config)
 
     # 4. Data Collator
     # Data collator for MLM. It will handle dynamic masking.
