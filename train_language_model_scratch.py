@@ -398,10 +398,6 @@ def main():
         print(f"Using full dataset for training ({len(train_dataset)}). No evaluation set created.")
 
     # 3. モデル設定の作成
-    config = AutoConfig.from_pretrained(
-        args.model_name,
-        vocab_size=len(tokenizer),
-    )
     config = AutoConfig(
         vocab_size=tokenizer.vocab_size, # トークナイザの語彙サイズに合わせる
         max_position_embeddings=128,
@@ -426,6 +422,7 @@ def main():
         tokenizer_class="BertTokenizerFast",
         use_cache=True,
     )
+    
     # 3. Model
     # model = AutoModelForMaskedLM.from_pretrained(args.model_name, attn_implementation="flash_attention_2")
     model = AutoModelForMaskedLM.from_config(config)
