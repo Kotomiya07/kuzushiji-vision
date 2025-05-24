@@ -2,6 +2,9 @@ import argparse
 import os
 from datetime import datetime
 
+os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
+import logging
+
 import pytorch_lightning as pl
 import torch
 from pytorch_lightning.callbacks import EarlyStopping, LearningRateMonitor, ModelCheckpoint
@@ -122,6 +125,14 @@ def main(args):
     # Initialize Tokenizer directly from CSV path
     try:
         tokenizer = AutoTokenizer.from_pretrained(args.decoder_model_name)
+        if tokenizer.pad_token_id is None:
+            if tokenizer.eos_token_id is not None:
+                print(
+                    f"Warning: tokenizer.pad_token_id is None. Setting it to tokenizer.eos_token_id ({tokenizer.eos_token_id})"
+                )
+                tokenizer.pad_token_id = tokenizer.eos_token_id
+            else:
+                raise ValueError("tokenizer.pad_token_id is None and tokenizer.eos_token_id is also None. Cannot proceed.")
     except Exception as e:
         print(f"Failed to initialize tokenizer: {e}")
         return  # Exit if tokenizer fails

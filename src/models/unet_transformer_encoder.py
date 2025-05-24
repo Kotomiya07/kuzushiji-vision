@@ -111,7 +111,7 @@ class UNetTransformerEncoder(nn.Module):
             nhead=transformer_heads,
             dim_feedforward=transformer_mlp_dim,
             dropout=0.1, # Standard dropout
-            activation='relu',
+            activation='gelu',
             batch_first=True # Expects (batch, seq, feature)
         )
         self.transformer_encoder = nn.TransformerEncoder(
