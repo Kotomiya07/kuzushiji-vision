@@ -1,0 +1,30 @@
+# Data settings
+data_dir: "./data/column_dataset_padded" # Path to the dataset
+create_dummy_if_missing: true # Create dummy data if data_dir is not found or empty
+num_workers: 4               # Number of workers for DataLoader
+target_height: 64            # Target image height for resizing
+target_width: 512            # Target image width for resizing
+max_label_length: 50         # Maximum length for labels (used in data_loader.py)
+
+# Model settings
+rnn_hidden_size: 256         # Hidden size for the RNN decoder in OCRModel
+input_channels: 3            # Number of input channels for the model (e.g., 3 for RGB, 1 for grayscale)
+
+# Training settings
+learning_rate: 0.001         # Initial learning rate
+batch_size: 16               # Batch size for training and evaluation
+max_epochs: 50               # Maximum number of training epochs
+patience: 10                 # Patience for EarlyStopping callback
+accelerator: "auto"          # "auto", "cpu", "gpu", "mps"
+precision: 32                # Training precision (e.g., 16 for mixed, 32 for full)
+deterministic: false         # Whether to enable deterministic mode for reproducibility
+run_test: true               # Whether to run the test set after training
+
+# Callback/Logging settings
+checkpoint_dir: "./checkpoints/" # Directory to save model checkpoints
+monitor_metric: "val_loss"   # Metric to monitor for ModelCheckpoint and EarlyStopping (e.g., "val_loss", "val_cer", "val_mean_iou")
+monitor_mode: "min"          # Mode for monitoring ("min" or "max")
+save_top_k: 1                # Number of best checkpoints to save
+
+# If adding specific ResNet backbone choice later, could add:
+# model_backbone: "resnet34"
