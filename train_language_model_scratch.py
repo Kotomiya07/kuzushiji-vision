@@ -17,6 +17,7 @@ from numpy import dtype, ndarray
 from numpy.core.multiarray import _reconstruct
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from transformers import (
+    AutoConfig,
     AutoModelForMaskedLM,
     AutoTokenizer,
     DataCollatorForLanguageModeling,
@@ -396,13 +397,14 @@ def main():
         eval_dataset = None  # Or a small subset if evaluation is still desired during training
         print(f"Using full dataset for training ({len(train_dataset)}). No evaluation set created.")
 
+    # 3. モデル設定の作成
+    config = AutoConfig.from_pretrained(
+        args.model_name,
+        vocab_size=len(tokenizer),
+    )
     # 3. Model
-    print(f"Loading model: {args.model_name}")
     # model = AutoModelForMaskedLM.from_pretrained(args.model_name, attn_implementation="flash_attention_2")
-    model = AutoModelForMaskedLM.from_pretrained(args.model_name)
-    # Resize token embeddings if we used a custom tokenizer or added tokens to AutoTokenizer
-    # This is crucial if the vocab size of the tokenizer is different from the model's original vocab size
-    model.resize_token_embeddings(len(tokenizer))
+    model = AutoModelForMaskedLM.from_config(config)
 
     # 4. Data Collator
     # Data collator for MLM. It will handle dynamic masking.
@@ -551,7 +553,7 @@ if __name__ == "__main__":
 
 # How to run
 """
-python train_language_model.py \
+python train_language_model_scratch.py \
     --num_train_epochs 10000 \
     --per_device_train_batch_size 256 \
     --per_device_eval_batch_size 2 \
