@@ -398,10 +398,31 @@ def main():
         print(f"Using full dataset for training ({len(train_dataset)}). No evaluation set created.")
 
     # 3. モデル設定の作成
-    config = AutoConfig.from_pretrained(
-        args.model_name,
-        vocab_size=len(tokenizer),
+    config = AutoConfig(
+        vocab_size=tokenizer.vocab_size, # トークナイザの語彙サイズに合わせる
+        max_position_embeddings=128,
+        num_hidden_layers=12, 
+        num_attention_heads=4,
+        hidden_size=256, 
+        type_vocab_size=2,
+        intermediate_size=768, 
+        mask_token_id=tokenizer.mask_token_id,
+        bos_token_id=tokenizer.bos_token_id,
+        eos_token_id=tokenizer.eos_token_id,
+        pad_token_id=tokenizer.pad_token_id,
+        architectures=["RobertaForMaskedLM"],
+        attention_probs_dropout_prob=0.1,
+        classifier_dropout=None,
+        hidden_act="gelu",
+        hidden_dropout_prob=0.1,
+        initializer_range=0.02,
+        layer_norm_eps=1e-12,
+        model_type="roberta",
+        position_embedding_type="absolute",
+        tokenizer_class="BertTokenizerFast",
+        use_cache=True,
     )
+    
     # 3. Model
     # model = AutoModelForMaskedLM.from_pretrained(args.model_name, attn_implementation="flash_attention_2")
     model = AutoModelForMaskedLM.from_config(config)
