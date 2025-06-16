@@ -4,10 +4,10 @@
 
 import argparse
 import glob
+import logging
 import os
 from datetime import datetime
 
-# typingからList, Optionalをインポート
 import numpy as np
 import torch
 from datasets import Dataset
@@ -17,11 +17,11 @@ from numpy import dtype, ndarray
 from numpy.core.multiarray import _reconstruct
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from transformers import (
-    RobertaConfig,
-    RobertaForMaskedLM,
     AutoTokenizer,
     DataCollatorForLanguageModeling,
     EarlyStoppingCallback,
+    RobertaConfig,
+    RobertaForMaskedLM,
     Trainer,
     TrainerCallback,
     TrainingArguments,
@@ -319,7 +319,10 @@ def main():
             # "ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
             # "honkoku_yatanavi/honkoku_oneline",
             # "data/oneline",
-            "kokubunken_repo/text",
+            # "kokubunken_repo/text",
+            "kokubunken_repo/text/eirigenji",
+            "kokubunken_repo/text/nijuuichidaishuu",
+            "kokubunken_repo/text/rekishimonogo",
         ],
         help="Directory containing the text dataset files.",
     )
@@ -348,6 +351,12 @@ def main():
     parser.add_argument("--resume_from_checkpoint", type=str, default=None, help="Resume from checkpoint.")
 
     args = parser.parse_args()
+
+    # 0. Logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+    logger.info(f"args: {args}")
 
     # 1. Vocab and Tokenizer
     DEFAULT_VOCAB_SIZE = args.vocab_size
@@ -433,9 +442,9 @@ def main():
     print(f"Using DataCollatorForLanguageModeling with mask probability: {args.mask_probability}")
 
     if args.resume_from_checkpoint is None:
-        output_dir = os.path.join(args.output_dir, args.model_name.split("/")[-1], datetime.now().strftime("%Y%m%d_%H%M%S"))
+        output_dir = os.path.join(args.output_dir, args.model_name.split("/")[-1], datetime.now().strftime("%Y%m%d_%H%M%S"), "from_scratch")
         os.makedirs(output_dir, exist_ok=True)
-        run_name = output_dir.split("/")[-1]
+        run_name = output_dir.split("/")[-1] + "_from_scratch"
     else:
         output_dir = args.resume_from_checkpoint
         run_name = args.resume_from_checkpoint.split("/")[-1] + "_resume"
@@ -576,7 +585,7 @@ if __name__ == "__main__":
 """
 python train_language_model_scratch.py \
     --num_train_epochs 10000 \
-    --per_device_train_batch_size 256 \
+    --per_device_train_batch_size 1024 \
     --per_device_eval_batch_size 2 \
     --learning_rate 0.0001 \
     --mask_probability 0.15 \
