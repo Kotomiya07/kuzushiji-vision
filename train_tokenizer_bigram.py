@@ -1,7 +1,7 @@
 import glob
 import os
 
-from tokenizers import Regex, Tokenizer, decoders, normalizers, pre_tokenizers, Metaspace
+from tokenizers import Regex, Tokenizer, decoders, normalizers, pre_tokenizers
 from tokenizers.models import Unigram
 from tokenizers.trainers import WordLevelTrainer
 from transformers import AutoTokenizer, PreTrainedTokenizerFast

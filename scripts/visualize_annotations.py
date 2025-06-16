@@ -6,7 +6,6 @@ import os
 
 import matplotlib.pyplot as plt  # matplotlib.pyplotをインポート
 from PIL import Image, ImageDraw, ImageFont
-import japanize_matplotlib
 
 # コマンドライン引数を設定
 parser = argparse.ArgumentParser(description="Visualize annotations on images.")

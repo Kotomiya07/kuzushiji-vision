@@ -48,7 +48,7 @@ def verify_unk_detection():
         # 文字単位で比較
         if sentence.strip() != decoded.strip():
             print("  差異分析:")
-            for j, (orig, dec) in enumerate(zip(sentence, decoded)):
+            for j, (orig, dec) in enumerate(zip(sentence, decoded, strict=False)):
                 if orig != dec:
                     print(f"    位置 {j}: '{orig}' → '{dec}'")
     
@@ -83,7 +83,7 @@ def verify_unk_detection():
     # 元のテキストファイルから実際にUNKを含む文を探す
     print("=== 実際のUNKを含む文の検索 ===")
     try:
-        with open("data/honkoku/honkoku.txt", "r", encoding="utf-8") as f:
+        with open("data/honkoku/honkoku.txt", encoding="utf-8") as f:
             lines = f.readlines()
         
         unk_containing_sentences = []

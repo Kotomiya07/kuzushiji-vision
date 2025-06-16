@@ -147,7 +147,7 @@ class DeBERTaTokenizerExtender:
         print(f"検出された未知文字数: {len(self.unknown_chars)}")
 
         if self.unknown_chars:
-            print(f"未知文字: {sorted(list(self.unknown_chars))}")
+            print(f"未知文字: {sorted(self.unknown_chars)}")
             print(f"未知文字（Unicode）: {[f'U+{ord(c):04X}' for c in sorted(self.unknown_chars)]}")
 
         # 文字の分布を表示
@@ -160,7 +160,7 @@ class DeBERTaTokenizerExtender:
         # 未知文字の使用例を表示
         if self.unknown_chars:
             print("\n未知文字の使用例:")
-            for char in sorted(list(self.unknown_chars))[:10]:
+            for char in sorted(self.unknown_chars)[:10]:
                 examples = []
                 for sentence in self.sentences:
                     if char in sentence:
@@ -253,9 +253,6 @@ class DeBERTaTokenizerExtender:
 
         print(f"拡張後の語彙サイズ: {len(new_vocab)}")
 
-        # 元のトークナイザーの設定をコピー
-        tokenizer_config = original_tokenizer.backend_tokenizer
-
         # 新しい語彙で更新
 
         # SentencePieceモデルではなく、直接語彙を設定する方法を試す
@@ -280,7 +277,6 @@ class DeBERTaTokenizerExtender:
             print("代替方法を試行中...")
 
             # 代替方法: 元のトークナイザーに直接トークンを追加
-            special_tokens_dict = {}
             new_tokens = []
 
             for char in sorted(self.unknown_chars):
@@ -315,7 +311,7 @@ class DeBERTaTokenizerExtender:
                 "original_vocab_size": original_vocab_size,
                 "extended_vocab_size": extended_vocab_size,
                 "unknown_characters_added": len(self.unknown_chars),
-                "unknown_characters": sorted(list(self.unknown_chars)),
+                "unknown_characters": sorted(self.unknown_chars),
                 "total_sentences_processed": len(self.sentences),
                 "vocab_increase": extended_vocab_size - original_vocab_size,
             }

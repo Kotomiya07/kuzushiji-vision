@@ -93,6 +93,7 @@ torchvision = [
 [tool.ruff]
 # 1行の最大文字数
 line-length = 127
+exclude = [".git", ".ruff_cache", ".venv", ".vscode", "notebooks", "*.ipynb"]
 
 [tool.ruff.lint]
 # チェックするエラーの種類

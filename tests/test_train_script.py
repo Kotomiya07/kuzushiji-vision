@@ -1,10 +1,10 @@
-import pytest
-import subprocess # For running train.py as a script
-import sys
-from pathlib import Path
-import tempfile
 import shutil
-import os
+import subprocess  # For running train.py as a script
+import sys
+import tempfile
+from pathlib import Path
+
+import pytest
 
 # This test assumes train.py is executable and in the parent directory.
 # Adjust path if train.py is located elsewhere.

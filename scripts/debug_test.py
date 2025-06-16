@@ -3,7 +3,6 @@
 Debug test to identify and fix issues
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -11,8 +10,9 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 import torch
-from PIL import Image
 import torchvision.transforms as transforms
+from PIL import Image
+
 
 def test_vit_encoder():
     """Test ViT encoder with correct image size"""
@@ -31,7 +31,7 @@ def test_vit_encoder():
             intermediate_size=1024,
         )
         
-        print(f"✅ ViT encoder created")
+        print("✅ ViT encoder created")
         print(f"   Image size: {encoder.image_size}")
         print(f"   Patch size: {encoder.patch_size}")
         print(f"   Num patches: {encoder.num_patches}")
@@ -68,10 +68,10 @@ def test_image_transform():
         test_image = Image.new('RGB', (100, 800), color=(128, 128, 128))
         tensor = transform(test_image)
         
-        print(f"✅ Image transform successful")
+        print("✅ Image transform successful")
         print(f"   Input size: {test_image.size}")
         print(f"   Output shape: {tensor.shape}")
-        print(f"   Expected: (3, 1024, 64)")
+        print("   Expected: (3, 1024, 64)")
         
         return tensor.shape == (3, 1024, 64)
     except Exception as e:
@@ -93,7 +93,7 @@ def test_tokenizer():
         test_text = "四修の事行者"
         tokens = tokenizer(test_text, max_length=32, padding='max_length', truncation=True, return_tensors='pt')
         
-        print(f"✅ Tokenizer test successful")
+        print("✅ Tokenizer test successful")
         print(f"   Vocab size: {len(tokenizer)}")
         print(f"   Test text: '{test_text}'")
         print(f"   Token shape: {tokens['input_ids'].shape}")
@@ -127,7 +127,7 @@ def test_model_integration():
             decoder_path=decoder_path,
         )
         
-        print(f"✅ Model created")
+        print("✅ Model created")
         print(f"   Encoder hidden size: {model.encoder.config.hidden_size}")
         print(f"   Decoder hidden size: {model.decoder.config.hidden_size}")
         
@@ -138,14 +138,14 @@ def test_model_integration():
         
         with torch.no_grad():
             outputs = model(pixel_values, labels)
-            print(f"   Forward pass successful")
+            print("   Forward pass successful")
             print(f"   Loss: {outputs['loss'].item():.4f}")
             print(f"   Logits shape: {outputs['logits'].shape}")
         
         # Test inference
         with torch.no_grad():
             outputs = model(pixel_values, labels=None)
-            print(f"   Inference successful")
+            print("   Inference successful")
             print(f"   Generated shape: {outputs['generated_ids'].shape}")
         
         return True
@@ -183,7 +183,7 @@ def main():
     print("Test Summary:")
     test_names = ["Image Transform", "Tokenizer", "ViT Encoder", "Model Integration"]
     
-    for name, result in zip(test_names, results):
+    for name, result in zip(test_names, results, strict=False):
         status = "✅ PASS" if result else "❌ FAIL"
         print(f"  {name}: {status}")
     

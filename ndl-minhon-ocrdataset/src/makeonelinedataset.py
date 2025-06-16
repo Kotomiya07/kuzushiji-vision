@@ -7,20 +7,19 @@ import cv2
 from tqdm import tqdm
 
 if __name__ == "__main__":
-args = sys.argv
-mode = ""
-if len(args) >= 2:
-    if args[1] == "v1":
-        mode = "v1"
-    elif args[1] == "v2":
-        mode = "v2"
+    args = sys.argv
+    mode = ""
+    if len(args) >= 2:
+        if args[1] == "v1":
+            mode = "v1"
+        elif args[1] == "v2":
+            mode = "v2"
+        else:
+            print("The parameter must be 'v1' or 'v2'.", file=sys.stderr)
+            sys.exit(1)
     else:
-        print("The parameter must be 'v1 'or 'v2'.")
-        sys.exit()
-else:
-    print("The parameter must be 'v1 'or 'v2'.")
-    # mode="v2"
-    sys.exit()
+        print("The parameter must be 'v1' or 'v2'.", file=sys.stderr)
+        sys.exit(1)
 
 if mode == "v1":
     outputdir = "honkoku_oneline_v1"

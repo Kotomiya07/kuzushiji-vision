@@ -1,20 +1,21 @@
 import argparse
-import yaml
 from pathlib import Path
 
-import torch
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping, LearningRateMonitor
+import torch
+import yaml
+from pytorch_lightning.callbacks import EarlyStopping, LearningRateMonitor, ModelCheckpoint
 
 # Assuming data_loader.py and ocr_model.py are in the same directory or accessible in PYTHONPATH
 from scripts.data_loader import (
-    get_data_loader, 
-    build_char_to_int_map, 
-    MAX_LABEL_LENGTH, 
-    DEFAULT_TARGET_HEIGHT, 
+    DEFAULT_TARGET_HEIGHT,
     DEFAULT_TARGET_WIDTH,
+    MAX_LABEL_LENGTH,
+    build_char_to_int_map,
+    get_data_loader,
 )
 from scripts.ocr_model import OCRModel
+
 
 def load_config(config_path):
     """Loads a YAML configuration file."""
@@ -24,7 +25,7 @@ def load_config(config_path):
     if not config_path.is_file():
         print(f"Warning: Config file not found at {config_path}. Using defaults/CLI args.")
         return {}
-    with open(config_path, 'r') as f:
+    with open(config_path) as f:
         try:
             config = yaml.safe_load(f)
             return config if config else {}

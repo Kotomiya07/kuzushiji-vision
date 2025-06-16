@@ -5,12 +5,14 @@ import datetime
 # --- ViTEncoder Code (Copied from enhancing-transformers/enhancing/modules/stage1/layers.py) ---
 import os
 from collections.abc import Callable
+from pathlib import Path
 
 import jiwer
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
+import yaml
 from einops import rearrange
 from einops.layers.torch import Rearrange
 from PIL import Image
@@ -18,8 +20,10 @@ from torch import Tensor
 from torch.nn.utils.rnn import pad_sequence as torch_pad_sequence
 from torch.utils.data import Dataset
 from transformers import AutoConfig, AutoModelForCausalLM
+from ultralytics import YOLO
 
 import wandb
+from src.utils.util import EasyDict
 
 
 def get_2d_sincos_pos_embed(embed_dim, grid_size):
@@ -731,15 +735,6 @@ def validate(
             print(f"WANDB: Error logging validation examples table: {e}")
 
     return avg_char_loss, avg_bbox_loss, avg_combined_loss, cer
-
-
-from datetime import datetime
-from pathlib import Path
-
-import yaml
-from ultralytics import YOLO
-
-from src.utils.util import EasyDict
 
 
 def get_project_root():

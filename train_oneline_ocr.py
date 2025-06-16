@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 
 os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
-import logging
 
 import pytorch_lightning as pl
 import torch

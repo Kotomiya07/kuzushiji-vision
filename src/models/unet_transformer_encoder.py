@@ -1,7 +1,8 @@
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import math
+
 
 class ConvBlock(nn.Module):
     """
@@ -84,7 +85,7 @@ class UNetTransformerEncoder(nn.Module):
         
         self.down_blocks = nn.ModuleList()
         current_filters = initial_filters
-        for i in range(num_unet_layers):
+        for _ in range(num_unet_layers):
             self.down_blocks.append(DownsampleBlock(current_filters, current_filters * 2))
             current_filters *= 2
         

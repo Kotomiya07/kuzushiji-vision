@@ -1,10 +1,12 @@
+import concurrent.futures
 import glob
 import json
 import os
 import sys
+
 import cv2
 from tqdm import tqdm
-import concurrent.futures
+
 
 # 各画像ファイルとその関連データを処理するワーカー関数
 # この関数は、並列実行される個々のタスクを定義します。

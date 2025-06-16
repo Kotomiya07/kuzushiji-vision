@@ -16,7 +16,7 @@ def unicode_to_char(unicode_str):
     try:
         code_point = int(unicode_str.replace("U+", ""), 16)
         return chr(code_point)
-    except:
+    except Exception:
         print(f"変換エラー: {unicode_str}")
         return ""
 

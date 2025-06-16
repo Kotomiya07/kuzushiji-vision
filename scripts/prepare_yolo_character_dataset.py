@@ -330,7 +330,7 @@ def prepare_yolo_character_dataset(
                                     continue
 
                                 # 座標値の検証
-                                if not all(isinstance(coord, (int, float)) for coord in box):
+                                if not all(isinstance(coord, int | float) for coord in box):
                                     print(f"\nWarning: Non-numeric coordinates for {image_name}: {box}")
                                     continue
 

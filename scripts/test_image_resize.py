@@ -9,9 +9,10 @@ from pathlib import Path
 # Add src to path
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
-from PIL import Image
 import torch
 import torchvision.transforms as transforms
+from PIL import Image
+
 from data.trocr_dataset import ResizeWithPadding
 
 
@@ -141,7 +142,7 @@ def main():
     print("=" * 40)
     print("Test Summary:")
     test_names = ["ResizeWithPadding", "Full Transform", "ViT Compatibility"]
-    for name, result in zip(test_names, results):
+    for name, result in zip(test_names, results, strict=False):
         status = "✅ PASS" if result else "❌ FAIL"
         print(f"  {name}: {status}")
     

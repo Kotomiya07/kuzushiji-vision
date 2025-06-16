@@ -136,9 +136,9 @@ def restore_masked_text(model, tokenizer, input_ids, labels, max_examples=10):
             original_text = tokenizer.decode(original_tokens, skip_special_tokens=True)
             masked_text = tokenizer.decode(masked_tokens, skip_special_tokens=False)
             # PADトークンを削除
-            masked_text = masked_text.replace(tokenizer.pad_token, "")
-            masked_text = masked_text.replace(tokenizer.cls_token, "")
-            masked_text = masked_text.replace(tokenizer.sep_token, "")
+            for special in (tokenizer.pad_token, tokenizer.cls_token, tokenizer.sep_token, tokenizer.eos_token):
+                if special:
+                    masked_text = masked_text.replace(special, "")
             masked_text = masked_text.replace(tokenizer.mask_token, "　")
 
             restored_text_top1 = tokenizer.decode(restored_tokens_top1, skip_special_tokens=True)
@@ -525,7 +525,7 @@ def main():
         tf32=True,
         bf16=torch.cuda.is_available(),
         load_best_model_at_end=True,
-        metric_for_best_model="f1",
+        metric_for_best_model="eval_f1",
         resume_from_checkpoint=args.resume_from_checkpoint,
         optim="schedule_free_adamw",  # Schedule-Free Optimizer の指定
         lr_scheduler_type="constant",
