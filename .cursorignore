@@ -158,23 +158,17 @@ Thumbs.db
 *.bak
 
 # Project-specific
-.cursurrules
-.cursor/
-.roo/
-.roorules/
 memory-bank/
 data/raw/
 data/oneline/
 data/onechannel/
 data/honkoku/
 data/processed/
-data/processed_v2/
 data/processed_padded/
 data/column_dataset/
 data/column_dataset_padded/
 data/column_dataset_f1/
 data/yolo_dataset_oneline/
-data/yolo_dataset_character_detection/
 data/yolo_dataset_page_images_by_book/
 data/visualize/
 data/*.zip
@@ -187,7 +181,6 @@ logs/
 wandb/
 tensorboard/
 tb_logs/
-results/
 
 # PyPI configuration file
 .pypirc
@@ -210,5 +203,3 @@ honkoku_yatanavi/
 kokubunken_repo/
 
 **/*.zip
-
-tasks.md
