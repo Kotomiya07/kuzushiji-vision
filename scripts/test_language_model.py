@@ -19,12 +19,10 @@ from transformers import (
     AutoModelForMaskedLM,
     AutoTokenizer,
     DataCollatorForLanguageModeling,
-    EarlyStoppingCallback,
     Trainer,
     TrainerCallback,
     TrainingArguments,
 )
-from transformers.trainer_utils import get_last_checkpoint
 
 # 安全なグローバルとして登録
 torch.serialization.add_safe_globals([_reconstruct])
@@ -608,7 +606,7 @@ def main():
             top5_acc = eval_results['eval_accuracy_top5']
             improvement_top3 = top3_acc - top1_acc
             improvement_top5 = top5_acc - top1_acc
-            print(f"\n精度比較:")
+            print("\n精度比較:")
             print(f"  Top1精度: {top1_acc:.4f} ({top1_acc*100:.2f}%)")
             print(f"  Top3精度: {top3_acc:.4f} ({top3_acc*100:.2f}%) [+{improvement_top3:.4f} ({improvement_top3*100:.2f}ポイント)]")
             print(f"  Top5精度: {top5_acc:.4f} ({top5_acc*100:.2f}%) [+{improvement_top5:.4f} ({improvement_top5*100:.2f}ポイント)]")

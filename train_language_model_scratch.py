@@ -359,11 +359,7 @@ def main():
     logger.info(f"args: {args}")
 
     # 1. Vocab and Tokenizer
-    DEFAULT_VOCAB_SIZE = args.vocab_size
-    DEFAULT_MODEL_TYPE = args.model_type
     BASE_EXPERIMENT_DIR = "experiments/kuzushiji_tokenizer_one_char"
-    MODEL_SPECIFIC_DIR_NAME = f"vocab{DEFAULT_VOCAB_SIZE}_{DEFAULT_MODEL_TYPE}"
-    TOKENIZER_FILE_PATH = os.path.join(BASE_EXPERIMENT_DIR, MODEL_SPECIFIC_DIR_NAME)
 
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
 

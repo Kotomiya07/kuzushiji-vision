@@ -12,7 +12,7 @@ sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 import torch
 from PIL import Image
-import torchvision.transforms as transforms
+
 
 def test_image_resize():
     """Test image resizing functionality"""
@@ -222,7 +222,7 @@ def main():
         "Inference"
     ]
     
-    for name, result in zip(test_names, results):
+    for name, result in zip(test_names, results, strict=False):
         status = "✅ PASS" if result else "❌ FAIL"
         print(f"  {name}: {status}")
     

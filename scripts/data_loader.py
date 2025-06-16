@@ -223,7 +223,7 @@ def build_char_to_int_map(data_dir):
     # Create mappings
     char_to_int = {"<PAD>": 0, "<UNK>": 1}  # Special tokens
     # Start other characters from index 2
-    for i, char in enumerate(sorted(list(unique_chars)), start=2):
+    for i, char in enumerate(sorted(unique_chars), start=2):
         char_to_int[char] = i
 
     int_to_char = {i: char for char, i in char_to_int.items()}
@@ -295,7 +295,9 @@ if __name__ == "__main__":
     # Create dummy data for testing if it doesn't exist
     EXAMPLE_DATA_DIR = "data/column_dataset_padded_example"  # Use a different dir for example
 
-    def create_dummy_data(base_dir, splits=["train", "val", "test"]):
+    def create_dummy_data(base_dir, splits=None):
+        if splits is None:
+            splits = ["train", "val", "test"]
         if os.path.exists(base_dir):
             print(f"Dummy data directory {base_dir} already exists. Skipping creation.")
             # return # If you want to avoid re-creation, uncomment this

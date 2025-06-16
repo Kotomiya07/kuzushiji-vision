@@ -1,12 +1,12 @@
 import pytest
-import torch
 import pytorch_lightning as pl
+import torch
 
 # Adjust import path if necessary
 # import sys
 # from pathlib import Path
 # sys.path.append(str(Path(__file__).resolve().parent.parent))
-from scripts.ocr_model import OCRModel # Assuming ocr_model.py is in the parent directory or PYTHONPATH
+from scripts.ocr_model import OCRModel  # Assuming ocr_model.py is in the parent directory or PYTHONPATH
 
 # --- Test Setup & Fixtures ---
 
@@ -139,7 +139,6 @@ def test_calculate_cer(ocr_model_instance, model_params): # Pass model_params fo
     #                 "test" vs "test" -> 0
     # Target lengths: 2, 3, 4
     # CER = (1 + 1 + 0) / (2 + 3 + 4) = 2 / 9
-    expected_cer = (1/2 + 1/3 + 0/4) / 3 # This is average of CERs per sample
     # The model's CER is (total_edit_distance / total_target_length)
     expected_cer_model_impl = (1 + 1 + 0) / (len("ac") + len("cot") + len("test")) # 2 / (2+3+4) = 2/9
 

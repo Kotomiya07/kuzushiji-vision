@@ -8,6 +8,7 @@
 
 from transformers import DebertaV2TokenizerFast
 
+
 def main():
     """学習したトークナイザーの使用例"""
     print("=== DeBERTa V3 Japanese Trained Tokenizer Example ===\n")

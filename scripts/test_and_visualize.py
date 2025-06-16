@@ -3,7 +3,6 @@ import csv
 from pathlib import Path
 
 import cv2
-import japanize_matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -156,7 +155,7 @@ class OCRTester:
             0.02,
             text_info,
             transform=ax.transAxes,
-            bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.8),
+            bbox={"boxstyle": "round,pad=0.3", "facecolor": "white", "alpha": 0.8},
             fontsize=12,
             verticalalignment="bottom",
         )

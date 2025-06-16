@@ -1,5 +1,5 @@
 import pathlib
-import os # pathlibが使えない古いPython環境用。基本はpathlibを推奨
+
 
 def analyze_text_file_lengths(target_directory_str):
     """
@@ -23,7 +23,7 @@ def analyze_text_file_lengths(target_directory_str):
         if file_path.is_file() and file_path.suffix == '.txt':
             try:
                 # ファイルをUTF-8として読み込み
-                with open(file_path, 'r', encoding='utf-8') as f:
+                with open(file_path, encoding='utf-8') as f:
                     content = f.read()
                 
                 # 文字数を取得

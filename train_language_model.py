@@ -136,7 +136,7 @@ def restore_masked_text(model, tokenizer, input_ids, labels, max_examples=10):
             original_text = tokenizer.decode(original_tokens, skip_special_tokens=True)
             masked_text = tokenizer.decode(masked_tokens, skip_special_tokens=False)
             # PADトークンを削除
-            for special in (tokenizer.pad_token, tokenizer.cls_token, tokenizer.sep_token):
+            for special in (tokenizer.pad_token, tokenizer.cls_token, tokenizer.sep_token, tokenizer.eos_token):
                 if special:
                     masked_text = masked_text.replace(special, "")
             masked_text = masked_text.replace(tokenizer.mask_token, "　")

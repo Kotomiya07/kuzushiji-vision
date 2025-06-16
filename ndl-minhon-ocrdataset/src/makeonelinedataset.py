@@ -15,11 +15,11 @@ if __name__ == "__main__":
         elif args[1] == "v2":
             mode = "v2"
         else:
-            print("The parameter must be 'v1' or 'v2'.")
-            sys.exit()
+            print("The parameter must be 'v1' or 'v2'.", file=sys.stderr)
+            sys.exit(1)
     else:
-        print("The parameter must be 'v1' or 'v2'.")
-        sys.exit()
+        print("The parameter must be 'v1' or 'v2'.", file=sys.stderr)
+        sys.exit(1)
 
 if mode == "v1":
     outputdir = "honkoku_oneline_v1"

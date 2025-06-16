@@ -1,5 +1,6 @@
-import pandas as pd
 import os
+
+import pandas as pd
 
 # Define special token IDs as constants
 PAD_ID = 0
@@ -52,7 +53,7 @@ class Vocab:
             # Ensure characters are unique and sort them for consistency (optional but good practice)
             # Filter out any characters that might already be special token strings
             # (though unlikely if CSV contains actual textual characters)
-            unique_chars = sorted(list(set(str(c) for c in df['char'].tolist() if str(c) not in self.c2i)))
+            unique_chars = sorted({str(c) for c in df['char'].tolist() if str(c) not in self.c2i})
 
             for char_val in unique_chars:
                 if char_val not in self.c2i: # Redundant check if unique_chars is filtered, but safe

@@ -1,10 +1,10 @@
+import editdistance  # For CER calculation
+import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
 import torchvision.ops as ops
-import pytorch_lightning as pl
-import editdistance # For CER calculation
 
 # Assume char_to_int will have 0 as blank, matching CTCLoss default
 # Assume int_to_char will be passed for decoding
@@ -234,10 +234,11 @@ class OCRModel(pl.LightningModule):
 
     @staticmethod
     def calculate_cer(preds_str_list, targets_str_list):
-        if len(preds_str_list) != len(targets_str_list): return 1.0
+        if len(preds_str_list) != len(targets_str_list):
+            return 1.0
         total_edit_distance = 0
         total_target_length = 0
-        for pred, target in zip(preds_str_list, targets_str_list):
+        for pred, target in zip(preds_str_list, targets_str_list, strict=False):
             total_edit_distance += editdistance.eval(pred, target)
             total_target_length += len(target)
         return total_edit_distance / total_target_length if total_target_length > 0 else (0.0 if total_edit_distance == 0 else 1.0)
@@ -255,11 +256,13 @@ class OCRModel(pl.LightningModule):
 
         for i in range(batch_size):
             actual_len = target_lengths[i].item()
-            if actual_len == 0: continue
+            if actual_len == 0:
+                continue
 
             # Number of boxes to compare for this sample
             len_to_compare = min(actual_len, t_model, s_max)
-            if len_to_compare == 0: continue
+            if len_to_compare == 0:
+                continue
 
             preds = bbox_preds_seq[i, :len_to_compare]      # (len_to_compare, 4)
             targets = bbox_targets_padded[i, :len_to_compare]  # (len_to_compare, 4)

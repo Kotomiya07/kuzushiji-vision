@@ -670,7 +670,7 @@ def sort_characters_in_merged_column(column):
         return column
 
     # 文字の中心x座標でソート（降順: 右から左）
-    column_sorted_by_x = sorted(column, key=lambda char: (char.x1 + char.x2) / 2, reverse=True)
+    sorted(column, key=lambda char: (char.x1 + char.x2) / 2, reverse=True)
 
     # 中央値を基準に左右を分割
     x_centers = [(char.x1 + char.x2) / 2 for char in column]

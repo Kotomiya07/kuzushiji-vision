@@ -149,7 +149,7 @@ def load_bounding_boxes(bbox_file: Path) -> list[list[float]]:
         for i, bbox in enumerate(bboxes):
             if not isinstance(bbox, list) or len(bbox) != 4:
                 raise ValueError(f"Bounding box {i} should be [x1, y1, x2, y2], got {bbox}")
-            if not all(isinstance(coord, (int, float)) for coord in bbox):
+            if not all(isinstance(coord, int | float) for coord in bbox):
                 raise ValueError(f"All coordinates should be numeric, got {bbox}")
             validated_bboxes.append([float(coord) for coord in bbox])
 
