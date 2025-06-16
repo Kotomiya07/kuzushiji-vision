@@ -21,9 +21,50 @@ def concatenate_files(file_list, output_dir):
             for filepath in file_list:
                 try:
                     with open(filepath, encoding="utf-8") as infile:
-                        for line in infile:
-                            outfile.write(line)
-                        outfile.write("\n")  # 各ファイルの内容を書き込んだ後に改行を追加
+                        # 確認した項目
+                        # (
+                        # )
+                        # （
+                        # ）
+                        # [
+                        # ]
+                        # {
+                        # }
+                        # 【
+                        # 】
+                        # ｛
+                        # ｝
+                        # TODO: ?, ？, □ , 𠁅 が含まれている場合の処理 <と>
+                        content = infile.read().strip()  # ファイル全体を読み込み、空白文字を除去
+                        if content:  # 空でない場合のみ書き込み
+                            outfile.write(content)
+                            outfile.write("\n")  # 各ファイルの内容を書き込んだ後に改行を追加
+
+                        # テスト用
+                        # for line in infile:
+                        #     if  "𠁅" in line or \
+                        #         "𢔗" in line or \
+                        #         "𢳣" in line or \
+                        #         "𣪃" in line or \
+                        #         "𤧀" in line or \
+                        #         "𤴼" in line or \
+                        #         "𤺺" in line or \
+                        #         "𥙊" in line or \
+                        #         "𥝐" in line or \
+                        #         "𦑄" in line or \
+                        #         "𦒳" in line or \
+                        #         "𧇾" in line or \
+                        #         "𧹛" in line or \
+                        #         "𧹬" in line or \
+                        #         "𨻳" in line or \
+                        #         "𩞀" in line or \
+                        #         "𩷚" in line or \
+                        #         "𪅂" in line or \
+                        #         "𫚄" in line:
+                        #         outfile.write(filepath)
+                        #         outfile.write("\n")
+                        #         outfile.write(line)
+                        #         outfile.write("\n\n")  # 各ファイルの内容を書き込んだ後に改行を追加
                 except Exception as e:
                     print(f"ファイル {filepath} の読み込み中にエラー: {e}")
     except Exception as e:

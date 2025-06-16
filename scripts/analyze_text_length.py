@@ -49,7 +49,7 @@ def analyze_text_file_lengths(target_directory_str):
     # 平均を計算する際、リストが空でないことを確認済みなのでゼロ除算の心配はない
     average_length = sum(all_lengths) / len(all_lengths)
 
-    print("\n--- 解析結果 ---")
+    print(f"\n--- 解析結果: {target_directory_str} ---")
     print(f"処理されたファイル数: {processed_files_count}")
     print(f"最大の文の長さ（文字数）: {max_length}")
     print(f"平均の文の長さ（文字数）: {average_length:.2f}") # 小数点以下2桁で表示
@@ -68,10 +68,10 @@ if __name__ == "__main__":
     # ここでは、カレントワーキングディレクトリからの相対パスとします。
     
     target_repo_paths = [
-        #"ndl-minhon-ocrdataset/src/honkoku_oneline_v1",
-        #"ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
-        #"honkoku_yatanavi/honkoku_oneline",
-        #"data/oneline",
+        "ndl-minhon-ocrdataset/src/honkoku_oneline_v1",
+        "ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
+        "honkoku_yatanavi/honkoku_oneline",
+        "data/oneline",
         "kokubunken_repo/text",
     ]
 
