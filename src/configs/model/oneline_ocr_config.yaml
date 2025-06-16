@@ -1,0 +1,91 @@
+# Example Configuration for train_oneline_ocr.py
+# -------------------------------------------------
+# This YAML file provides an example set of parameters for the training script.
+# You can use these values to construct the command-line arguments for train_oneline_ocr.py,
+# or adapt the training script to load this YAML directly (e.g., using a library like Hydra or OmegaConf).
+#
+# Example command line construction based on this file:
+# python train_oneline_ocr.py \
+#   --data_root_dir data/oneline_splits \
+#   --train_dir_name train \
+#   --val_dir_name val \
+#   --test_dir_name test \
+#   --unicode_csv_path data/unicode_translation.csv \
+#   --image_height 64 \
+#   --image_width 1024 \
+#   --image_channels 1 \
+#   --max_label_len 128 \
+#   --batch_size 16 \
+#   --num_workers 4 \
+#   --max_epochs 100 \
+#   --learning_rate 0.0001 \
+#   --accelerator gpu \
+#   --devices "[0]" \ # Or "1" for a single GPU, or "0,1" for two. Script parses this.
+#   --seed 42 \
+#   --patience_early_stopping 10 \
+#   --checkpoint_monitor_metric val_cer \
+#   --bbox_loss_weight 0.05 \
+#   --encoder_initial_filters 64 \
+#   --encoder_num_unet_layers 4 \
+#   --encoder_num_transformer_layers 4 \
+#   --encoder_transformer_heads 8 \
+#   --encoder_transformer_mlp_dim 2048 \
+#   --decoder_model_name "KoichiYasuoka/roberta-small-japanese-aozora-char" \
+#   --max_gen_len 50 \
+#   --wandb_project "oneline-ocr" 
+#   # --wandb_entity "your_wandb_entity" # Optional
+
+# Data Configuration
+data:
+  data_root_dir: data/oneline_splits # Root directory containing train/val/test split folders
+  train_dir_name: train_data # Specific directory name for training data under data_root_dir
+  val_dir_name: val_data     # Specific directory name for validation data under data_root_dir
+  test_dir_name: test_data   # Specific directory name for test data (optional, can be null or commented)
+  # test_dir_name: null # Example if no test set initially
+  unicode_csv_path: data/unicode_translation.csv # Path to the CSV defining characters for the Vocab
+
+  image_height: 1024          # Target height for images
+  image_width: 64         # Target width for images
+  image_channels: 3         # 1 for grayscale, 3 for RGB
+  max_label_len: 128        # Maximum sequence length for labels (including GO/EOS tokens)
+
+# Training Configuration
+training:
+  batch_size: 16
+  num_workers: 4            # Number of CPU workers for DataLoader
+  max_epochs: 1000
+  learning_rate: 0.0001     # Initial learning rate for AdamW optimizer
+  accelerator: gpu          # "cpu", "gpu", "tpu", "ipu", "auto"
+  devices: "[0]"            # Devices to use, e.g., "[0]" for GPU 0, "[0, 1]" for GPUs 0 and 1, or 1 for 1 device count.
+                            # The script train_oneline_ocr.py attempts to parse this.
+  seed: 42                  # Random seed for reproducibility
+  
+  # Callbacks
+  patience_early_stopping: 10 # Patience for early stopping (0 or negative to disable)
+  checkpoint_monitor_metric: "val_cer" # Metric to monitor (e.g., "val_loss", "val_cer", "val_iou")
+  checkpoint_mode: "min"    # "min" for loss/error metrics, "max" for accuracy/IoU
+
+# Model Core Configuration
+model_core:
+  bbox_loss_weight: 0.05    # Weight for the bounding box L1 loss component
+
+# Encoder Parameters (for UNetTransformerEncoder)
+encoder_params:
+  # encoder_in_channels is automatically set from data.image_channels in the script
+  initial_filters: 64       # Initial number of filters in the first U-Net conv block
+  num_unet_layers: 4        # Number of downsampling stages in the U-Net part
+  num_transformer_layers: 4 # Number of layers in the Transformer encoder part
+  transformer_heads: 8      # Number of attention heads in the Transformer
+  transformer_mlp_dim: 2048 # Dimension of the feed-forward network in Transformer layers
+
+# Decoder Parameters (for HuggingFace AutoModelForCausalLM)
+decoder_params:
+  model_name: "KoichiYasuoka/roberta-small-japanese-aozora-char" # Pretrained model name or path
+  max_gen_len: 50           # Max length for sequence generation by the decoder
+
+# Logging Configuration
+logging_params:
+  wandb_project: "oneline-ocr"  # Weights & Biases project name. Set to null or comment out to use TensorBoard.
+  # wandb_project: null 
+  wandb_entity: null            # Optional: Your WandB entity (team name).
+  # wandb_entity: "your_team"

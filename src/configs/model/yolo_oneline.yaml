@@ -1,0 +1,26 @@
+model:
+  name: "yolo_oneline"
+  type: "yolo"
+  backbone: "yolo11x"
+  input_size: [640, 640]  # 長辺を640にリサイズ（アスペクト比保持）
+  num_classes: 1  # 列領域の検出のみ
+
+training:
+  batch_size: -1
+  patience: 100
+  learning_rate: 0.001
+  optimizer: "adamW"
+  weight_decay: 0.0001
+  scheduler:
+    type: "cosine"
+    warmup_epochs: 10
+    total_epochs: 1000
+
+augmentation:
+  horizontal_flip: false  # 日本語の文書なので水平方向の反転は不要
+  vertical_flip: false   # 垂直方向の反転も不要
+  rotation: [0, 0]      # なし
+  scale: 0.2            # スケール変更の範囲（±20%）
+  brightness: 0.2
+  contrast: 0.2
+  gaussian_noise: 0.1

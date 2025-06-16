@@ -398,7 +398,7 @@ def prepare_yolo_dataset(
 
 if __name__ == "__main__":
     # --- 設定 ---
-    COLUMN_INFO_FILE = "data/processed/column_info.csv"
+    COLUMN_INFO_FILE = "data/processed_v2/column_info.csv"
     # 出力ディレクトリ名を変更して、以前のスクリプトの出力と区別する
     OUTPUT_YOLO_DIR = "data/yolo_dataset_page_images_by_book"
     # 指定された書籍数

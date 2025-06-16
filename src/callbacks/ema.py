@@ -44,19 +44,22 @@ class EMACallback(L.Callback):
 
     def on_fit_start(self, trainer: L.Trainer, pl_module: L.LightningModule):
         """訓練開始時にEMAパラメータを初期化"""
-        self.shadow.clear()  # 念のためクリア
+        self.shadow.clear()
         for name, param in self._get_target_parameters(pl_module):
             self.shadow[name] = param.data.clone()
 
     def on_train_batch_end(self, trainer: L.Trainer, pl_module: L.LightningModule, outputs, batch, batch_idx):
         """各バッチ後にEMAを更新"""
         for name, param in self._get_target_parameters(pl_module):
-            if name in self.shadow:  # on_fit_startで初期化されたものだけ更新
-                self.shadow[name] = self.shadow[name] * self.decay + param.data * (1 - self.decay)
+            if name in self.shadow:
+                # self.shadow[name] が on_load_checkpoint または on_fit_start で
+                # pl_module のデバイス上に移動済みであることを想定しています。
+                # よりメモリ効率の良いインプレース操作を使用。
+                self.shadow[name].mul_(self.decay).add_(param.data, alpha=1 - self.decay)
 
     def on_validation_start(self, trainer: L.Trainer, pl_module: L.LightningModule):
         """検証開始時にモデルのパラメータをEMAに置き換え"""
-        self.backup.clear()  # 念のためクリア
+        self.backup.clear()
         for name, param in self._get_target_parameters(pl_module):
             if name in self.shadow:
                 self.backup[name] = param.data.clone()
@@ -65,21 +68,31 @@ class EMACallback(L.Callback):
     def on_validation_end(self, trainer: L.Trainer, pl_module: L.LightningModule):
         """検証終了時にモデルのパラメータを元に戻す"""
         for name, param in self._get_target_parameters(pl_module):
-            if name in self.backup:  # backupしたものだけ復元
+            if name in self.backup:
                 param.data.copy_(self.backup[name])
         self.backup.clear()
 
     def on_save_checkpoint(self, trainer: L.Trainer, pl_module: L.LightningModule, checkpoint: dict) -> dict:
         """チェックポイント保存時にEMAの状態も保存"""
-        # checkpoint辞書に直接追加する方が一般的
-        checkpoint["ema_shadow"] = self.shadow
+        # DDP環境では、通常グローバルランク0のプロセスのみがチェックポイントを保存します。
+        # チェックポイントのポータビリティのため、保存前にEMAパラメータをCPUに移動します。
+        if trainer.is_global_zero:
+            cpu_shadow = {name: s.cpu() for name, s in self.shadow.items()}
+            checkpoint["ema_shadow"] = cpu_shadow
+        return checkpoint
 
     def on_load_checkpoint(self, trainer: L.Trainer, pl_module: L.LightningModule, checkpoint: dict):
         """チェックポイント読み込み時にEMAの状態を復元"""
-        # checkpointにema_shadowキーが存在するか確認
         if "ema_shadow" in checkpoint:
-            self.shadow = checkpoint["ema_shadow"]
+            loaded_shadow = checkpoint["ema_shadow"]
+            self.shadow.clear() # 既存のシャドウをクリア
+            # ここが最も重要な修正点です。
+            # ロードされたテンソルを、現在の pl_module が存在するデバイスに明示的に移動させます。
+            # pl_module.device は現在のDDPプロセスが使用しているデバイス (例: cuda:0, cuda:1) を返します。
+            for name, shadow_tensor in loaded_shadow.items():
+                self.shadow[name] = shadow_tensor.to(pl_module.device)
         else:
             print("Warning: EMA shadow parameters not found in checkpoint. Initializing EMA from current model parameters.")
-            # shadowがない場合は現在のパラメータで初期化し直す
+            # shadow がチェックポイントにない場合は、現在のモデルパラメータで初期化し直します。
+            # この場合、on_fit_start が呼び出され、テンソルは正しいデバイス上に初期化されます。
             self.on_fit_start(trainer, pl_module)

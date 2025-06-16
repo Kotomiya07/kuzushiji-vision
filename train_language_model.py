@@ -60,7 +60,7 @@ else:
 
 def restore_masked_text(model, tokenizer, input_ids, labels, max_examples=10):
     """
-    マスクされたトークンをモデルのTop1予測で復元し、元の文、マスクされた文、復元された文を返す
+    マスクされたトークンをモデルのTop1、Top3、Top5予測で復元し、元の文、マスクされた文、復元された文を返す
 
     Args:
         model: 学習済みのAutoModelForMaskedLM
@@ -73,7 +73,11 @@ def restore_masked_text(model, tokenizer, input_ids, labels, max_examples=10):
         list: 復元結果の辞書のリスト
             - original_text: 元の文
             - masked_text: マスクされた文
-            - restored_text: 復元された文
+            - restored_text_top1: Top1で復元された文
+            - restored_text_top3: Top3候補を含む復元された文
+            - restored_text_top5: Top5候補を含む復元された文
+            - top3_tokens: マスク位置のTop3候補トークン
+            - top5_tokens: マスク位置のTop5候補トークン
     """
     model.eval()
     device = next(model.parameters()).device
@@ -88,7 +92,16 @@ def restore_masked_text(model, tokenizer, input_ids, labels, max_examples=10):
     with torch.no_grad():
         # モデルで予測
         outputs = model(input_ids=input_ids)
-        predictions = outputs.logits.argmax(dim=-1)  # Top1予測
+        logits = outputs.logits
+
+        # Top1予測
+        predictions_top1 = logits.argmax(dim=-1)
+
+        # Top3予測
+        top3_predictions = torch.topk(logits, k=3, dim=-1)  # values, indices
+
+        # Top5予測
+        top5_predictions = torch.topk(logits, k=5, dim=-1)  # values, indices
 
         for i in range(batch_size):
             # 元の文を復元（labelsから-100でない部分を取得）
@@ -99,22 +112,56 @@ def restore_masked_text(model, tokenizer, input_ids, labels, max_examples=10):
             # マスクされた文
             masked_tokens = input_ids[i].clone()
 
-            # 復元された文（マスク位置のみ予測で置換）
-            restored_tokens = input_ids[i].clone()
-            restored_tokens[mask_positions] = predictions[i][mask_positions]
+            # Top1で復元された文（マスク位置のみ予測で置換）
+            restored_tokens_top1 = input_ids[i].clone()
+            restored_tokens_top1[mask_positions] = predictions_top1[i][mask_positions]
+
+            # マスク位置のTop3、Top5候補を取得
+            mask_positions_list = torch.where(mask_positions)[0]
+            top3_tokens_for_masks = []
+            top5_tokens_for_masks = []
+
+            for pos in mask_positions_list:
+                # Top3候補
+                top3_indices = top3_predictions.indices[i][pos]
+                top3_tokens = [tokenizer.decode([idx], skip_special_tokens=True) for idx in top3_indices]
+                top3_tokens_for_masks.append(top3_tokens)
+
+                # Top5候補
+                top5_indices = top5_predictions.indices[i][pos]
+                top5_tokens = [tokenizer.decode([idx], skip_special_tokens=True) for idx in top5_indices]
+                top5_tokens_for_masks.append(top5_tokens)
 
             # テキストに変換
             original_text = tokenizer.decode(original_tokens, skip_special_tokens=True)
             masked_text = tokenizer.decode(masked_tokens, skip_special_tokens=False)
             # PADトークンを削除
             masked_text = masked_text.replace(tokenizer.pad_token, "")
-            restored_text = tokenizer.decode(restored_tokens, skip_special_tokens=True)
+            masked_text = masked_text.replace(tokenizer.cls_token, "")
+            masked_text = masked_text.replace(tokenizer.sep_token, "")
+            masked_text = masked_text.replace(tokenizer.mask_token, "　")
+
+            restored_text_top1 = tokenizer.decode(restored_tokens_top1, skip_special_tokens=True)
+
+            # Top3候補を含む復元文の作成
+            restored_text_top3 = restored_text_top1
+            if top3_tokens_for_masks:
+                restored_text_top3 += " [Top3: " + ", ".join([f"{'|'.join(tokens)}" for tokens in top3_tokens_for_masks]) + "]"
+
+            # Top5候補を含む復元文の作成
+            restored_text_top5 = restored_text_top1
+            if top5_tokens_for_masks:
+                restored_text_top5 += " [Top5: " + ", ".join([f"{'|'.join(tokens)}" for tokens in top5_tokens_for_masks]) + "]"
 
             results.append(
                 {
                     "original_text": original_text,
                     "masked_text": masked_text,
-                    "restored_text": restored_text,
+                    "restored_text_top1": restored_text_top1,
+                    "restored_text_top3": restored_text_top3,
+                    "restored_text_top5": restored_text_top5,
+                    "top3_tokens": top3_tokens_for_masks,
+                    "top5_tokens": top5_tokens_for_masks,
                     "mask_count": mask_positions.sum().item(),
                 }
             )
@@ -131,21 +178,52 @@ def print_restoration_examples(restoration_results, max_display=5):
         max_display: 表示する例の最大数
     """
     print("\n" + "=" * 80)
-    print("マスクされたトークンの復元結果 (Top1予測)")
+    print("マスクされたトークンの復元結果 (Top1 & Top3 & Top5予測)")
     print("=" * 80)
 
     for i, result in enumerate(restoration_results[:max_display]):
         print(f"\n例 {i + 1} (マスクされたトークン数: {result['mask_count']})")
         print("-" * 60)
-        print(f"元の文:     {result['original_text']}")
-        print(f"マスク文:   {result['masked_text']}")
-        print(f"復元文:     {result['restored_text']}")
+        print(f"元の文:        {result['original_text']}")
+        print(f"マスク文:      {result['masked_text']}")
+        print(f"復元文(Top1):  {result['restored_text_top1']}")
+
+        # Top3候補を表示
+        if result.get("top3_tokens") and len(result["top3_tokens"]) > 0:
+            print(f"Top3候補:      {result['restored_text_top3']}")
+
+        # Top5候補を表示（長くなりすぎないように制御）
+        if result.get("top5_tokens") and len(result["top5_tokens"]) > 0:
+            print(f"Top5候補:      {result['restored_text_top5']}")
 
         # 復元の正確性を簡単にチェック
-        if result["original_text"] == result["restored_text"]:
-            print("✓ 完全復元成功")
+        if result["original_text"] == result["restored_text_top1"]:
+            print("✓ Top1完全復元成功")
         else:
-            print("△ 部分的復元")
+            # Top3とTop5に正解が含まれているかチェック
+            top3_correct = False
+            top5_correct = False
+
+            if result.get("top3_tokens"):
+                # 各マスク位置で正解がTop3に含まれているかチェック
+                original_tokens = result["original_text"]
+                top3_tokens_flat = [token for mask_tokens in result["top3_tokens"] for token in mask_tokens]
+                # 簡易的なチェック（完全ではないが参考になる）
+                top3_correct = any(token in original_tokens for token in top3_tokens_flat)
+
+            if result.get("top5_tokens"):
+                # 各マスク位置で正解がTop5に含まれているかチェック
+                original_tokens = result["original_text"]
+                top5_tokens_flat = [token for mask_tokens in result["top5_tokens"] for token in mask_tokens]
+                # 簡易的なチェック（完全ではないが参考になる）
+                top5_correct = any(token in original_tokens for token in top5_tokens_flat)
+
+            if top5_correct:
+                print("△ Top1では不完全だが、Top5に正解候補あり")
+            elif top3_correct:
+                print("△ Top1では不完全だが、Top3に正解候補あり")
+            else:
+                print("× Top5でも不完全復元")
 
     print("\n" + "=" * 80)
 
@@ -311,14 +389,24 @@ def main():
         help="Pretrained model name or path.",
     )
     parser.add_argument(
+        "--tokenizer_name",
+        type=str,
+        default="experiments/kuzushiji_tokenizer_one_char",
+        help="Tokenizer name or path.",
+    )
+    parser.add_argument(
         "--dataset_dirs",
-        type=list,
+        nargs="+",
         default=[
-            # "ndl-minhon-ocrdataset/src/honkoku_oneline_v1",
-            # "ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
-            # "honkoku_yatanavi/honkoku_oneline",
-            # "data/oneline",
-            "kokubunken_repo/text",
+            "ndl-minhon-ocrdataset/src/honkoku_oneline_v1",
+            "ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
+            "honkoku_yatanavi/honkoku_oneline",
+            "data/oneline",
+            # "kokubunken_repo/text"
+            "kokubunken_repo/text/azumakagami",
+            "kokubunken_repo/text/eirigenji",
+            "kokubunken_repo/text/nijuuichidaishuu",
+            "kokubunken_repo/text/rekishimonogo",
         ],
         help="Directory containing the text dataset files.",
     )
@@ -338,10 +426,6 @@ def main():
     parser.add_argument("--eval_steps", type=int, default=500, help="Run evaluation every X updates steps.")
     parser.add_argument("--logging_steps", type=int, default=100, help="Log metrics every X updates steps.")
     parser.add_argument("--early_stopping_patience", type=int, default=None, help="Early stopping patience.")
-    parser.add_argument("--vocab_size", type=int, default=32000, help="学習時の語彙サイズ (パスの推測用)")
-    parser.add_argument(
-        "--model_type", type=str, default="bpe", choices=["bpe", "unigram"], help="学習時のモデルタイプ (パスの推測用)"
-    )
     parser.add_argument("--gradient_accumulation_steps", type=int, default=None, help="Gradient accumulation steps.")
     parser.add_argument("--auto_find_batch_size", action="store_true", help="Auto find batch size.")
     parser.add_argument("--resume_from_checkpoint", type=str, default=None, help="Resume from checkpoint.")
@@ -349,15 +433,9 @@ def main():
     args = parser.parse_args()
 
     # 1. Vocab and Tokenizer
-    DEFAULT_VOCAB_SIZE = args.vocab_size
-    DEFAULT_MODEL_TYPE = args.model_type
-    BASE_EXPERIMENT_DIR = "experiments/kuzushiji_tokenizer_one_char"
-    MODEL_SPECIFIC_DIR_NAME = f"vocab{DEFAULT_VOCAB_SIZE}_{DEFAULT_MODEL_TYPE}"
-    TOKENIZER_FILE_PATH = os.path.join(BASE_EXPERIMENT_DIR, MODEL_SPECIFIC_DIR_NAME)
-
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
-    tokenizer = AutoTokenizer.from_pretrained(BASE_EXPERIMENT_DIR)
+    tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_name)
     # 2. Load and Preprocess Dataset
     print(f"Loading dataset from {args.dataset_dirs}")
     text_files = []
@@ -382,9 +460,16 @@ def main():
     # Tokenize the dataset
     def tokenize_function(examples):
         # Tokenize the texts. The tokenizer will automatically add CLS and SEP if configured.
-        return tokenizer(examples["text"], truncation=True)
+        tokenized = tokenizer(examples["text"], truncation=True)
+        # Ensure input_ids are of type Long (int64) to avoid dtype mismatch in DataCollator
+        if "input_ids" in tokenized:
+            tokenized["input_ids"] = [torch.tensor(ids, dtype=torch.long).tolist() for ids in tokenized["input_ids"]]
+        return tokenized
 
     tokenized_dataset = dataset.map(tokenize_function, batched=True, remove_columns=["text"])
+
+    # Set the format to ensure proper tensor types
+    tokenized_dataset.set_format(type="torch", columns=["input_ids", "attention_mask"])
     print(f"Dataset tokenized. Number of examples: {len(tokenized_dataset)}")
 
     # Split dataset into train and test
@@ -406,7 +491,12 @@ def main():
 
     # 4. Data Collator
     # Data collator for MLM. It will handle dynamic masking.
-    data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=True, mlm_probability=args.mask_probability)
+    data_collator = DataCollatorForLanguageModeling(
+        tokenizer=tokenizer,
+        mlm=True,
+        mlm_probability=args.mask_probability,
+        return_tensors="pt",  # Ensure proper tensor format
+    )
     print(f"Using DataCollatorForLanguageModeling with mask probability: {args.mask_probability}")
 
     if args.resume_from_checkpoint is None:
@@ -450,24 +540,59 @@ def main():
     # 6. Evaluation Metrics
     def compute_metrics(p):
         predictions, labels = p
-        # predictions are logits, so we need to take argmax
+        # predictions are logits, so we need to get top-k predictions
         # For MLM, labels contain -100 for non-masked tokens
         masked_indices = labels != -100
 
         # Flatten and filter predictions and labels
-        flat_predictions = predictions.argmax(axis=-1)[masked_indices].flatten()
+        flat_predictions_logits = predictions[masked_indices]  # Shape: (num_masked_tokens, vocab_size)
         flat_labels = labels[masked_indices].flatten()
 
         if len(flat_labels) == 0:  # Should not happen if there are masked tokens
-            return {"accuracy": 0.0, "precision_macro": 0.0, "recall_macro": 0.0, "f1_macro": 0.0}
+            return {
+                "accuracy": 0.0,
+                "accuracy_top3": 0.0,
+                "accuracy_top5": 0.0,
+                "precision_macro": 0.0,
+                "recall_macro": 0.0,
+                "f1_macro": 0.0,
+            }
 
-        accuracy = accuracy_score(flat_labels, flat_predictions)
+        # Top1 predictions
+        flat_predictions_top1 = flat_predictions_logits.argmax(axis=-1).flatten()
+
+        # Top3 predictions
+        top3_predictions = np.argsort(flat_predictions_logits, axis=-1)[:, -3:]  # Get top 3 indices
+
+        # Top5 predictions
+        top5_predictions = np.argsort(flat_predictions_logits, axis=-1)[:, -5:]  # Get top 5 indices
+
+        # Calculate Top1 accuracy
+        accuracy_top1 = accuracy_score(flat_labels, flat_predictions_top1)
+
+        # Calculate Top3 accuracy
+        correct_top3 = 0
+        for i, true_label in enumerate(flat_labels):
+            if true_label in top3_predictions[i]:
+                correct_top3 += 1
+        accuracy_top3 = correct_top3 / len(flat_labels)
+
+        # Calculate Top5 accuracy
+        correct_top5 = 0
+        for i, true_label in enumerate(flat_labels):
+            if true_label in top5_predictions[i]:
+                correct_top5 += 1
+        accuracy_top5 = correct_top5 / len(flat_labels)
+
+        # Calculate precision, recall, f1 for Top1 predictions
         precision, recall, f1, _ = precision_recall_fscore_support(
-            flat_labels, flat_predictions, average="macro", zero_division=0
+            flat_labels, flat_predictions_top1, average="macro", zero_division=0
         )
 
         return {
-            "accuracy": accuracy,
+            "accuracy": accuracy_top1,
+            "accuracy_top3": accuracy_top3,
+            "accuracy_top5": accuracy_top5,
             "precision": precision,
             "recall": recall,
             "f1": f1,
@@ -499,7 +624,7 @@ def main():
     # Add custom callback for training metrics
     if trainer.train_dataset is not None and (compute_metrics if eval_dataset is not None else None) is not None:
         train_metrics_callback = TrainMetricsCallback(
-            train_dataset_for_metrics=trainer.train_dataset, compute_metrics_fn=compute_metrics, max_samples_for_metrics=2000
+            train_dataset_for_metrics=trainer.train_dataset, compute_metrics_fn=compute_metrics, max_samples_for_metrics=1000
         )
         train_metrics_callback.trainer = trainer
         trainer.add_callback(train_metrics_callback)
@@ -537,11 +662,30 @@ def main():
         eval_results = trainer.evaluate()
         print("Evaluation results:")
         for key, value in eval_results.items():
-            print(f"  {key}: {value}")
+            if key in ["eval_accuracy", "eval_accuracy_top3", "eval_accuracy_top5", "eval_f1", "eval_precision", "eval_recall"]:
+                print(f"  {key}: {value:.4f}")
+            else:
+                print(f"  {key}: {value}")
+
+        # Top1、Top3、Top5精度の比較を分かりやすく表示
+        if "eval_accuracy" in eval_results and "eval_accuracy_top3" in eval_results and "eval_accuracy_top5" in eval_results:
+            top1_acc = eval_results["eval_accuracy"]
+            top3_acc = eval_results["eval_accuracy_top3"]
+            top5_acc = eval_results["eval_accuracy_top5"]
+            improvement_top3 = top3_acc - top1_acc
+            improvement_top5 = top5_acc - top1_acc
+            print("\n精度比較:")
+            print(f"  Top1精度: {top1_acc:.4f} ({top1_acc * 100:.2f}%)")
+            print(
+                f"  Top3精度: {top3_acc:.4f} ({top3_acc * 100:.2f}%) [+{improvement_top3:.4f} ({improvement_top3 * 100:.2f}ポイント)]"
+            )
+            print(
+                f"  Top5精度: {top5_acc:.4f} ({top5_acc * 100:.2f}%) [+{improvement_top5:.4f} ({improvement_top5 * 100:.2f}ポイント)]"
+            )
 
         # 最終評価後に復元例を表示
         print("\n最終評価後の復元例表示:")
-        trainer.show_restoration_examples(eval_dataset=eval_dataset, num_examples=5)
+        trainer.show_restoration_examples(eval_dataset=eval_dataset, num_examples=10)
     else:
         print("No evaluation dataset provided. Skipping final evaluation.")
 
@@ -553,15 +697,25 @@ if __name__ == "__main__":
 """
 python train_language_model.py \
     --num_train_epochs 10000 \
-    --per_device_train_batch_size 256 \
+    --per_device_train_batch_size 1024 \
     --per_device_eval_batch_size 2 \
-    --learning_rate 0.0001 \
-    --mask_probability 0.15 \
-    --test_size 0.1 \
+    --learning_rate 0.00001 \
+    --mask_probability 0.3 \
+    --test_size 0.2 \
     --save_steps 10000 \
     --eval_steps 10000 \
     --logging_steps 100 \
-    --resume_from_checkpoint experiments/pretrain_language_model/roberta-small-japanese-aozora-char/20250511_192051
+    --tokenizer_name experiments/kuzushiji_tokenizer_one_char \
+    --model_name KoichiYasuoka/roberta-small-japanese-aozora-char \
+    --dataset_dirs \
+        ndl-minhon-ocrdataset/src/honkoku_oneline_v1 \
+        ndl-minhon-ocrdataset/src/honkoku_oneline_v2 \
+        honkoku_yatanavi/honkoku_oneline \
+        data/oneline \
+        kokubunken_repo/text/azumakagami \
+        kokubunken_repo/text/eirigenji \
+        kokubunken_repo/text/nijuuichidaishuu \
+        kokubunken_repo/text/rekishimonogo
 """
 
 """

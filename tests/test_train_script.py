@@ -25,7 +25,7 @@ def temp_dummy_data_dir_for_train():
         parent_dir = str(Path(__file__).resolve().parent.parent)
         if parent_dir not in sys.path:
             sys.path.insert(0, parent_dir)
-        from data_loader import create_dummy_data as create_dl_dummy_data
+        from scripts.data_loader import create_dummy_data as create_dl_dummy_data
         
         # Create dummy data using the imported function
         create_dl_dummy_data(base_dir) # This creates train/val/test splits with 5 samples each
@@ -124,34 +124,34 @@ def test_train_script_runs_dummy(temp_dummy_data_dir_for_train, temp_checkpoint_
 # then the dummy data creation logic would need to be duplicated or simplified within
 # the `temp_dummy_data_dir_for_train` fixture itself. The current version attempts import.The tests have been created as three separate files:
 
-1.  `tests/test_data_loader.py`:
-    *   Includes a `temp_data_dir` fixture to create a temporary dummy dataset (images, labels, bounding boxes) for train, val, and test splits.
-    *   `test_build_char_to_int_map`: Verifies the character mapping function, checking for special tokens, consistency, and vocabulary size.
-    *   `test_ocr_dataset`: Tests the `OCRDataset` class for length, item retrieval (keys, types, shapes of image, label, bounding\_boxes, label\_lengths), and correct padding/label length values.
-    *   `test_get_data_loader`: Checks if `get_data_loader` returns a DataLoader and if a batch can be drawn with correct keys and tensor shapes.
+# 1.  `tests/test_data_loader.py`:
+#     *   Includes a `temp_data_dir` fixture to create a temporary dummy dataset (images, labels, bounding boxes) for train, val, and test splits.
+#     *   `test_build_char_to_int_map`: Verifies the character mapping function, checking for special tokens, consistency, and vocabulary size.
+#     *   `test_ocr_dataset`: Tests the `OCRDataset` class for length, item retrieval (keys, types, shapes of image, label, bounding\_boxes, label\_lengths), and correct padding/label length values.
+#     *   `test_get_data_loader`: Checks if `get_data_loader` returns a DataLoader and if a batch can be drawn with correct keys and tensor shapes.
 
-2.  `tests/test_ocr_model.py`:
-    *   Uses fixtures to set up model parameters and an `OCRModel` instance with reduced sizes for speed.
-    *   `test_model_initialization`: Checks if the model is a `LightningModule` and has key components.
-    *   `test_model_forward_pass`: Verifies the forward pass output (keys, shapes of logits and bounding box predictions).
-    *   `test_model_step_methods`: Creates a dummy batch and calls `training_step`, `validation_step`, and `test_step` to ensure they run and return a scalar loss.
-    *   `test_calculate_cer`: Tests the static CER calculation method with predefined strings.
-    *   `test_calculate_mean_iou`: Tests the static Mean IoU calculation with predefined bounding boxes and target lengths.
+# 2.  `tests/test_ocr_model.py`:
+#     *   Uses fixtures to set up model parameters and an `OCRModel` instance with reduced sizes for speed.
+#     *   `test_model_initialization`: Checks if the model is a `LightningModule` and has key components.
+#     *   `test_model_forward_pass`: Verifies the forward pass output (keys, shapes of logits and bounding box predictions).
+#     *   `test_model_step_methods`: Creates a dummy batch and calls `training_step`, `validation_step`, and `test_step` to ensure they run and return a scalar loss.
+#     *   `test_calculate_cer`: Tests the static CER calculation method with predefined strings.
+#     *   `test_calculate_mean_iou`: Tests the static Mean IoU calculation with predefined bounding boxes and target lengths.
 
-3.  `tests/test_train_script.py`:
-    *   `test_train_script_runs_dummy`: A light integration test that runs the `train.py` script as a subprocess.
-    *   Uses fixtures for a temporary dummy dataset (attempting to use `create_dummy_data` from `data_loader.py`) and a temporary checkpoint directory.
-    *   Passes command-line arguments to `train.py` for a minimal run (1 epoch, small batch size, CPU, dummy data creation flag, etc.).
-    *   Asserts that the script completes successfully (exit code 0) and optionally checks for checkpoint creation and absence of "Error" or "Traceback" in output.
+# 3.  `tests/test_train_script.py`:
+#     *   `test_train_script_runs_dummy`: A light integration test that runs the `train.py` script as a subprocess.
+#     *   Uses fixtures for a temporary dummy dataset (attempting to use `create_dummy_data` from `data_loader.py`) and a temporary checkpoint directory.
+#     *   Passes command-line arguments to `train.py` for a minimal run (1 epoch, small batch size, CPU, dummy data creation flag, etc.).
+#     *   Asserts that the script completes successfully (exit code 0) and optionally checks for checkpoint creation and absence of "Error" or "Traceback" in output.
 
-**General Considerations for the tests:**
-*   They are structured for use with `pytest`.
-*   Necessary imports are included.
-*   Temporary directories are used for generated data and checkpoints, with cleanup handled by fixtures.
-*   The tests focus on unit-level functionality, with `test_train_script.py` providing a basic integration check.
-*   Path adjustments for importing project modules (e.g., `data_loader`, `ocr_model`) are commented within the test files, assuming a standard project structure where `tests` is a subdirectory in the root.
+# **General Considerations for the tests:**
+# *   They are structured for use with `pytest`.
+# *   Necessary imports are included.
+# *   Temporary directories are used for generated data and checkpoints, with cleanup handled by fixtures.
+# *   The tests focus on unit-level functionality, with `test_train_script.py` providing a basic integration check.
+# *   Path adjustments for importing project modules (e.g., `data_loader`, `ocr_model`) are commented within the test files, assuming a standard project structure where `tests` is a subdirectory in the root.
 
-To run these tests, one would typically navigate to the project's root directory and execute `pytest`.
-The python environment needs `pytest`, `torch`, `pytorch-lightning`, `Pillow`, `PyYAML`, and `editdistance` installed.
-The `train.py` test, in particular, relies on `data_loader.py` being importable to use its `create_dummy_data` function for setting up the test environment. If this import fails, that specific test will be skipped.
-The tests for `test_data_loader.py` and `test_ocr_model.py` should be self-contained regarding their specific module dependencies.
+# To run these tests, one would typically navigate to the project's root directory and execute `pytest`.
+# The python environment needs `pytest`, `torch`, `pytorch-lightning`, `Pillow`, `PyYAML`, and `editdistance` installed.
+# The `train.py` test, in particular, relies on `data_loader.py` being importable to use its `create_dummy_data` function for setting up the test environment. If this import fails, that specific test will be skipped.
+# The tests for `test_data_loader.py` and `test_ocr_model.py` should be self-contained regarding their specific module dependencies.

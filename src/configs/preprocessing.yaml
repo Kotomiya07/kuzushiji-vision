@@ -2,11 +2,17 @@ data_dir: "data"
 target_size: 640  # 列検出モデルの入力サイズ
 column_width: 192   # 文字検出モデルの入力幅
 
+# 並列処理の設定
+max_workers: 24  # 並列処理の最大ワーカー数（CPUコア数に応じて調整）
+
 # 前処理のパラメータ
 preprocessing:
   # パラメータ
-  eps_ratio: 0.1
+  eps_ratio: 0.3
   min_samples: 1
+  
+  # 列統合の設定
+  column_merge_threshold: 0.9  # 列統合の重複率閾値（90%）
 
   # 画像の正規化
   normalize:
@@ -27,7 +33,7 @@ preprocessing:
 
 # データ分割の設定
 split:
-  train_ratio: 0.8
-  val_ratio: 0.1
-  test_ratio: 0.1
+  train_ratio: 0.6
+  val_ratio: 0.2
+  test_ratio: 0.2
   random_seed: 42

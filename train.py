@@ -7,15 +7,14 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping, LearningRateMonitor
 
 # Assuming data_loader.py and ocr_model.py are in the same directory or accessible in PYTHONPATH
-from data_loader import (
+from scripts.data_loader import (
     get_data_loader, 
     build_char_to_int_map, 
     MAX_LABEL_LENGTH, 
     DEFAULT_TARGET_HEIGHT, 
     DEFAULT_TARGET_WIDTH,
-    create_dummy_data # Import for checking/creating dummy data
 )
-from ocr_model import OCRModel
+from scripts.ocr_model import OCRModel
 
 def load_config(config_path):
     """Loads a YAML configuration file."""
@@ -67,14 +66,9 @@ def run_training(args):
     # This condition checks if the specific 'train/images' subdirectory is missing,
     # which is a strong indicator that the dataset structure isn't there.
     train_images_dir = data_dir / "train" / "images"
-    if args.create_dummy_if_missing and (not data_dir.exists() or not train_images_dir.exists()):
-        print(f"Data directory {data_dir} or its subdirectories not found or empty. Attempting to create dummy data...")
-        create_dummy_data(str(data_dir)) # create_dummy_data expects a string path
-        # Verify dummy data creation
-        if not train_images_dir.exists():
-            print(f"Critical: Dummy data creation failed or did not create expected structure at {data_dir}.")
-            print("Please ensure the data directory is correctly set up or dummy data creation works.")
-            return # Exit if data is still not available
+    if not data_dir.exists() or not train_images_dir.exists():
+        print(f"Data directory {data_dir} or its subdirectories not found or empty. Please check the --data_dir path.")
+        exit(1)
 
     print(f"Using data directory: {data_dir}")
     
@@ -211,8 +205,8 @@ if __name__ == "__main__":
 
     # Paths and Config
     parser.add_argument("--config_path", type=str, default=None, help="Path to YAML configuration file.")
-    parser.add_argument("--data_dir", type=str, default="./data/column_dataset_padded_example", help="Directory containing the dataset.")
-    parser.add_argument("--checkpoint_dir", type=str, default="./checkpoints", help="Directory to save model checkpoints.")
+    parser.add_argument("--data_dir", type=str, default="data/column_dataset_padded", help="Directory containing the dataset.")
+    parser.add_argument("--checkpoint_dir", type=str, default="experiments/ocr_model", help="Directory to save model checkpoints.")
     
     # Data Parameters
     parser.add_argument("--target_height", type=int, default=DEFAULT_TARGET_HEIGHT, help="Target height for images.")
@@ -221,23 +215,23 @@ if __name__ == "__main__":
     parser.add_argument("--create_dummy_if_missing", action='store_true', help="Create dummy data if data_dir is not found/empty.")
 
     # Model Hyperparameters
-    parser.add_argument("--encoder_name", type=str, default="resnet34", choices=["resnet34", "resnet50"], help="Encoder backbone.")
+    parser.add_argument("--encoder_name", type=str, default="resnet50", choices=["resnet34", "resnet50"], help="Encoder backbone.")
     parser.add_argument("--pretrained_encoder", type=lambda x: (str(x).lower() == 'true'), default=True, help="Use pretrained encoder weights.")
     parser.add_argument("--rnn_hidden_size", type=int, default=256, help="Hidden size for RNN decoder.")
     parser.add_argument("--rnn_layers", type=int, default=2, help="Number of layers for RNN decoder.")
     parser.add_argument("--lambda_bbox", type=float, default=1.0, help="Weight for bounding box loss.")
 
     # Training Parameters
-    parser.add_argument("--learning_rate", type=float, default=1e-3, help="Learning rate.")
+    parser.add_argument("--learning_rate", type=float, default=1e-4, help="Learning rate.")
     parser.add_argument("--batch_size", type=int, default=16, help="Batch size.")
     parser.add_argument("--max_epochs", type=int, default=50, help="Maximum number of training epochs.")
-    parser.add_argument("--num_workers", type=int, default=0, help="Number of workers for DataLoader. Set to 0 for main process debugging.")
+    parser.add_argument("--num_workers", type=int, default=8, help="Number of workers for DataLoader. Set to 0 for main process debugging.")
     parser.add_argument("--patience", type=int, default=10, help="Patience for EarlyStopping.")
     parser.add_argument("--accelerator", type=str, default="auto", choices=["auto", "cpu", "gpu", "mps"], help="Accelerator to use ('auto', 'cpu', 'gpu', 'mps').")
     parser.add_argument("--devices", type=int, default=None, help="Number of devices to use (e.g., GPUs). None for auto.")
     parser.add_argument("--precision", type=int, default=32, choices=[16, 32], help="Training precision (16 for mixed, 32 for full).")
     parser.add_argument("--deterministic", type=lambda x: (str(x).lower() == 'true'), default=False, help="Enable deterministic mode for reproducibility.")
-    parser.add_argument("--log_every_n_steps", type=int, default=50, help="Log training information every N steps.")
+    parser.add_argument("--log_every_n_steps", type=int, default=100, help="Log training information every N steps.")
 
     # Callback Monitors
     parser.add_argument("--checkpoint_monitor", type=str, default="val_loss", help="Metric to monitor for ModelCheckpoint.")

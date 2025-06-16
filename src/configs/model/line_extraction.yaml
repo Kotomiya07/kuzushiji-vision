@@ -1,13 +1,13 @@
 model:
   name: "line_extraction"
   type: "yolo"
-  backbone: "yolov9t"
+  backbone: "yolo11x"
   input_size: [640, 640]  # 長辺を640にリサイズ（アスペクト比保持）
   num_classes: 1  # 列領域の検出のみ
 
 training:
   batch_size: -1
-  patience: 100
+  patience: 10
   learning_rate: 0.001
   optimizer: "adamW"
   weight_decay: 0.0001

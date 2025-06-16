@@ -6,7 +6,7 @@ import pytorch_lightning as pl
 # import sys
 # from pathlib import Path
 # sys.path.append(str(Path(__file__).resolve().parent.parent))
-from ocr_model import OCRModel # Assuming ocr_model.py is in the parent directory or PYTHONPATH
+from scripts.ocr_model import OCRModel # Assuming ocr_model.py is in the parent directory or PYTHONPATH
 
 # --- Test Setup & Fixtures ---
 
@@ -168,10 +168,12 @@ def test_calculate_mean_iou(ocr_model_instance, model_params): # Needs model ins
 
     # Box 1: pred=[0,0,10,10], target=[0,0,10,10]. IoU = 1.0
     # Box 2: pred=[20,20,30,30], target=[25,25,35,35]
-    # Intersection: None (area = 0). Union: Area1 + Area2 = 100 + 100 = 200. IoU = 0.0
-    # Mean IoU = (1.0 + 0.0) / 2 = 0.5
+    # Intersection: x1=max(20,25)=25, y1=max(20,25)=25, x2=min(30,35)=30, y2=min(30,35)=30
+    # Intersection area = (30-25) * (30-25) = 25
+    # Union: Area1 + Area2 - Intersection = 100 + 100 - 25 = 175. IoU = 25/175 = 1/7 ≈ 0.1429
+    # Mean IoU = (1.0 + 0.1429) / 2 ≈ 0.5714
     
-    expected_mean_iou = 0.5
+    expected_mean_iou = (1.0 + 1/7) / 2  # ≈ 0.5714
     
     mean_iou = OCRModel.calculate_mean_iou(bbox_preds, bbox_targets, target_lengths, t_model, s_max)
     assert isinstance(mean_iou, float), "Mean IoU should be a float"

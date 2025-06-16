@@ -132,7 +132,7 @@ def _process_single_image(
                 modified_relative_path = filename
             # --- 出力パス変更ロジック END ---
 
-            output_path = os.path.join(output_dir, modified_relative_path)  # 変更！
+            output_path = os.path.join(output_dir, modified_relative_path)
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
             output_format_str = os.path.splitext(image_path)[1].lower()
@@ -261,4 +261,9 @@ def process_images_parallel(input_dir: str, output_dir: str, target_width: int):
 # --- スクリプトの実行 ---
 if __name__ == "__main__":
     # process_images_memory_efficient(INPUT_DIR, OUTPUT_DIR, TARGET_WIDTH) # 旧関数
+    import time
+    start_time = time.time()
     process_images_parallel(INPUT_DIR, OUTPUT_DIR, TARGET_WIDTH)
+    end_time = time.time()
+    print(f"処理時間: {end_time - start_time} 秒")
+# 処理時間: 62.67992901802063 秒

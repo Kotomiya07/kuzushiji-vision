@@ -1,0 +1,205 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Virtual Environments / Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# pipenv, poetry, pdm
+.pdm.toml
+.pdm-python
+.pdm-build/
+
+# PEP 582 (e.g. pyflow, pdm)
+__pypackages__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# Local development settings
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+debug.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+
+# Project-specific
+memory-bank/
+data/raw/
+data/oneline/
+data/onechannel/
+data/honkoku/
+data/processed/
+data/processed_padded/
+data/column_dataset/
+data/column_dataset_padded/
+data/column_dataset_f1/
+data/yolo_dataset_oneline/
+data/yolo_dataset_page_images_by_book/
+data/visualize/
+data/*.zip
+experiments/*/
+!experiments/.gitkeep
+logs/
+*.ckpt
+*.pth
+*.pt
+wandb/
+tensorboard/
+tb_logs/
+
+# PyPI configuration file
+.pypirc
+
+# Ruff cache
+.ruff_cache/
+
+# NDL dataset
+ndl-minhon-ocrdataset/src/honkoku_oneline_v1/
+ndl-minhon-ocrdataset/src/honkoku_oneline_v2/
+ndl-minhon-ocrdataset/src/img_v1/
+ndl-minhon-ocrdataset/src/img_v2/
+ndl-minhon-ocrdataset/src/v1/
+ndl-minhon-ocrdataset/src/v2/
+
+# yatanavi honkoku
+honkoku_yatanavi/
+
+# kokubunken
+kokubunken_repo/
+
+**/*.zip

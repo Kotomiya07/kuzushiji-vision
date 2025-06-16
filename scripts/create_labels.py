@@ -7,7 +7,7 @@ def ensure_dir(directory):
     """ディレクトリが存在しない場合は作成する"""
     if not os.path.exists(directory):
         os.makedirs(directory)
-        print(f"ディレクトリを作成しました: {directory}")
+        #print(f"ディレクトリを作成しました: {directory}")
 
 
 def unicode_to_char(unicode_str):
@@ -40,8 +40,8 @@ def process_dataset(dataset_type):
         image_path = row["column_image"]
         image_name = os.path.splitext(os.path.basename(image_path))[0]
 
-        # book_id を image_name から抽出 (例: 100249416_00002_2_column_001 -> 100249416)
-        book_id = image_name.split("_")[0]
+        # book_id を image_path から抽出
+        book_id = image_path.split("/")[2]
 
         # book_id を含む新しいラベル出力ディレクトリパスを作成
         book_labels_dir = os.path.join(labels_dir, book_id)
@@ -61,7 +61,7 @@ def process_dataset(dataset_type):
         if (idx + 1) % 1000 == 0:
             print(f"{idx + 1}/{len(df)} 処理完了")
 
-    print(f"{dataset_type}データセットの処理が完了しました")
+    #print(f"{dataset_type}データセットの処理が完了しました")
 
 
 def main():
