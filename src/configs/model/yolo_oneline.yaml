@@ -1,5 +1,5 @@
 model:
-  name: "line_extraction"
+  name: "yolo_oneline"
   type: "yolo"
   backbone: "yolo11x"
   input_size: [640, 640]  # 長辺を640にリサイズ（アスペクト比保持）
@@ -7,7 +7,7 @@ model:
 
 training:
   batch_size: -1
-  patience: 10
+  patience: 100
   learning_rate: 0.001
   optimizer: "adamW"
   weight_decay: 0.0001

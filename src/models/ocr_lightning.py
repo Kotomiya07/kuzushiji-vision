@@ -84,9 +84,8 @@ class LitOCRModel(pl.LightningModule):
             # target_ids shape: (batch_size, seq_len)
             # attention_mask shape: (batch_size, seq_len)
             attention_mask = (labels != self.vocab.pad_token_id).long()
-            print(
-                f"[DEBUG] attention_mask before decoder - shape: {attention_mask.shape}, dtype: {attention_mask.dtype}, device: {attention_mask.device}"
-            )
+            # Use logger instead of print for debugging
+            # self.log_dict({"attention_mask_shape": str(attention_mask.shape)}, on_step=False, on_epoch=True)
             token_type_ids = torch.zeros_like(labels, device=labels.device)
 
             decoder_outputs = self.decoder(

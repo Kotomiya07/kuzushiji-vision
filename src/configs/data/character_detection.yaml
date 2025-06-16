@@ -1,0 +1,23 @@
+path: data/yolo_dataset_character_detection  # データセットのルートディレクトリ
+train: train/images  # 訓練画像のディレクトリ
+val: val/images      # 検証画像のディレクトリ
+test: test/images    # テスト画像のディレクトリ
+nc: 1  # 文字位置検出のみ（文字種分類なし）
+
+# クラス名
+names:
+  0: character  # 文字クラス（種類は問わず、文字の存在のみ）
+
+# データセットの形式
+task: detect  # 物体検出タスク 
+
+# 実験結果の保存設定
+experiment:
+  save_dir: experiments/character_detection/%Y%m%d_%H%M%S  # 実験結果を保存するディレクトリ（日時フォーマット）
+  log_dir: logs  # ログファイルを保存するサブディレクトリ
+  checkpoint_dir: checkpoints  # モデルのチェックポイントを保存するサブディレクトリ
+  eval_dir: evaluation  # 評価結果を保存するサブディレクトリ
+
+# 文字位置検出設定
+character_detection:
+  class_id: 0  # すべての文字に対して使用するクラスID 
