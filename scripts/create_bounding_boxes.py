@@ -1,3 +1,4 @@
+import ast
 import json  # JSONを扱うために追加
 import os
 
@@ -40,8 +41,7 @@ def process_dataset(dataset_type):
 
         # char_boxes_in_column カラムからバウンディングボックス情報を取得
         try:
-            # 文字列形式のリストを実際のリストに変換
-            bounding_boxes = eval(row["char_boxes_in_column"])
+            bounding_boxes = ast.literal_eval(row["char_boxes_in_column"])
         except Exception as e:
             print(f"エラー: {image_name} の char_boxes_in_column のパースに失敗しました。スキップします。エラー詳細: {e}")
             continue
