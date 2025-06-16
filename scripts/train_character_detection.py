@@ -4,9 +4,7 @@ import datetime
 
 # --- ViTEncoder Code (Copied from enhancing-transformers/enhancing/modules/stage1/layers.py) ---
 import os
-import random
 from collections.abc import Callable
-from functools import partial
 
 import jiwer
 import numpy as np
@@ -18,8 +16,7 @@ from einops.layers.torch import Rearrange
 from PIL import Image
 from torch import Tensor
 from torch.nn.utils.rnn import pad_sequence as torch_pad_sequence
-from torch.utils.data import DataLoader, Dataset
-from torchvision import transforms
+from torch.utils.data import Dataset
 from transformers import AutoConfig, AutoModelForCausalLM
 
 import wandb
@@ -709,7 +706,7 @@ def validate(
                 print(f"    Target:    '{target_text_sample}'")
                 first_batch_printed = True
 
-                if epoch_num % 5 == 0 or epoch_num == EPOCHS - 1:
+                if epoch_num % 5 == 0:
                     num_examples_to_log = min(5, images.size(0))
                     for k in range(num_examples_to_log):
                         example_images.append(wandb.Image(images[k]))
@@ -736,334 +733,92 @@ def validate(
     return avg_char_loss, avg_bbox_loss, avg_combined_loss, cer
 
 
-# --- Main Script ---
+from datetime import datetime
+from pathlib import Path
+
+import yaml
+from ultralytics import YOLO
+
+from src.utils.util import EasyDict
+
+
+def get_project_root():
+    """プロジェクトのルートディレクトリを取得"""
+    return Path(__file__).parent.parent
+
+
+def main():
+    """文字位置検出モデルの学習を実行"""
+    # プロジェクトルートディレクトリに移動
+    os.chdir(get_project_root())
+
+    # 設定の読み込み
+    with open("src/configs/model/character_detection.yaml", encoding="utf-8") as f:
+        config = yaml.safe_load(f)
+
+    # 実験ディレクトリの設定
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    exp_dir = Path("experiments/character_detection") / timestamp
+    exp_dir.mkdir(parents=True, exist_ok=True)
+
+    # 設定の保存
+    with open(exp_dir / "config.yaml", "w", encoding="utf-8") as f:
+        yaml.dump(config, f)
+
+    config = EasyDict(config)
+
+    # モデルの準備
+    model = YOLO(f"{config.model.backbone}")  # YOLOモデルをロード
+
+    # モデル構造の調整
+    model.model.nc = config.model.num_classes
+
+    # 学習の設定
+    train_args = {
+        "data": "src/configs/data/character_detection.yaml",
+        "epochs": config.training.scheduler.total_epochs,
+        "batch": config.training.batch_size,
+        "patience": config.training.patience,
+        "imgsz": config.model.input_size[0],
+        "device": 0,
+        "workers": 24,
+        "project": "experiments/character_detection",
+        "name": timestamp,
+        "exist_ok": True,
+        "pretrained": True,
+        "optimizer": config.training.optimizer,
+        "lr0": config.training.learning_rate,
+        "weight_decay": config.training.weight_decay,
+        "label_smoothing": 0.0,
+        "scale": 0.5,
+        "warmup_epochs": config.training.scheduler.warmup_epochs,
+        "close_mosaic": 10,  # モザイク拡張を終了するエポック
+        "flipud": config.augmentation.vertical_flip,
+        "fliplr": config.augmentation.horizontal_flip,
+        "mosaic": 1.0,  # モザイク拡張の確率
+        "mixup": 0.0,  # mixupは使用しない
+        "copy_paste": 0.0,  # copy-pasteも使用しない
+        "degrees": config.augmentation.rotation[1],  # 回転の最大角度
+        "hsv_h": 0.0,  # 色相の変更なし
+        "hsv_s": 0.0,  # 彩度の変更なし
+        "hsv_v": config.augmentation.brightness,  # 明度の変更
+        "single_cls": True,  # 単一クラス検出（文字位置のみ）
+        "cache": False,
+        "multi_scale": False,
+        "profile": False,
+        "plots": True,
+    }
+
+    # 学習の実行
+    model.train(**train_args)
+
+    # ベストモデルをコピー
+    best_model_path = exp_dir / "weights" / "best.pt"
+    if best_model_path.exists():
+        print(f"Best model saved at: {best_model_path}")
+    else:
+        print("Warning: Best model not found!")
+
+
 if __name__ == "__main__":
-    # --- Configuration ---
-    # WANDB: Define hyperparameters in a dictionary for wandb.config
-    config_defaults = {
-        "DATA_BASE_DIR": "data/column_dataset_padded",
-        "UNICODE_CSV_PATH": "data/unicode_translation.csv",
-        "IMAGE_HEIGHT": 1024,
-        "IMAGE_WIDTH": 64,
-        "IMAGE_CHANNELS": 3,
-        "PATCH_SIZE": 16,
-        "NAVIT_DIM": 256,
-        "NAVIT_DEPTH": 6,
-        "NAVIT_HEADS": 8,
-        "NAVIT_MLP_DIM_RATIO": 4,  # NAVIT_MLP_DIM = NAVIT_DIM * NAVIT_MLP_DIM_RATIO
-        "NAVIT_EMB_DROPOUT": 0.1,
-        "NAVIT_DROPOUT": 0.1,
-        "DEBERTA_MODEL_NAME": "KoichiYasuoka/roberta-small-japanese-aozora-char",
-        "MAX_LABEL_LEN": 128,
-        "BATCH_SIZE": 128,
-        "EPOCHS": 1000,  # Will be overwritten by global EPOCHS
-        "LEARNING_RATE": 5e-5,
-        "CLIP_GRAD_NORM": 1.0,
-        "NUM_WORKERS": 24,
-        "BBOX_LOSS_WEIGHT": 0.5,
-        "SEED": 42,
-        "WANDB_PROJECT": "kuzushiji-ocr",
-        "WANDB_ENTITY": None,  # WANDB: Set your entity (username or team), or leave as None for default
-    }
-
-    # Global EPOCHS, will be used by validate function for example logging condition
-    EPOCHS = config_defaults["EPOCHS"]
-
-    # WANDB: Initialize wandb
-    run_name = f"{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    wandb.init(
-        project=config_defaults["WANDB_PROJECT"],
-        entity=config_defaults["WANDB_ENTITY"],
-        config=config_defaults,
-        name=run_name,
-        # mode="disabled" # WANDB: Uncomment to disable wandb for debugging
-    )
-    # WANDB: Access hyperparameters from wandb.config for consistency
-    cfg = wandb.config
-
-    DATA_BASE_DIR = cfg.DATA_BASE_DIR
-    UNICODE_CSV_PATH = cfg.UNICODE_CSV_PATH
-    IMAGE_HEIGHT = cfg.IMAGE_HEIGHT
-    IMAGE_WIDTH = cfg.IMAGE_WIDTH
-    IMAGE_CHANNELS = cfg.IMAGE_CHANNELS
-    PATCH_SIZE = cfg.PATCH_SIZE
-    NAVIT_DIM = cfg.NAVIT_DIM
-    NAVIT_DEPTH = cfg.NAVIT_DEPTH
-    NAVIT_HEADS = cfg.NAVIT_HEADS
-    NAVIT_MLP_DIM = NAVIT_DIM * cfg.NAVIT_MLP_DIM_RATIO
-    NAVIT_EMB_DROPOUT = cfg.NAVIT_EMB_DROPOUT
-    NAVIT_DROPOUT = cfg.NAVIT_DROPOUT
-    DEBERTA_MODEL_NAME = cfg.DEBERTA_MODEL_NAME
-    MAX_LABEL_LEN = cfg.MAX_LABEL_LEN
-    MAX_DECODER_LEN = MAX_LABEL_LEN
-    BATCH_SIZE = cfg.BATCH_SIZE
-    EPOCHS = cfg.EPOCHS  # Overwrite global EPOCHS with wandb config
-    LEARNING_RATE = cfg.LEARNING_RATE
-    CLIP_GRAD_NORM = cfg.CLIP_GRAD_NORM
-    NUM_WORKERS = cfg.NUM_WORKERS
-    BBOX_LOSS_WEIGHT = cfg.BBOX_LOSS_WEIGHT
-    SEED = cfg.SEED
-
-    random.seed(SEED)
-    np.random.seed(SEED)
-    torch.manual_seed(SEED)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(SEED)
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using device: {device}")
-
-    tokenizer = Vocab(UNICODE_CSV_PATH, SPECIAL_TOKENS)
-    vocab_size = len(tokenizer)
-    print(f"Vocabulary size: {vocab_size}")
-
-    train_transform = transforms.Compose(
-        [
-            # transforms.Resize((IMAGE_HEIGHT, IMAGE_WIDTH)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5] * IMAGE_CHANNELS, std=[0.5] * IMAGE_CHANNELS),
-        ]
-    )
-    val_transform = transforms.Compose(
-        [
-            # transforms.Resize((IMAGE_HEIGHT, IMAGE_WIDTH)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5] * IMAGE_CHANNELS, std=[0.5] * IMAGE_CHANNELS),
-        ]
-    )
-
-    train_dataset_dir = os.path.join(DATA_BASE_DIR, "train")
-    val_dataset_dir = os.path.join(DATA_BASE_DIR, "val")
-
-    train_dataset = KuzushijiDataset(
-        train_dataset_dir,
-        tokenizer,
-        train_transform,
-        MAX_LABEL_LEN,
-        IMAGE_CHANNELS,
-        target_image_height=IMAGE_HEIGHT,
-        target_image_width=IMAGE_WIDTH,
-        image_col="column_image",
-        label_col="unicode_ids",
-        bbox_col="char_boxes_in_column",
-    )
-    val_dataset = KuzushijiDataset(
-        val_dataset_dir,
-        tokenizer,
-        val_transform,
-        MAX_LABEL_LEN,
-        IMAGE_CHANNELS,
-        target_image_height=IMAGE_HEIGHT,
-        target_image_width=IMAGE_WIDTH,
-        image_col="column_image",
-        label_col="unicode_ids",
-        bbox_col="char_boxes_in_column",
-    )
-
-    if len(train_dataset) == 0:
-        print(f"Error: Training dataset is empty. Check path: {train_dataset_dir} and its contents.")
-        wandb.finish(exit_code=1)  # WANDB: Finish run with error code
-        exit()
-    if len(val_dataset) == 0:
-        print(f"Warning: Validation dataset is empty. Check path: {val_dataset_dir}.")
-
-    custom_collate_fn = partial(collate_fn, pad_token_id=tokenizer.pad_id)
-    train_dataloader = DataLoader(
-        train_dataset,
-        batch_size=BATCH_SIZE,
-        shuffle=True,
-        collate_fn=custom_collate_fn,
-        num_workers=NUM_WORKERS,
-        pin_memory=True if device.type == "cuda" else False,
-    )
-    val_dataloader = DataLoader(
-        val_dataset,
-        batch_size=BATCH_SIZE,
-        shuffle=False,
-        collate_fn=custom_collate_fn,
-        num_workers=NUM_WORKERS,
-        pin_memory=True if device.type == "cuda" else False,
-    )
-
-    navit_config_dict = {
-        "image_size": (IMAGE_HEIGHT, IMAGE_WIDTH),
-        "patch_size": PATCH_SIZE,
-        "num_classes": NAVIT_DIM,
-        "dim": NAVIT_DIM,
-        "depth": NAVIT_DEPTH,
-        "heads": NAVIT_HEADS,
-        "mlp_dim": NAVIT_MLP_DIM,
-        "channels": IMAGE_CHANNELS,
-        "emb_dropout": NAVIT_EMB_DROPOUT,
-        "dropout": NAVIT_DROPOUT,
-    }
-
-    model = OCRModel(
-        vit_encoder_config=navit_config_dict,
-        deberta_model_name=DEBERTA_MODEL_NAME,
-        vocab_size=vocab_size,
-        sos_id=tokenizer.sos_id,
-        eos_id=tokenizer.eos_id,
-        pad_id=tokenizer.pad_id,
-        max_decoder_len=MAX_DECODER_LEN,
-        image_channels=IMAGE_CHANNELS,
-    ).to(device)
-
-    # WANDB: Watch the model for gradients and topology (optional)
-    # wandb.watch(model, log="all", log_freq=100) # Log gradients every 100 batches
-
-    criterion_char = nn.CrossEntropyLoss(ignore_index=tokenizer.pad_id)
-    criterion_bbox = nn.L1Loss(reduction="none")
-    optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
-
-    best_val_cer = float("inf")
-    # Output directory for local saves, wandb will also save artifacts
-    output_dir_base = "experiments/ocr"  # WANDB: Base directory for local saves
-    output_dir = os.path.join(output_dir_base, run_name)  # WANDB: Use run ID for unique folder
-
-    print(f"Local output directory: {output_dir}")
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir, exist_ok=True)
-
-    print("Starting training...")
-    for epoch in range(EPOCHS):
-        print(f"--- Epoch {epoch + 1}/{EPOCHS} ---")
-
-        avg_char_loss_train, avg_bbox_loss_train, avg_combined_loss_train = train_one_epoch(
-            model,
-            train_dataloader,
-            optimizer,
-            criterion_char,
-            criterion_bbox,
-            BBOX_LOSS_WEIGHT,
-            device,
-            tokenizer,
-            epoch,
-            CLIP_GRAD_NORM,  # WANDB: Pass current epoch
-        )
-        print(
-            f"Epoch {epoch + 1} Training: Char Loss: {avg_char_loss_train:.4f}, BBox Loss: {avg_bbox_loss_train:.4f}, Combined Loss: {avg_combined_loss_train:.4f}"
-        )
-        # WANDB: Log epoch training metrics
-        wandb.log(
-            {
-                "train_epoch_char_loss": avg_char_loss_train,
-                "train_epoch_bbox_loss": avg_bbox_loss_train,
-                "train_epoch_combined_loss": avg_combined_loss_train,
-                "epoch": epoch,
-            }
-        )
-
-        if len(val_dataloader) > 0:
-            avg_char_loss_val, avg_bbox_loss_val, avg_combined_loss_val, val_cer = validate(
-                model,
-                val_dataloader,
-                criterion_char,
-                criterion_bbox,
-                BBOX_LOSS_WEIGHT,
-                device,
-                tokenizer,
-                epoch,  # WANDB: Pass current epoch
-            )
-            print(
-                f"Epoch {epoch + 1} Validation: Char Loss: {avg_char_loss_val:.4f}, BBox Loss: {avg_bbox_loss_val:.4f}, Combined Loss: {avg_combined_loss_val:.4f}, CER: {val_cer:.4f}"
-            )
-            # WANDB: Log epoch validation metrics
-            wandb.log(
-                {
-                    "val_epoch_char_loss": avg_char_loss_val,
-                    "val_epoch_bbox_loss": avg_bbox_loss_val,
-                    "val_epoch_combined_loss": avg_combined_loss_val,
-                    "val_epoch_cer": val_cer,
-                    "epoch": epoch,
-                }
-            )
-
-            if val_cer < best_val_cer:
-                best_val_cer = val_cer
-                wandb.run.summary["best_val_cer"] = best_val_cer  # WANDB: Update summary for best CER
-
-                model_save_path = os.path.join(output_dir, f"best_ocr_bbox_model_epoch_{epoch + 1}_cer_{val_cer:.4f}.pth")
-                torch.save(model.state_dict(), model_save_path)
-                print(f"Saved best model locally to {model_save_path}")
-
-                # Option: Save model as artifact
-                # artifact = wandb.Artifact(f'model-{wandb.run.id}-best', type='model')
-                # artifact.add_file(model_save_path)
-                # wandb.log_artifact(artifact, aliases=["best", f"epoch-{epoch+1}"])
-                # print(f"Saved best model artifact to wandb")
-
-        else:
-            print("Skipping validation as validation dataloader is empty.")
-            if (epoch + 1) % 10 == 0:
-                model_save_path = os.path.join(output_dir, f"ocr_bbox_model_epoch_{epoch + 1}_no_val.pth")
-                torch.save(model.state_dict(), model_save_path)
-                print(f"Saved model (no validation) locally to {model_save_path}")
-                # WANDB: Save checkpoint model as artifact
-            #  artifact_ckpt = wandb.Artifact(f'model-{wandb.run.id}-ckpt-epoch-{epoch+1}', type='model')
-            #  artifact_ckpt.add_file(model_save_path)
-            #  wandb.log_artifact(artifact_ckpt)
-
-    print("Training finished.")
-    if len(val_dataloader) > 0:
-        print(f"Best Validation CER: {best_val_cer:.4f}")
-    else:
-        print("Training finished (no validation performed).")
-
-    # Test set evaluation (if available)
-    test_dataset_dir = os.path.join(DATA_BASE_DIR, "test")
-    test_csv_path = os.path.join(test_dataset_dir, "test_column_info.csv")
-
-    if os.path.exists(test_csv_path):
-        test_dataset = KuzushijiDataset(
-            test_dataset_dir,
-            tokenizer,
-            val_transform,
-            MAX_LABEL_LEN,
-            IMAGE_CHANNELS,
-            target_image_height=IMAGE_HEIGHT,
-            target_image_width=IMAGE_WIDTH,
-            image_col="column_image",
-            label_col="unicode_ids",
-            bbox_col="char_boxes_in_column",
-        )
-        if len(test_dataset) > 0:
-            test_dataloader = DataLoader(
-                test_dataset, batch_size=BATCH_SIZE, shuffle=False, collate_fn=custom_collate_fn, num_workers=NUM_WORKERS
-            )
-            print("Evaluating on Test Set...")
-            # Load the best model for testing
-            # This assumes the best model was saved. If using wandb artifacts, you might download it.
-            # For simplicity, we use the current model state or you can manually load the saved .pth.
-            # Example: model.load_state_dict(torch.load(best_model_path))
-
-            # WANDB: For test evaluation, pass a different epoch number or a specific identifier if needed for logging step
-            test_char_loss, test_bbox_loss, test_combined_loss, test_cer = validate(
-                model,
-                test_dataloader,
-                criterion_char,
-                criterion_bbox,
-                BBOX_LOSS_WEIGHT,
-                device,
-                tokenizer,
-                epoch_num=EPOCHS,  # Log against final epoch num
-            )
-            print(
-                f"Test Set Results: Char Loss: {test_char_loss:.4f}, BBox Loss: {test_bbox_loss:.4f}, Combined Loss: {test_combined_loss:.4f}, CER: {test_cer:.4f}"
-            )
-            # WANDB: Log test metrics
-            wandb.log(
-                {
-                    "test_char_loss": test_char_loss,
-                    "test_bbox_loss": test_bbox_loss,
-                    "test_combined_loss": test_combined_loss,
-                    "test_cer": test_cer,
-                }
-            )
-        else:
-            print("Test dataset is empty or could not be loaded.")
-    else:
-        print(f"Test dataset CSV not found at {test_csv_path}. Skipping test set evaluation.")
-
-    # WANDB: Finish the run
-    wandb.finish()
+    main()

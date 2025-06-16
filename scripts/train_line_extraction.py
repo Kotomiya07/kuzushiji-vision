@@ -51,7 +51,7 @@ def main():
         "project": "experiments/line_extraction",
         "name": timestamp,
         "exist_ok": True,
-        "pretrained": False,
+        "pretrained": True,
         "optimizer": config.training.optimizer,
         "lr0": config.training.learning_rate,
         "weight_decay": config.training.weight_decay,
