@@ -1,6 +1,6 @@
 # train_ocr.py
 import ast  # For safely evaluating string representations of lists/dicts
-import datetime
+from datetime import datetime
 
 # --- ViTEncoder Code (Copied from enhancing-transformers/enhancing/modules/stage1/layers.py) ---
 import os

@@ -4,12 +4,12 @@ seed: 42 # Global random seed
 model:
   name: "character_detection"
   type: "yolo"
-  backbone: "yolo11n"
+  backbone: "yolo12n"
   input_size: [640, 640]  # 長辺を640にリサイズ（アスペクト比保持）
   num_classes: 1  # 文字位置検出のみ（文字種分類なし）
 
 training:
-  batch_size: -1
+  batch_size: 32
   patience: 15
   learning_rate: 0.001
   optimizer: "adamW"
