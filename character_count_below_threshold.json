@@ -1,0 +1,9760 @@
+{
+  "summary": {
+    "total_characters": 4328,
+    "characters_in_category": 1625,
+    "threshold": 5,
+    "category": "below_threshold"
+  },
+  "characters": [
+    {
+      "index": 1,
+      "char": "萌",
+      "unicode_id": "U+840C",
+      "count": 4
+    },
+    {
+      "index": 2,
+      "char": "什",
+      "unicode_id": "U+4EC0",
+      "count": 4
+    },
+    {
+      "index": 3,
+      "char": "宙",
+      "unicode_id": "U+5B99",
+      "count": 4
+    },
+    {
+      "index": 4,
+      "char": "梵",
+      "unicode_id": "U+68B5",
+      "count": 4
+    },
+    {
+      "index": 5,
+      "char": "奔",
+      "unicode_id": "U+5954",
+      "count": 4
+    },
+    {
+      "index": 6,
+      "char": "舅",
+      "unicode_id": "U+8205",
+      "count": 4
+    },
+    {
+      "index": 7,
+      "char": "呟",
+      "unicode_id": "U+545F",
+      "count": 4
+    },
+    {
+      "index": 8,
+      "char": "槿",
+      "unicode_id": "U+69FF",
+      "count": 4
+    },
+    {
+      "index": 9,
+      "char": "詐",
+      "unicode_id": "U+8A50",
+      "count": 4
+    },
+    {
+      "index": 10,
+      "char": "皺",
+      "unicode_id": "U+76BA",
+      "count": 4
+    },
+    {
+      "index": 11,
+      "char": "梧",
+      "unicode_id": "U+68A7",
+      "count": 4
+    },
+    {
+      "index": 12,
+      "char": "躾",
+      "unicode_id": "U+8EBE",
+      "count": 4
+    },
+    {
+      "index": 13,
+      "char": "婢",
+      "unicode_id": "U+5A62",
+      "count": 4
+    },
+    {
+      "index": 14,
+      "char": "憖",
+      "unicode_id": "U+6196",
+      "count": 4
+    },
+    {
+      "index": 15,
+      "char": "頗",
+      "unicode_id": "U+9817",
+      "count": 4
+    },
+    {
+      "index": 16,
+      "char": "餉",
+      "unicode_id": "U+9909",
+      "count": 4
+    },
+    {
+      "index": 17,
+      "char": "巡",
+      "unicode_id": "U+5DE1",
+      "count": 4
+    },
+    {
+      "index": 18,
+      "char": "沃",
+      "unicode_id": "U+6C83",
+      "count": 4
+    },
+    {
+      "index": 19,
+      "char": "蹴",
+      "unicode_id": "U+8E74",
+      "count": 4
+    },
+    {
+      "index": 20,
+      "char": "掩",
+      "unicode_id": "U+63A9",
+      "count": 4
+    },
+    {
+      "index": 21,
+      "char": "翰",
+      "unicode_id": "U+7FF0",
+      "count": 4
+    },
+    {
+      "index": 22,
+      "char": "克",
+      "unicode_id": "U+514B",
+      "count": 4
+    },
+    {
+      "index": 23,
+      "char": "叉",
+      "unicode_id": "U+53C9",
+      "count": 4
+    },
+    {
+      "index": 24,
+      "char": "悖",
+      "unicode_id": "U+6096",
+      "count": 4
+    },
+    {
+      "index": 25,
+      "char": "侮",
+      "unicode_id": "U+4FAE",
+      "count": 4
+    },
+    {
+      "index": 26,
+      "char": "棠",
+      "unicode_id": "U+68E0",
+      "count": 4
+    },
+    {
+      "index": 27,
+      "char": "娯",
+      "unicode_id": "U+5A2F",
+      "count": 4
+    },
+    {
+      "index": 28,
+      "char": "鎖",
+      "unicode_id": "U+9396",
+      "count": 4
+    },
+    {
+      "index": 29,
+      "char": "筵",
+      "unicode_id": "U+7B75",
+      "count": 4
+    },
+    {
+      "index": 30,
+      "char": "摧",
+      "unicode_id": "U+6467",
+      "count": 4
+    },
+    {
+      "index": 31,
+      "char": "㑹",
+      "unicode_id": "U+3479",
+      "count": 4
+    },
+    {
+      "index": 32,
+      "char": "械",
+      "unicode_id": "U+68B0",
+      "count": 4
+    },
+    {
+      "index": 33,
+      "char": "慧",
+      "unicode_id": "U+6167",
+      "count": 4
+    },
+    {
+      "index": 34,
+      "char": "溺",
+      "unicode_id": "U+6EBA",
+      "count": 4
+    },
+    {
+      "index": 35,
+      "char": "颯",
+      "unicode_id": "U+98AF",
+      "count": 4
+    },
+    {
+      "index": 36,
+      "char": "轟",
+      "unicode_id": "U+8F5F",
+      "count": 4
+    },
+    {
+      "index": 37,
+      "char": "逍",
+      "unicode_id": "U+900D",
+      "count": 4
+    },
+    {
+      "index": 38,
+      "char": "鼬",
+      "unicode_id": "U+9F2C",
+      "count": 4
+    },
+    {
+      "index": 39,
+      "char": "耽",
+      "unicode_id": "U+803D",
+      "count": 4
+    },
+    {
+      "index": 40,
+      "char": "苧",
+      "unicode_id": "U+82E7",
+      "count": 4
+    },
+    {
+      "index": 41,
+      "char": "賽",
+      "unicode_id": "U+8CFD",
+      "count": 4
+    },
+    {
+      "index": 42,
+      "char": "煖",
+      "unicode_id": "U+7156",
+      "count": 4
+    },
+    {
+      "index": 43,
+      "char": "醴",
+      "unicode_id": "U+91B4",
+      "count": 4
+    },
+    {
+      "index": 44,
+      "char": "痰",
+      "unicode_id": "U+75F0",
+      "count": 4
+    },
+    {
+      "index": 45,
+      "char": "核",
+      "unicode_id": "U+6838",
+      "count": 4
+    },
+    {
+      "index": 46,
+      "char": "餻",
+      "unicode_id": "U+993B",
+      "count": 4
+    },
+    {
+      "index": 47,
+      "char": "坤",
+      "unicode_id": "U+5764",
+      "count": 4
+    },
+    {
+      "index": 48,
+      "char": "屁",
+      "unicode_id": "U+5C41",
+      "count": 4
+    },
+    {
+      "index": 49,
+      "char": "挺",
+      "unicode_id": "U+633A",
+      "count": 4
+    },
+    {
+      "index": 50,
+      "char": "襖",
+      "unicode_id": "U+8956",
+      "count": 4
+    },
+    {
+      "index": 51,
+      "char": "畦",
+      "unicode_id": "U+7566",
+      "count": 4
+    },
+    {
+      "index": 52,
+      "char": "瞿",
+      "unicode_id": "U+77BF",
+      "count": 4
+    },
+    {
+      "index": 53,
+      "char": "囃",
+      "unicode_id": "U+56C3",
+      "count": 4
+    },
+    {
+      "index": 54,
+      "char": "遷",
+      "unicode_id": "U+9077",
+      "count": 4
+    },
+    {
+      "index": 55,
+      "char": "箆",
+      "unicode_id": "U+7B86",
+      "count": 4
+    },
+    {
+      "index": 56,
+      "char": "粘",
+      "unicode_id": "U+7C98",
+      "count": 4
+    },
+    {
+      "index": 57,
+      "char": "輛",
+      "unicode_id": "U+8F1B",
+      "count": 4
+    },
+    {
+      "index": 58,
+      "char": "埃",
+      "unicode_id": "U+57C3",
+      "count": 4
+    },
+    {
+      "index": 59,
+      "char": "妊",
+      "unicode_id": "U+598A",
+      "count": 4
+    },
+    {
+      "index": 60,
+      "char": "姪",
+      "unicode_id": "U+59EA",
+      "count": 4
+    },
+    {
+      "index": 61,
+      "char": "鉛",
+      "unicode_id": "U+925B",
+      "count": 4
+    },
+    {
+      "index": 62,
+      "char": "壇",
+      "unicode_id": "U+58C7",
+      "count": 4
+    },
+    {
+      "index": 63,
+      "char": "庇",
+      "unicode_id": "U+5E87",
+      "count": 4
+    },
+    {
+      "index": 64,
+      "char": "裙",
+      "unicode_id": "U+88D9",
+      "count": 4
+    },
+    {
+      "index": 65,
+      "char": "碑",
+      "unicode_id": "U+7891",
+      "count": 4
+    },
+    {
+      "index": 66,
+      "char": "苡",
+      "unicode_id": "U+82E1",
+      "count": 4
+    },
+    {
+      "index": 67,
+      "char": "葎",
+      "unicode_id": "U+844E",
+      "count": 4
+    },
+    {
+      "index": 68,
+      "char": "孑",
+      "unicode_id": "U+5B51",
+      "count": 4
+    },
+    {
+      "index": 69,
+      "char": "誕",
+      "unicode_id": "U+8A95",
+      "count": 4
+    },
+    {
+      "index": 70,
+      "char": "蔀",
+      "unicode_id": "U+8500",
+      "count": 4
+    },
+    {
+      "index": 71,
+      "char": "充",
+      "unicode_id": "U+5145",
+      "count": 4
+    },
+    {
+      "index": 72,
+      "char": "寇",
+      "unicode_id": "U+5BC7",
+      "count": 4
+    },
+    {
+      "index": 73,
+      "char": "甜",
+      "unicode_id": "U+751C",
+      "count": 4
+    },
+    {
+      "index": 74,
+      "char": "帖",
+      "unicode_id": "U+5E16",
+      "count": 4
+    },
+    {
+      "index": 75,
+      "char": "蟶",
+      "unicode_id": "U+87F6",
+      "count": 4
+    },
+    {
+      "index": 76,
+      "char": "滴",
+      "unicode_id": "U+6EF4",
+      "count": 4
+    },
+    {
+      "index": 77,
+      "char": "昧",
+      "unicode_id": "U+6627",
+      "count": 4
+    },
+    {
+      "index": 78,
+      "char": "酉",
+      "unicode_id": "U+9149",
+      "count": 4
+    },
+    {
+      "index": 79,
+      "char": "環",
+      "unicode_id": "U+74B0",
+      "count": 4
+    },
+    {
+      "index": 80,
+      "char": "枇",
+      "unicode_id": "U+6787",
+      "count": 4
+    },
+    {
+      "index": 81,
+      "char": "竪",
+      "unicode_id": "U+7AEA",
+      "count": 4
+    },
+    {
+      "index": 82,
+      "char": "整",
+      "unicode_id": "U+6574",
+      "count": 4
+    },
+    {
+      "index": 83,
+      "char": "弄",
+      "unicode_id": "U+5F04",
+      "count": 4
+    },
+    {
+      "index": 84,
+      "char": "酸",
+      "unicode_id": "U+9178",
+      "count": 4
+    },
+    {
+      "index": 85,
+      "char": "頽",
+      "unicode_id": "U+983D",
+      "count": 4
+    },
+    {
+      "index": 86,
+      "char": "瑣",
+      "unicode_id": "U+7463",
+      "count": 4
+    },
+    {
+      "index": 87,
+      "char": "眷",
+      "unicode_id": "U+7737",
+      "count": 4
+    },
+    {
+      "index": 88,
+      "char": "跋",
+      "unicode_id": "U+8DCB",
+      "count": 4
+    },
+    {
+      "index": 89,
+      "char": "パ",
+      "unicode_id": "U+30D1",
+      "count": 4
+    },
+    {
+      "index": 90,
+      "char": "締",
+      "unicode_id": "U+7DE0",
+      "count": 4
+    },
+    {
+      "index": 91,
+      "char": "純",
+      "unicode_id": "U+7D14",
+      "count": 4
+    },
+    {
+      "index": 92,
+      "char": "嬰",
+      "unicode_id": "U+5B30",
+      "count": 4
+    },
+    {
+      "index": 93,
+      "char": "𢦙",
+      "unicode_id": "U+22999",
+      "count": 4
+    },
+    {
+      "index": 94,
+      "char": "億",
+      "unicode_id": "U+5104",
+      "count": 4
+    },
+    {
+      "index": 95,
+      "char": "疹",
+      "unicode_id": "U+75B9",
+      "count": 4
+    },
+    {
+      "index": 96,
+      "char": "プ",
+      "unicode_id": "U+30D7",
+      "count": 4
+    },
+    {
+      "index": 97,
+      "char": "吠",
+      "unicode_id": "U+5420",
+      "count": 4
+    },
+    {
+      "index": 98,
+      "char": "拿",
+      "unicode_id": "U+62FF",
+      "count": 4
+    },
+    {
+      "index": 99,
+      "char": "捷",
+      "unicode_id": "U+6377",
+      "count": 4
+    },
+    {
+      "index": 100,
+      "char": "肇",
+      "unicode_id": "U+8087",
+      "count": 4
+    },
+    {
+      "index": 101,
+      "char": "秩",
+      "unicode_id": "U+79E9",
+      "count": 4
+    },
+    {
+      "index": 102,
+      "char": "嚀",
+      "unicode_id": "U+5680",
+      "count": 4
+    },
+    {
+      "index": 103,
+      "char": "辟",
+      "unicode_id": "U+8F9F",
+      "count": 4
+    },
+    {
+      "index": 104,
+      "char": "宦",
+      "unicode_id": "U+5BA6",
+      "count": 4
+    },
+    {
+      "index": 105,
+      "char": "特",
+      "unicode_id": "U+7279",
+      "count": 4
+    },
+    {
+      "index": 106,
+      "char": "咬",
+      "unicode_id": "U+54AC",
+      "count": 4
+    },
+    {
+      "index": 107,
+      "char": "睪",
+      "unicode_id": "U+776A",
+      "count": 4
+    },
+    {
+      "index": 108,
+      "char": "繕",
+      "unicode_id": "U+7E55",
+      "count": 4
+    },
+    {
+      "index": 109,
+      "char": "褄",
+      "unicode_id": "U+8904",
+      "count": 4
+    },
+    {
+      "index": 110,
+      "char": "涎",
+      "unicode_id": "U+6D8E",
+      "count": 4
+    },
+    {
+      "index": 111,
+      "char": "穏",
+      "unicode_id": "U+7A4F",
+      "count": 4
+    },
+    {
+      "index": 112,
+      "char": "允",
+      "unicode_id": "U+5141",
+      "count": 4
+    },
+    {
+      "index": 113,
+      "char": "夙",
+      "unicode_id": "U+5919",
+      "count": 4
+    },
+    {
+      "index": 114,
+      "char": "覇",
+      "unicode_id": "U+8987",
+      "count": 4
+    },
+    {
+      "index": 115,
+      "char": "班",
+      "unicode_id": "U+73ED",
+      "count": 4
+    },
+    {
+      "index": 116,
+      "char": "蕭",
+      "unicode_id": "U+856D",
+      "count": 4
+    },
+    {
+      "index": 117,
+      "char": "蕊",
+      "unicode_id": "U+854A",
+      "count": 4
+    },
+    {
+      "index": 118,
+      "char": "厂",
+      "unicode_id": "U+5382",
+      "count": 4
+    },
+    {
+      "index": 119,
+      "char": "嶮",
+      "unicode_id": "U+5DAE",
+      "count": 4
+    },
+    {
+      "index": 120,
+      "char": "摸",
+      "unicode_id": "U+6478",
+      "count": 4
+    },
+    {
+      "index": 121,
+      "char": "駐",
+      "unicode_id": "U+99D0",
+      "count": 4
+    },
+    {
+      "index": 122,
+      "char": "域",
+      "unicode_id": "U+57DF",
+      "count": 4
+    },
+    {
+      "index": 123,
+      "char": "裹",
+      "unicode_id": "U+88F9",
+      "count": 4
+    },
+    {
+      "index": 124,
+      "char": "枴",
+      "unicode_id": "U+67B4",
+      "count": 4
+    },
+    {
+      "index": 125,
+      "char": "倹",
+      "unicode_id": "U+5039",
+      "count": 4
+    },
+    {
+      "index": 126,
+      "char": "厨",
+      "unicode_id": "U+53A8",
+      "count": 4
+    },
+    {
+      "index": 127,
+      "char": "怯",
+      "unicode_id": "U+602F",
+      "count": 4
+    },
+    {
+      "index": 128,
+      "char": "蒼",
+      "unicode_id": "U+84BC",
+      "count": 4
+    },
+    {
+      "index": 129,
+      "char": "奮",
+      "unicode_id": "U+596E",
+      "count": 4
+    },
+    {
+      "index": 130,
+      "char": "牀",
+      "unicode_id": "U+7240",
+      "count": 4
+    },
+    {
+      "index": 131,
+      "char": "徐",
+      "unicode_id": "U+5F90",
+      "count": 4
+    },
+    {
+      "index": 132,
+      "char": "霹",
+      "unicode_id": "U+9739",
+      "count": 4
+    },
+    {
+      "index": 133,
+      "char": "靂",
+      "unicode_id": "U+9742",
+      "count": 4
+    },
+    {
+      "index": 134,
+      "char": "怡",
+      "unicode_id": "U+6021",
+      "count": 4
+    },
+    {
+      "index": 135,
+      "char": "娶",
+      "unicode_id": "U+5A36",
+      "count": 4
+    },
+    {
+      "index": 136,
+      "char": "誦",
+      "unicode_id": "U+8AA6",
+      "count": 4
+    },
+    {
+      "index": 137,
+      "char": "閣",
+      "unicode_id": "U+95A3",
+      "count": 4
+    },
+    {
+      "index": 138,
+      "char": "謫",
+      "unicode_id": "U+8B2B",
+      "count": 4
+    },
+    {
+      "index": 139,
+      "char": "蛟",
+      "unicode_id": "U+86DF",
+      "count": 4
+    },
+    {
+      "index": 140,
+      "char": "戈",
+      "unicode_id": "U+6208",
+      "count": 4
+    },
+    {
+      "index": 141,
+      "char": "雕",
+      "unicode_id": "U+96D5",
+      "count": 4
+    },
+    {
+      "index": 142,
+      "char": "稜",
+      "unicode_id": "U+7A1C",
+      "count": 4
+    },
+    {
+      "index": 143,
+      "char": "陋",
+      "unicode_id": "U+964B",
+      "count": 4
+    },
+    {
+      "index": 144,
+      "char": "斧",
+      "unicode_id": "U+65A7",
+      "count": 4
+    },
+    {
+      "index": 145,
+      "char": "牝",
+      "unicode_id": "U+725D",
+      "count": 4
+    },
+    {
+      "index": 146,
+      "char": "寤",
+      "unicode_id": "U+5BE4",
+      "count": 4
+    },
+    {
+      "index": 147,
+      "char": "誅",
+      "unicode_id": "U+8A85",
+      "count": 4
+    },
+    {
+      "index": 148,
+      "char": "胤",
+      "unicode_id": "U+80E4",
+      "count": 4
+    },
+    {
+      "index": 149,
+      "char": "尉",
+      "unicode_id": "U+5C09",
+      "count": 4
+    },
+    {
+      "index": 150,
+      "char": "匿",
+      "unicode_id": "U+533F",
+      "count": 4
+    },
+    {
+      "index": 151,
+      "char": "佞",
+      "unicode_id": "U+4F5E",
+      "count": 4
+    },
+    {
+      "index": 152,
+      "char": "邦",
+      "unicode_id": "U+90A6",
+      "count": 4
+    },
+    {
+      "index": 153,
+      "char": "嚼",
+      "unicode_id": "U+56BC",
+      "count": 4
+    },
+    {
+      "index": 154,
+      "char": "帛",
+      "unicode_id": "U+5E1B",
+      "count": 4
+    },
+    {
+      "index": 155,
+      "char": "肱",
+      "unicode_id": "U+80B1",
+      "count": 4
+    },
+    {
+      "index": 156,
+      "char": "拘",
+      "unicode_id": "U+62D8",
+      "count": 4
+    },
+    {
+      "index": 157,
+      "char": "荅",
+      "unicode_id": "U+8345",
+      "count": 4
+    },
+    {
+      "index": 158,
+      "char": "戟",
+      "unicode_id": "U+621F",
+      "count": 4
+    },
+    {
+      "index": 159,
+      "char": "囓",
+      "unicode_id": "U+56D3",
+      "count": 4
+    },
+    {
+      "index": 160,
+      "char": "躇",
+      "unicode_id": "U+8E87",
+      "count": 4
+    },
+    {
+      "index": 161,
+      "char": "項",
+      "unicode_id": "U+9805",
+      "count": 4
+    },
+    {
+      "index": 162,
+      "char": "副",
+      "unicode_id": "U+526F",
+      "count": 4
+    },
+    {
+      "index": 163,
+      "char": "旃",
+      "unicode_id": "U+65C3",
+      "count": 4
+    },
+    {
+      "index": 164,
+      "char": "停",
+      "unicode_id": "U+505C",
+      "count": 4
+    },
+    {
+      "index": 165,
+      "char": "搦",
+      "unicode_id": "U+6426",
+      "count": 4
+    },
+    {
+      "index": 166,
+      "char": "筬",
+      "unicode_id": "U+7B6C",
+      "count": 4
+    },
+    {
+      "index": 167,
+      "char": "縷",
+      "unicode_id": "U+7E37",
+      "count": 4
+    },
+    {
+      "index": 168,
+      "char": "娥",
+      "unicode_id": "U+5A25",
+      "count": 4
+    },
+    {
+      "index": 169,
+      "char": "樟",
+      "unicode_id": "U+6A1F",
+      "count": 4
+    },
+    {
+      "index": 170,
+      "char": "瓠",
+      "unicode_id": "U+74E0",
+      "count": 4
+    },
+    {
+      "index": 171,
+      "char": "蚢",
+      "unicode_id": "U+86A2",
+      "count": 4
+    },
+    {
+      "index": 172,
+      "char": "袞",
+      "unicode_id": "U+889E",
+      "count": 4
+    },
+    {
+      "index": 173,
+      "char": "杞",
+      "unicode_id": "U+675E",
+      "count": 4
+    },
+    {
+      "index": 174,
+      "char": "莧",
+      "unicode_id": "U+83A7",
+      "count": 4
+    },
+    {
+      "index": 175,
+      "char": "鯊",
+      "unicode_id": "U+9BCA",
+      "count": 4
+    },
+    {
+      "index": 176,
+      "char": "揆",
+      "unicode_id": "U+63C6",
+      "count": 4
+    },
+    {
+      "index": 177,
+      "char": "蔔",
+      "unicode_id": "U+8514",
+      "count": 4
+    },
+    {
+      "index": 178,
+      "char": "譏",
+      "unicode_id": "U+8B4F",
+      "count": 4
+    },
+    {
+      "index": 179,
+      "char": "菪",
+      "unicode_id": "U+83EA",
+      "count": 4
+    },
+    {
+      "index": 180,
+      "char": "濫",
+      "unicode_id": "U+6FEB",
+      "count": 4
+    },
+    {
+      "index": 181,
+      "char": "甑",
+      "unicode_id": "U+7511",
+      "count": 4
+    },
+    {
+      "index": 182,
+      "char": "鵑",
+      "unicode_id": "U+9D51",
+      "count": 4
+    },
+    {
+      "index": 183,
+      "char": "譜",
+      "unicode_id": "U+8B5C",
+      "count": 4
+    },
+    {
+      "index": 184,
+      "char": "梭",
+      "unicode_id": "U+68AD",
+      "count": 4
+    },
+    {
+      "index": 185,
+      "char": "柾",
+      "unicode_id": "U+67FE",
+      "count": 4
+    },
+    {
+      "index": 186,
+      "char": "鷗",
+      "unicode_id": "U+9DD7",
+      "count": 4
+    },
+    {
+      "index": 187,
+      "char": "莕",
+      "unicode_id": "U+8395",
+      "count": 4
+    },
+    {
+      "index": 188,
+      "char": "鯰",
+      "unicode_id": "U+9BF0",
+      "count": 4
+    },
+    {
+      "index": 189,
+      "char": "夀",
+      "unicode_id": "U+5900",
+      "count": 4
+    },
+    {
+      "index": 190,
+      "char": "ボ",
+      "unicode_id": "U+30DC",
+      "count": 4
+    },
+    {
+      "index": 191,
+      "char": "啌",
+      "unicode_id": "U+554C",
+      "count": 4
+    },
+    {
+      "index": 192,
+      "char": "𥡷",
+      "unicode_id": "U+25877",
+      "count": 4
+    },
+    {
+      "index": 193,
+      "char": "廾",
+      "unicode_id": "U+5EFE",
+      "count": 4
+    },
+    {
+      "index": 194,
+      "char": "憾",
+      "unicode_id": "U+61BE",
+      "count": 4
+    },
+    {
+      "index": 195,
+      "char": "翳",
+      "unicode_id": "U+7FF3",
+      "count": 4
+    },
+    {
+      "index": 196,
+      "char": "吮",
+      "unicode_id": "U+542E",
+      "count": 4
+    },
+    {
+      "index": 197,
+      "char": "2",
+      "unicode_id": "U+0032",
+      "count": 4
+    },
+    {
+      "index": 198,
+      "char": "姥",
+      "unicode_id": "U+59E5",
+      "count": 4
+    },
+    {
+      "index": 199,
+      "char": "莟",
+      "unicode_id": "U+839F",
+      "count": 3
+    },
+    {
+      "index": 200,
+      "char": "瞬",
+      "unicode_id": "U+77AC",
+      "count": 3
+    },
+    {
+      "index": 201,
+      "char": "酬",
+      "unicode_id": "U+916C",
+      "count": 3
+    },
+    {
+      "index": 202,
+      "char": "絆",
+      "unicode_id": "U+7D46",
+      "count": 3
+    },
+    {
+      "index": 203,
+      "char": "悌",
+      "unicode_id": "U+608C",
+      "count": 3
+    },
+    {
+      "index": 204,
+      "char": "噬",
+      "unicode_id": "U+566C",
+      "count": 3
+    },
+    {
+      "index": 205,
+      "char": "倩",
+      "unicode_id": "U+5029",
+      "count": 3
+    },
+    {
+      "index": 206,
+      "char": "膠",
+      "unicode_id": "U+81A0",
+      "count": 3
+    },
+    {
+      "index": 207,
+      "char": "抛",
+      "unicode_id": "U+629B",
+      "count": 3
+    },
+    {
+      "index": 208,
+      "char": "戛",
+      "unicode_id": "U+621B",
+      "count": 3
+    },
+    {
+      "index": 209,
+      "char": "肘",
+      "unicode_id": "U+8098",
+      "count": 3
+    },
+    {
+      "index": 210,
+      "char": "髻",
+      "unicode_id": "U+9AFB",
+      "count": 3
+    },
+    {
+      "index": 211,
+      "char": "喃",
+      "unicode_id": "U+5583",
+      "count": 3
+    },
+    {
+      "index": 212,
+      "char": "殽",
+      "unicode_id": "U+6BBD",
+      "count": 3
+    },
+    {
+      "index": 213,
+      "char": "媽",
+      "unicode_id": "U+5ABD",
+      "count": 3
+    },
+    {
+      "index": 214,
+      "char": "緻",
+      "unicode_id": "U+7DFB",
+      "count": 3
+    },
+    {
+      "index": 215,
+      "char": "哽",
+      "unicode_id": "U+54FD",
+      "count": 3
+    },
+    {
+      "index": 216,
+      "char": "熾",
+      "unicode_id": "U+71BE",
+      "count": 3
+    },
+    {
+      "index": 217,
+      "char": "ョ",
+      "unicode_id": "U+30E7",
+      "count": 3
+    },
+    {
+      "index": 218,
+      "char": "藍",
+      "unicode_id": "U+85CD",
+      "count": 3
+    },
+    {
+      "index": 219,
+      "char": "縞",
+      "unicode_id": "U+7E1E",
+      "count": 3
+    },
+    {
+      "index": 220,
+      "char": "囂",
+      "unicode_id": "U+56C2",
+      "count": 3
+    },
+    {
+      "index": 221,
+      "char": "勃",
+      "unicode_id": "U+52C3",
+      "count": 3
+    },
+    {
+      "index": 222,
+      "char": "磤",
+      "unicode_id": "U+78E4",
+      "count": 3
+    },
+    {
+      "index": 223,
+      "char": "袱",
+      "unicode_id": "U+88B1",
+      "count": 3
+    },
+    {
+      "index": 224,
+      "char": "誑",
+      "unicode_id": "U+8A91",
+      "count": 3
+    },
+    {
+      "index": 225,
+      "char": "芙",
+      "unicode_id": "U+8299",
+      "count": 3
+    },
+    {
+      "index": 226,
+      "char": "蓉",
+      "unicode_id": "U+84C9",
+      "count": 3
+    },
+    {
+      "index": 227,
+      "char": "膂",
+      "unicode_id": "U+8182",
+      "count": 3
+    },
+    {
+      "index": 228,
+      "char": "較",
+      "unicode_id": "U+8F03",
+      "count": 3
+    },
+    {
+      "index": 229,
+      "char": "旁",
+      "unicode_id": "U+65C1",
+      "count": 3
+    },
+    {
+      "index": 230,
+      "char": "燧",
+      "unicode_id": "U+71E7",
+      "count": 3
+    },
+    {
+      "index": 231,
+      "char": "ヌ",
+      "unicode_id": "U+30CC",
+      "count": 3
+    },
+    {
+      "index": 232,
+      "char": "楫",
+      "unicode_id": "U+696B",
+      "count": 3
+    },
+    {
+      "index": 233,
+      "char": "絨",
+      "unicode_id": "U+7D68",
+      "count": 3
+    },
+    {
+      "index": 234,
+      "char": "毟",
+      "unicode_id": "U+6BDF",
+      "count": 3
+    },
+    {
+      "index": 235,
+      "char": "懶",
+      "unicode_id": "U+61F6",
+      "count": 3
+    },
+    {
+      "index": 236,
+      "char": "滄",
+      "unicode_id": "U+6EC4",
+      "count": 3
+    },
+    {
+      "index": 237,
+      "char": "姚",
+      "unicode_id": "U+59DA",
+      "count": 3
+    },
+    {
+      "index": 238,
+      "char": "槍",
+      "unicode_id": "U+69CD",
+      "count": 3
+    },
+    {
+      "index": 239,
+      "char": "眺",
+      "unicode_id": "U+773A",
+      "count": 3
+    },
+    {
+      "index": 240,
+      "char": "孰",
+      "unicode_id": "U+5B70",
+      "count": 3
+    },
+    {
+      "index": 241,
+      "char": "逅",
+      "unicode_id": "U+9005",
+      "count": 3
+    },
+    {
+      "index": 242,
+      "char": "褐",
+      "unicode_id": "U+8910",
+      "count": 3
+    },
+    {
+      "index": 243,
+      "char": "僻",
+      "unicode_id": "U+50FB",
+      "count": 3
+    },
+    {
+      "index": 244,
+      "char": "枋",
+      "unicode_id": "U+678B",
+      "count": 3
+    },
+    {
+      "index": 245,
+      "char": "虻",
+      "unicode_id": "U+867B",
+      "count": 3
+    },
+    {
+      "index": 246,
+      "char": "兌",
+      "unicode_id": "U+514C",
+      "count": 3
+    },
+    {
+      "index": 247,
+      "char": "祓",
+      "unicode_id": "U+7953",
+      "count": 3
+    },
+    {
+      "index": 248,
+      "char": "諍",
+      "unicode_id": "U+8ACD",
+      "count": 3
+    },
+    {
+      "index": 249,
+      "char": "叩",
+      "unicode_id": "U+53E9",
+      "count": 3
+    },
+    {
+      "index": 250,
+      "char": "榧",
+      "unicode_id": "U+69A7",
+      "count": 3
+    },
+    {
+      "index": 251,
+      "char": "鰊",
+      "unicode_id": "U+9C0A",
+      "count": 3
+    },
+    {
+      "index": 252,
+      "char": "糝",
+      "unicode_id": "U+7CDD",
+      "count": 3
+    },
+    {
+      "index": 253,
+      "char": "鱲",
+      "unicode_id": "U+9C72",
+      "count": 3
+    },
+    {
+      "index": 254,
+      "char": "鵲",
+      "unicode_id": "U+9D72",
+      "count": 3
+    },
+    {
+      "index": 255,
+      "char": "鯵",
+      "unicode_id": "U+9BF5",
+      "count": 3
+    },
+    {
+      "index": 256,
+      "char": "ょ",
+      "unicode_id": "U+3087",
+      "count": 3
+    },
+    {
+      "index": 257,
+      "char": "批",
+      "unicode_id": "U+6279",
+      "count": 3
+    },
+    {
+      "index": 258,
+      "char": "瀉",
+      "unicode_id": "U+7009",
+      "count": 3
+    },
+    {
+      "index": 259,
+      "char": "咸",
+      "unicode_id": "U+54B8",
+      "count": 3
+    },
+    {
+      "index": 260,
+      "char": "櫂",
+      "unicode_id": "U+6AC2",
+      "count": 3
+    },
+    {
+      "index": 261,
+      "char": "椋",
+      "unicode_id": "U+690B",
+      "count": 3
+    },
+    {
+      "index": 262,
+      "char": "黠",
+      "unicode_id": "U+9EE0",
+      "count": 3
+    },
+    {
+      "index": 263,
+      "char": "価",
+      "unicode_id": "U+4FA1",
+      "count": 3
+    },
+    {
+      "index": 264,
+      "char": "鍔",
+      "unicode_id": "U+9354",
+      "count": 3
+    },
+    {
+      "index": 265,
+      "char": "麿",
+      "unicode_id": "U+9EBF",
+      "count": 3
+    },
+    {
+      "index": 266,
+      "char": "氈",
+      "unicode_id": "U+6C08",
+      "count": 3
+    },
+    {
+      "index": 267,
+      "char": "机",
+      "unicode_id": "U+673A",
+      "count": 3
+    },
+    {
+      "index": 268,
+      "char": "閻",
+      "unicode_id": "U+95BB",
+      "count": 3
+    },
+    {
+      "index": 269,
+      "char": "饂",
+      "unicode_id": "U+9942",
+      "count": 3
+    },
+    {
+      "index": 270,
+      "char": "杭",
+      "unicode_id": "U+676D",
+      "count": 3
+    },
+    {
+      "index": 271,
+      "char": "鑰",
+      "unicode_id": "U+9470",
+      "count": 3
+    },
+    {
+      "index": 272,
+      "char": "圭",
+      "unicode_id": "U+572D",
+      "count": 3
+    },
+    {
+      "index": 273,
+      "char": "笙",
+      "unicode_id": "U+7B19",
+      "count": 3
+    },
+    {
+      "index": 274,
+      "char": "豕",
+      "unicode_id": "U+8C55",
+      "count": 3
+    },
+    {
+      "index": 275,
+      "char": "稠",
+      "unicode_id": "U+7A20",
+      "count": 3
+    },
+    {
+      "index": 276,
+      "char": "鬮",
+      "unicode_id": "U+9B2E",
+      "count": 3
+    },
+    {
+      "index": 277,
+      "char": "峠",
+      "unicode_id": "U+5CE0",
+      "count": 3
+    },
+    {
+      "index": 278,
+      "char": "楓",
+      "unicode_id": "U+6953",
+      "count": 3
+    },
+    {
+      "index": 279,
+      "char": "醍",
+      "unicode_id": "U+918D",
+      "count": 3
+    },
+    {
+      "index": 280,
+      "char": "醐",
+      "unicode_id": "U+9190",
+      "count": 3
+    },
+    {
+      "index": 281,
+      "char": "臂",
+      "unicode_id": "U+81C2",
+      "count": 3
+    },
+    {
+      "index": 282,
+      "char": "虹",
+      "unicode_id": "U+8679",
+      "count": 3
+    },
+    {
+      "index": 283,
+      "char": "惟",
+      "unicode_id": "U+60DF",
+      "count": 3
+    },
+    {
+      "index": 284,
+      "char": "哲",
+      "unicode_id": "U+54F2",
+      "count": 3
+    },
+    {
+      "index": 285,
+      "char": "炬",
+      "unicode_id": "U+70AC",
+      "count": 3
+    },
+    {
+      "index": 286,
+      "char": "懈",
+      "unicode_id": "U+61C8",
+      "count": 3
+    },
+    {
+      "index": 287,
+      "char": "蝕",
+      "unicode_id": "U+8755",
+      "count": 3
+    },
+    {
+      "index": 288,
+      "char": "蟷",
+      "unicode_id": "U+87F7",
+      "count": 3
+    },
+    {
+      "index": 289,
+      "char": "螂",
+      "unicode_id": "U+8782",
+      "count": 3
+    },
+    {
+      "index": 290,
+      "char": "耀",
+      "unicode_id": "U+8000",
+      "count": 3
+    },
+    {
+      "index": 291,
+      "char": "焔",
+      "unicode_id": "U+7114",
+      "count": 3
+    },
+    {
+      "index": 292,
+      "char": "蟾",
+      "unicode_id": "U+87FE",
+      "count": 3
+    },
+    {
+      "index": 293,
+      "char": "萍",
+      "unicode_id": "U+840D",
+      "count": 3
+    },
+    {
+      "index": 294,
+      "char": "眤",
+      "unicode_id": "U+7724",
+      "count": 3
+    },
+    {
+      "index": 295,
+      "char": "啄",
+      "unicode_id": "U+5544",
+      "count": 3
+    },
+    {
+      "index": 296,
+      "char": "涅",
+      "unicode_id": "U+6D85",
+      "count": 3
+    },
+    {
+      "index": 297,
+      "char": "蚓",
+      "unicode_id": "U+8693",
+      "count": 3
+    },
+    {
+      "index": 298,
+      "char": "鈍",
+      "unicode_id": "U+920D",
+      "count": 3
+    },
+    {
+      "index": 299,
+      "char": "韮",
+      "unicode_id": "U+97EE",
+      "count": 3
+    },
+    {
+      "index": 300,
+      "char": "窩",
+      "unicode_id": "U+7AA9",
+      "count": 3
+    },
+    {
+      "index": 301,
+      "char": "羔",
+      "unicode_id": "U+7F94",
+      "count": 3
+    },
+    {
+      "index": 302,
+      "char": "髄",
+      "unicode_id": "U+9AC4",
+      "count": 3
+    },
+    {
+      "index": 303,
+      "char": "舶",
+      "unicode_id": "U+8236",
+      "count": 3
+    },
+    {
+      "index": 304,
+      "char": "渉",
+      "unicode_id": "U+6E09",
+      "count": 3
+    },
+    {
+      "index": 305,
+      "char": "刊",
+      "unicode_id": "U+520A",
+      "count": 3
+    },
+    {
+      "index": 306,
+      "char": "趾",
+      "unicode_id": "U+8DBE",
+      "count": 3
+    },
+    {
+      "index": 307,
+      "char": "滞",
+      "unicode_id": "U+6EDE",
+      "count": 3
+    },
+    {
+      "index": 308,
+      "char": "藷",
+      "unicode_id": "U+85F7",
+      "count": 3
+    },
+    {
+      "index": 309,
+      "char": "稍",
+      "unicode_id": "U+7A0D",
+      "count": 3
+    },
+    {
+      "index": 310,
+      "char": "閲",
+      "unicode_id": "U+95B2",
+      "count": 3
+    },
+    {
+      "index": 311,
+      "char": "豌",
+      "unicode_id": "U+8C4C",
+      "count": 3
+    },
+    {
+      "index": 312,
+      "char": "𥙊",
+      "unicode_id": "U+2564A",
+      "count": 3
+    },
+    {
+      "index": 313,
+      "char": "壊",
+      "unicode_id": "U+58CA",
+      "count": 3
+    },
+    {
+      "index": 314,
+      "char": "壌",
+      "unicode_id": "U+58CC",
+      "count": 3
+    },
+    {
+      "index": 315,
+      "char": "勲",
+      "unicode_id": "U+52F2",
+      "count": 3
+    },
+    {
+      "index": 316,
+      "char": "饒",
+      "unicode_id": "U+9952",
+      "count": 3
+    },
+    {
+      "index": 317,
+      "char": "旭",
+      "unicode_id": "U+65ED",
+      "count": 3
+    },
+    {
+      "index": 318,
+      "char": "訣",
+      "unicode_id": "U+8A23",
+      "count": 3
+    },
+    {
+      "index": 319,
+      "char": "校",
+      "unicode_id": "U+6821",
+      "count": 3
+    },
+    {
+      "index": 320,
+      "char": "掾",
+      "unicode_id": "U+63BE",
+      "count": 3
+    },
+    {
+      "index": 321,
+      "char": "窹",
+      "unicode_id": "U+7AB9",
+      "count": 3
+    },
+    {
+      "index": 322,
+      "char": "噎",
+      "unicode_id": "U+564E",
+      "count": 3
+    },
+    {
+      "index": 323,
+      "char": "狽",
+      "unicode_id": "U+72FD",
+      "count": 3
+    },
+    {
+      "index": 324,
+      "char": "彙",
+      "unicode_id": "U+5F59",
+      "count": 3
+    },
+    {
+      "index": 325,
+      "char": "辷",
+      "unicode_id": "U+8FB7",
+      "count": 3
+    },
+    {
+      "index": 326,
+      "char": "𥿻",
+      "unicode_id": "U+25FFB",
+      "count": 3
+    },
+    {
+      "index": 327,
+      "char": "簪",
+      "unicode_id": "U+7C2A",
+      "count": 3
+    },
+    {
+      "index": 328,
+      "char": "諢",
+      "unicode_id": "U+8AE2",
+      "count": 3
+    },
+    {
+      "index": 329,
+      "char": "袒",
+      "unicode_id": "U+8892",
+      "count": 3
+    },
+    {
+      "index": 330,
+      "char": "貟",
+      "unicode_id": "U+8C9F",
+      "count": 3
+    },
+    {
+      "index": 331,
+      "char": "𥸮",
+      "unicode_id": "U+25E2E",
+      "count": 3
+    },
+    {
+      "index": 332,
+      "char": "ビ",
+      "unicode_id": "U+30D3",
+      "count": 3
+    },
+    {
+      "index": 333,
+      "char": "鎗",
+      "unicode_id": "U+9397",
+      "count": 3
+    },
+    {
+      "index": 334,
+      "char": "誥",
+      "unicode_id": "U+8AA5",
+      "count": 3
+    },
+    {
+      "index": 335,
+      "char": "摠",
+      "unicode_id": "U+6460",
+      "count": 3
+    },
+    {
+      "index": 336,
+      "char": "撞",
+      "unicode_id": "U+649E",
+      "count": 3
+    },
+    {
+      "index": 337,
+      "char": "誡",
+      "unicode_id": "U+8AA1",
+      "count": 3
+    },
+    {
+      "index": 338,
+      "char": "嬬",
+      "unicode_id": "U+5B2C",
+      "count": 3
+    },
+    {
+      "index": 339,
+      "char": "耶",
+      "unicode_id": "U+8036",
+      "count": 3
+    },
+    {
+      "index": 340,
+      "char": "桓",
+      "unicode_id": "U+6853",
+      "count": 3
+    },
+    {
+      "index": 341,
+      "char": "庸",
+      "unicode_id": "U+5EB8",
+      "count": 3
+    },
+    {
+      "index": 342,
+      "char": "澄",
+      "unicode_id": "U+6F84",
+      "count": 3
+    },
+    {
+      "index": 343,
+      "char": "淪",
+      "unicode_id": "U+6DEA",
+      "count": 3
+    },
+    {
+      "index": 344,
+      "char": "効",
+      "unicode_id": "U+52B9",
+      "count": 3
+    },
+    {
+      "index": 345,
+      "char": "礬",
+      "unicode_id": "U+792C",
+      "count": 3
+    },
+    {
+      "index": 346,
+      "char": "渦",
+      "unicode_id": "U+6E26",
+      "count": 3
+    },
+    {
+      "index": 347,
+      "char": "擂",
+      "unicode_id": "U+64C2",
+      "count": 3
+    },
+    {
+      "index": 348,
+      "char": "薏",
+      "unicode_id": "U+858F",
+      "count": 3
+    },
+    {
+      "index": 349,
+      "char": "揮",
+      "unicode_id": "U+63EE",
+      "count": 3
+    },
+    {
+      "index": 350,
+      "char": "逝",
+      "unicode_id": "U+901D",
+      "count": 3
+    },
+    {
+      "index": 351,
+      "char": "們",
+      "unicode_id": "U+5011",
+      "count": 3
+    },
+    {
+      "index": 352,
+      "char": "鞅",
+      "unicode_id": "U+9785",
+      "count": 3
+    },
+    {
+      "index": 353,
+      "char": "聘",
+      "unicode_id": "U+8058",
+      "count": 3
+    },
+    {
+      "index": 354,
+      "char": "庁",
+      "unicode_id": "U+5E81",
+      "count": 3
+    },
+    {
+      "index": 355,
+      "char": "杳",
+      "unicode_id": "U+6773",
+      "count": 3
+    },
+    {
+      "index": 356,
+      "char": "霽",
+      "unicode_id": "U+973D",
+      "count": 3
+    },
+    {
+      "index": 357,
+      "char": "媛",
+      "unicode_id": "U+5A9B",
+      "count": 3
+    },
+    {
+      "index": 358,
+      "char": "耐",
+      "unicode_id": "U+8010",
+      "count": 3
+    },
+    {
+      "index": 359,
+      "char": "稷",
+      "unicode_id": "U+7A37",
+      "count": 3
+    },
+    {
+      "index": 360,
+      "char": "忿",
+      "unicode_id": "U+5FFF",
+      "count": 3
+    },
+    {
+      "index": 361,
+      "char": "展",
+      "unicode_id": "U+5C55",
+      "count": 3
+    },
+    {
+      "index": 362,
+      "char": "囀",
+      "unicode_id": "U+56C0",
+      "count": 3
+    },
+    {
+      "index": 363,
+      "char": "績",
+      "unicode_id": "U+7E3E",
+      "count": 3
+    },
+    {
+      "index": 364,
+      "char": "漿",
+      "unicode_id": "U+6F3F",
+      "count": 3
+    },
+    {
+      "index": 365,
+      "char": "晨",
+      "unicode_id": "U+6668",
+      "count": 3
+    },
+    {
+      "index": 366,
+      "char": "魘",
+      "unicode_id": "U+9B58",
+      "count": 3
+    },
+    {
+      "index": 367,
+      "char": "朗",
+      "unicode_id": "U+6717",
+      "count": 3
+    },
+    {
+      "index": 368,
+      "char": "蜃",
+      "unicode_id": "U+8703",
+      "count": 3
+    },
+    {
+      "index": 369,
+      "char": "彩",
+      "unicode_id": "U+5F69",
+      "count": 3
+    },
+    {
+      "index": 370,
+      "char": "醢",
+      "unicode_id": "U+91A2",
+      "count": 3
+    },
+    {
+      "index": 371,
+      "char": "創",
+      "unicode_id": "U+5275",
+      "count": 3
+    },
+    {
+      "index": 372,
+      "char": "蘋",
+      "unicode_id": "U+860B",
+      "count": 3
+    },
+    {
+      "index": 373,
+      "char": "擒",
+      "unicode_id": "U+64D2",
+      "count": 3
+    },
+    {
+      "index": 374,
+      "char": "斃",
+      "unicode_id": "U+6583",
+      "count": 3
+    },
+    {
+      "index": 375,
+      "char": "牆",
+      "unicode_id": "U+7246",
+      "count": 3
+    },
+    {
+      "index": 376,
+      "char": "販",
+      "unicode_id": "U+8CA9",
+      "count": 3
+    },
+    {
+      "index": 377,
+      "char": "㊄",
+      "unicode_id": "U+3284",
+      "count": 3
+    },
+    {
+      "index": 378,
+      "char": "𨉣",
+      "unicode_id": "U+28263",
+      "count": 3
+    },
+    {
+      "index": 379,
+      "char": "𤸰",
+      "unicode_id": "U+24E30",
+      "count": 3
+    },
+    {
+      "index": 380,
+      "char": "僧",
+      "unicode_id": "U+FA31",
+      "count": 3
+    },
+    {
+      "index": 381,
+      "char": "饋",
+      "unicode_id": "U+994B",
+      "count": 3
+    },
+    {
+      "index": 382,
+      "char": "埔",
+      "unicode_id": "U+57D4",
+      "count": 3
+    },
+    {
+      "index": 383,
+      "char": "做",
+      "unicode_id": "U+505A",
+      "count": 3
+    },
+    {
+      "index": 384,
+      "char": "亘",
+      "unicode_id": "U+4E98",
+      "count": 3
+    },
+    {
+      "index": 385,
+      "char": "凋",
+      "unicode_id": "U+51CB",
+      "count": 3
+    },
+    {
+      "index": 386,
+      "char": "轎",
+      "unicode_id": "U+8F4E",
+      "count": 3
+    },
+    {
+      "index": 387,
+      "char": "㫖",
+      "unicode_id": "U+3AD6",
+      "count": 3
+    },
+    {
+      "index": 388,
+      "char": "遮",
+      "unicode_id": "U+906E",
+      "count": 3
+    },
+    {
+      "index": 389,
+      "char": "藺",
+      "unicode_id": "U+85FA",
+      "count": 3
+    },
+    {
+      "index": 390,
+      "char": "逓",
+      "unicode_id": "U+9013",
+      "count": 3
+    },
+    {
+      "index": 391,
+      "char": "躊",
+      "unicode_id": "U+8E8A",
+      "count": 3
+    },
+    {
+      "index": 392,
+      "char": "衡",
+      "unicode_id": "U+8861",
+      "count": 3
+    },
+    {
+      "index": 393,
+      "char": "琢",
+      "unicode_id": "U+7422",
+      "count": 3
+    },
+    {
+      "index": 394,
+      "char": "凹",
+      "unicode_id": "U+51F9",
+      "count": 3
+    },
+    {
+      "index": 395,
+      "char": "懼",
+      "unicode_id": "U+61FC",
+      "count": 3
+    },
+    {
+      "index": 396,
+      "char": "泅",
+      "unicode_id": "U+6CC5",
+      "count": 3
+    },
+    {
+      "index": 397,
+      "char": "霄",
+      "unicode_id": "U+9704",
+      "count": 3
+    },
+    {
+      "index": 398,
+      "char": "撓",
+      "unicode_id": "U+6493",
+      "count": 3
+    },
+    {
+      "index": 399,
+      "char": "諾",
+      "unicode_id": "U+8AFE",
+      "count": 3
+    },
+    {
+      "index": 400,
+      "char": "慙",
+      "unicode_id": "U+6159",
+      "count": 3
+    },
+    {
+      "index": 401,
+      "char": "超",
+      "unicode_id": "U+8D85",
+      "count": 3
+    },
+    {
+      "index": 402,
+      "char": "轡",
+      "unicode_id": "U+8F61",
+      "count": 3
+    },
+    {
+      "index": 403,
+      "char": "彭",
+      "unicode_id": "U+5F6D",
+      "count": 3
+    },
+    {
+      "index": 404,
+      "char": "鬚",
+      "unicode_id": "U+9B1A",
+      "count": 3
+    },
+    {
+      "index": 405,
+      "char": "艫",
+      "unicode_id": "U+826B",
+      "count": 3
+    },
+    {
+      "index": 406,
+      "char": "紵",
+      "unicode_id": "U+7D35",
+      "count": 3
+    },
+    {
+      "index": 407,
+      "char": "淳",
+      "unicode_id": "U+6DF3",
+      "count": 3
+    },
+    {
+      "index": 408,
+      "char": "賦",
+      "unicode_id": "U+8CE6",
+      "count": 3
+    },
+    {
+      "index": 409,
+      "char": "嘈",
+      "unicode_id": "U+5608",
+      "count": 3
+    },
+    {
+      "index": 410,
+      "char": "蛹",
+      "unicode_id": "U+86F9",
+      "count": 3
+    },
+    {
+      "index": 411,
+      "char": "昭",
+      "unicode_id": "U+662D",
+      "count": 3
+    },
+    {
+      "index": 412,
+      "char": "梯",
+      "unicode_id": "U+68AF",
+      "count": 3
+    },
+    {
+      "index": 413,
+      "char": "籃",
+      "unicode_id": "U+7C43",
+      "count": 3
+    },
+    {
+      "index": 414,
+      "char": "倣",
+      "unicode_id": "U+5023",
+      "count": 3
+    },
+    {
+      "index": 415,
+      "char": "簿",
+      "unicode_id": "U+7C3F",
+      "count": 3
+    },
+    {
+      "index": 416,
+      "char": "慨",
+      "unicode_id": "U+6168",
+      "count": 3
+    },
+    {
+      "index": 417,
+      "char": "亨",
+      "unicode_id": "U+4EA8",
+      "count": 3
+    },
+    {
+      "index": 418,
+      "char": "凍",
+      "unicode_id": "U+51CD",
+      "count": 3
+    },
+    {
+      "index": 419,
+      "char": "躬",
+      "unicode_id": "U+8EAC",
+      "count": 3
+    },
+    {
+      "index": 420,
+      "char": "鰶",
+      "unicode_id": "U+9C36",
+      "count": 3
+    },
+    {
+      "index": 421,
+      "char": "鮟",
+      "unicode_id": "U+9B9F",
+      "count": 3
+    },
+    {
+      "index": 422,
+      "char": "鱇",
+      "unicode_id": "U+9C47",
+      "count": 3
+    },
+    {
+      "index": 423,
+      "char": "鮧",
+      "unicode_id": "U+9BA7",
+      "count": 3
+    },
+    {
+      "index": 424,
+      "char": "鯔",
+      "unicode_id": "U+9BD4",
+      "count": 3
+    },
+    {
+      "index": 425,
+      "char": "兆",
+      "unicode_id": "U+5146",
+      "count": 3
+    },
+    {
+      "index": 426,
+      "char": "閤",
+      "unicode_id": "U+95A4",
+      "count": 3
+    },
+    {
+      "index": 427,
+      "char": "橇",
+      "unicode_id": "U+6A47",
+      "count": 3
+    },
+    {
+      "index": 428,
+      "char": "螻",
+      "unicode_id": "U+87BB",
+      "count": 3
+    },
+    {
+      "index": 429,
+      "char": "蛄",
+      "unicode_id": "U+86C4",
+      "count": 3
+    },
+    {
+      "index": 430,
+      "char": "耆",
+      "unicode_id": "U+8006",
+      "count": 3
+    },
+    {
+      "index": 431,
+      "char": "傚",
+      "unicode_id": "U+509A",
+      "count": 3
+    },
+    {
+      "index": 432,
+      "char": "跟",
+      "unicode_id": "U+8DDF",
+      "count": 3
+    },
+    {
+      "index": 433,
+      "char": "癩",
+      "unicode_id": "U+7669",
+      "count": 3
+    },
+    {
+      "index": 434,
+      "char": "険",
+      "unicode_id": "U+967A",
+      "count": 3
+    },
+    {
+      "index": 435,
+      "char": "䏻",
+      "unicode_id": "U+43FB",
+      "count": 3
+    },
+    {
+      "index": 436,
+      "char": "浚",
+      "unicode_id": "U+6D5A",
+      "count": 3
+    },
+    {
+      "index": 437,
+      "char": "㤙",
+      "unicode_id": "U+3919",
+      "count": 3
+    },
+    {
+      "index": 438,
+      "char": "扣",
+      "unicode_id": "U+6263",
+      "count": 3
+    },
+    {
+      "index": 439,
+      "char": "两",
+      "unicode_id": "U+4E24",
+      "count": 3
+    },
+    {
+      "index": 440,
+      "char": "圉",
+      "unicode_id": "U+5709",
+      "count": 3
+    },
+    {
+      "index": 441,
+      "char": "柯",
+      "unicode_id": "U+67EF",
+      "count": 3
+    },
+    {
+      "index": 442,
+      "char": "剤",
+      "unicode_id": "U+5264",
+      "count": 3
+    },
+    {
+      "index": 443,
+      "char": "輾",
+      "unicode_id": "U+8F3E",
+      "count": 3
+    },
+    {
+      "index": 444,
+      "char": "級",
+      "unicode_id": "U+7D1A",
+      "count": 3
+    },
+    {
+      "index": 445,
+      "char": "9",
+      "unicode_id": "U+0039",
+      "count": 3
+    },
+    {
+      "index": 446,
+      "char": "鏐",
+      "unicode_id": "U+93D0",
+      "count": 3
+    },
+    {
+      "index": 447,
+      "char": "玩",
+      "unicode_id": "U+73A9",
+      "count": 3
+    },
+    {
+      "index": 448,
+      "char": "叙",
+      "unicode_id": "U+53D9",
+      "count": 2
+    },
+    {
+      "index": 449,
+      "char": "倘",
+      "unicode_id": "U+5018",
+      "count": 2
+    },
+    {
+      "index": 450,
+      "char": "嵩",
+      "unicode_id": "U+5D69",
+      "count": 2
+    },
+    {
+      "index": 451,
+      "char": "孀",
+      "unicode_id": "U+5B40",
+      "count": 2
+    },
+    {
+      "index": 452,
+      "char": "兇",
+      "unicode_id": "U+5147",
+      "count": 2
+    },
+    {
+      "index": 453,
+      "char": "融",
+      "unicode_id": "U+878D",
+      "count": 2
+    },
+    {
+      "index": 454,
+      "char": "縺",
+      "unicode_id": "U+7E3A",
+      "count": 2
+    },
+    {
+      "index": 455,
+      "char": "黛",
+      "unicode_id": "U+9EDB",
+      "count": 2
+    },
+    {
+      "index": 456,
+      "char": "綢",
+      "unicode_id": "U+7DA2",
+      "count": 2
+    },
+    {
+      "index": 457,
+      "char": "繆",
+      "unicode_id": "U+7E46",
+      "count": 2
+    },
+    {
+      "index": 458,
+      "char": "伍",
+      "unicode_id": "U+4F0D",
+      "count": 2
+    },
+    {
+      "index": 459,
+      "char": "賛",
+      "unicode_id": "U+8CDB",
+      "count": 2
+    },
+    {
+      "index": 460,
+      "char": "擡",
+      "unicode_id": "U+64E1",
+      "count": 2
+    },
+    {
+      "index": 461,
+      "char": "怜",
+      "unicode_id": "U+601C",
+      "count": 2
+    },
+    {
+      "index": 462,
+      "char": "悧",
+      "unicode_id": "U+60A7",
+      "count": 2
+    },
+    {
+      "index": 463,
+      "char": "ヂ",
+      "unicode_id": "U+30C2",
+      "count": 2
+    },
+    {
+      "index": 464,
+      "char": "徨",
+      "unicode_id": "U+5FA8",
+      "count": 2
+    },
+    {
+      "index": 465,
+      "char": "喩",
+      "unicode_id": "U+55A9",
+      "count": 2
+    },
+    {
+      "index": 466,
+      "char": "檐",
+      "unicode_id": "U+6A90",
+      "count": 2
+    },
+    {
+      "index": 467,
+      "char": "縊",
+      "unicode_id": "U+7E0A",
+      "count": 2
+    },
+    {
+      "index": 468,
+      "char": "筏",
+      "unicode_id": "U+7B4F",
+      "count": 2
+    },
+    {
+      "index": 469,
+      "char": "苫",
+      "unicode_id": "U+82EB",
+      "count": 2
+    },
+    {
+      "index": 470,
+      "char": "塀",
+      "unicode_id": "U+5840",
+      "count": 2
+    },
+    {
+      "index": 471,
+      "char": "厘",
+      "unicode_id": "U+5398",
+      "count": 2
+    },
+    {
+      "index": 472,
+      "char": "豚",
+      "unicode_id": "U+8C5A",
+      "count": 2
+    },
+    {
+      "index": 473,
+      "char": "毀",
+      "unicode_id": "U+6BC0",
+      "count": 2
+    },
+    {
+      "index": 474,
+      "char": "撮",
+      "unicode_id": "U+64AE",
+      "count": 2
+    },
+    {
+      "index": 475,
+      "char": "掠",
+      "unicode_id": "U+63A0",
+      "count": 2
+    },
+    {
+      "index": 476,
+      "char": "邂",
+      "unicode_id": "U+9082",
+      "count": 2
+    },
+    {
+      "index": 477,
+      "char": "崖",
+      "unicode_id": "U+5D16",
+      "count": 2
+    },
+    {
+      "index": 478,
+      "char": "蠢",
+      "unicode_id": "U+8822",
+      "count": 2
+    },
+    {
+      "index": 479,
+      "char": "勾",
+      "unicode_id": "U+52FE",
+      "count": 2
+    },
+    {
+      "index": 480,
+      "char": "彰",
+      "unicode_id": "U+5F70",
+      "count": 2
+    },
+    {
+      "index": 481,
+      "char": "齟",
+      "unicode_id": "U+9F5F",
+      "count": 2
+    },
+    {
+      "index": 482,
+      "char": "齬",
+      "unicode_id": "U+9F6C",
+      "count": 2
+    },
+    {
+      "index": 483,
+      "char": "𤇆",
+      "unicode_id": "U+241C6",
+      "count": 2
+    },
+    {
+      "index": 484,
+      "char": "匙",
+      "unicode_id": "U+5319",
+      "count": 2
+    },
+    {
+      "index": 485,
+      "char": "悒",
+      "unicode_id": "U+6092",
+      "count": 2
+    },
+    {
+      "index": 486,
+      "char": "挫",
+      "unicode_id": "U+632B",
+      "count": 2
+    },
+    {
+      "index": 487,
+      "char": "厠",
+      "unicode_id": "U+53A0",
+      "count": 2
+    },
+    {
+      "index": 488,
+      "char": "赫",
+      "unicode_id": "U+8D6B",
+      "count": 2
+    },
+    {
+      "index": 489,
+      "char": "腋",
+      "unicode_id": "U+814B",
+      "count": 2
+    },
+    {
+      "index": 490,
+      "char": "謹",
+      "unicode_id": "U+8B39",
+      "count": 2
+    },
+    {
+      "index": 491,
+      "char": "器",
+      "unicode_id": "U+FA38",
+      "count": 2
+    },
+    {
+      "index": 492,
+      "char": "醯",
+      "unicode_id": "U+91AF",
+      "count": 2
+    },
+    {
+      "index": 493,
+      "char": "襄",
+      "unicode_id": "U+8944",
+      "count": 2
+    },
+    {
+      "index": 494,
+      "char": "拌",
+      "unicode_id": "U+62CC",
+      "count": 2
+    },
+    {
+      "index": 495,
+      "char": "鯑",
+      "unicode_id": "U+9BD1",
+      "count": 2
+    },
+    {
+      "index": 496,
+      "char": "烹",
+      "unicode_id": "U+70F9",
+      "count": 2
+    },
+    {
+      "index": 497,
+      "char": "蕃",
+      "unicode_id": "U+8543",
+      "count": 2
+    },
+    {
+      "index": 498,
+      "char": "䕃",
+      "unicode_id": "U+4543",
+      "count": 2
+    },
+    {
+      "index": 499,
+      "char": "秬",
+      "unicode_id": "U+79EC",
+      "count": 2
+    },
+    {
+      "index": 500,
+      "char": "罌",
+      "unicode_id": "U+7F4C",
+      "count": 2
+    },
+    {
+      "index": 501,
+      "char": "靨",
+      "unicode_id": "U+9768",
+      "count": 2
+    },
+    {
+      "index": 502,
+      "char": "桴",
+      "unicode_id": "U+6874",
+      "count": 2
+    },
+    {
+      "index": 503,
+      "char": "饘",
+      "unicode_id": "U+9958",
+      "count": 2
+    },
+    {
+      "index": 504,
+      "char": "蛯",
+      "unicode_id": "U+86EF",
+      "count": 2
+    },
+    {
+      "index": 505,
+      "char": "鋳",
+      "unicode_id": "U+92F3",
+      "count": 2
+    },
+    {
+      "index": 506,
+      "char": "癒",
+      "unicode_id": "U+7652",
+      "count": 2
+    },
+    {
+      "index": 507,
+      "char": "祗",
+      "unicode_id": "U+7957",
+      "count": 2
+    },
+    {
+      "index": 508,
+      "char": "烙",
+      "unicode_id": "U+70D9",
+      "count": 2
+    },
+    {
+      "index": 509,
+      "char": "扈",
+      "unicode_id": "U+6248",
+      "count": 2
+    },
+    {
+      "index": 510,
+      "char": "岨",
+      "unicode_id": "U+5CA8",
+      "count": 2
+    },
+    {
+      "index": 511,
+      "char": "珊",
+      "unicode_id": "U+73CA",
+      "count": 2
+    },
+    {
+      "index": 512,
+      "char": "瑚",
+      "unicode_id": "U+745A",
+      "count": 2
+    },
+    {
+      "index": 513,
+      "char": "鰐",
+      "unicode_id": "U+9C10",
+      "count": 2
+    },
+    {
+      "index": 514,
+      "char": "灘",
+      "unicode_id": "U+7058",
+      "count": 2
+    },
+    {
+      "index": 515,
+      "char": "賭",
+      "unicode_id": "U+8CED",
+      "count": 2
+    },
+    {
+      "index": 516,
+      "char": "胝",
+      "unicode_id": "U+80DD",
+      "count": 2
+    },
+    {
+      "index": 517,
+      "char": "筧",
+      "unicode_id": "U+7B67",
+      "count": 2
+    },
+    {
+      "index": 518,
+      "char": "麝",
+      "unicode_id": "U+9E9D",
+      "count": 2
+    },
+    {
+      "index": 519,
+      "char": "晶",
+      "unicode_id": "U+6676",
+      "count": 2
+    },
+    {
+      "index": 520,
+      "char": "櫚",
+      "unicode_id": "U+6ADA",
+      "count": 2
+    },
+    {
+      "index": 521,
+      "char": "檎",
+      "unicode_id": "U+6A8E",
+      "count": 2
+    },
+    {
+      "index": 522,
+      "char": "瑪",
+      "unicode_id": "U+746A",
+      "count": 2
+    },
+    {
+      "index": 523,
+      "char": "瑙",
+      "unicode_id": "U+7459",
+      "count": 2
+    },
+    {
+      "index": 524,
+      "char": "茜",
+      "unicode_id": "U+831C",
+      "count": 2
+    },
+    {
+      "index": 525,
+      "char": "櫓",
+      "unicode_id": "U+6AD3",
+      "count": 2
+    },
+    {
+      "index": 526,
+      "char": "漣",
+      "unicode_id": "U+6F23",
+      "count": 2
+    },
+    {
+      "index": 527,
+      "char": "踞",
+      "unicode_id": "U+8E1E",
+      "count": 2
+    },
+    {
+      "index": 528,
+      "char": "脛",
+      "unicode_id": "U+811B",
+      "count": 2
+    },
+    {
+      "index": 529,
+      "char": "畸",
+      "unicode_id": "U+7578",
+      "count": 2
+    },
+    {
+      "index": 530,
+      "char": "咥",
+      "unicode_id": "U+54A5",
+      "count": 2
+    },
+    {
+      "index": 531,
+      "char": "竅",
+      "unicode_id": "U+7AC5",
+      "count": 2
+    },
+    {
+      "index": 532,
+      "char": "襁",
+      "unicode_id": "U+8941",
+      "count": 2
+    },
+    {
+      "index": 533,
+      "char": "褓",
+      "unicode_id": "U+8913",
+      "count": 2
+    },
+    {
+      "index": 534,
+      "char": "諏",
+      "unicode_id": "U+8ACF",
+      "count": 2
+    },
+    {
+      "index": 535,
+      "char": "蹊",
+      "unicode_id": "U+8E4A",
+      "count": 2
+    },
+    {
+      "index": 536,
+      "char": "榾",
+      "unicode_id": "U+69BE",
+      "count": 2
+    },
+    {
+      "index": 537,
+      "char": "痘",
+      "unicode_id": "U+75D8",
+      "count": 2
+    },
+    {
+      "index": 538,
+      "char": "蚯",
+      "unicode_id": "U+86AF",
+      "count": 2
+    },
+    {
+      "index": 539,
+      "char": "蕀",
+      "unicode_id": "U+8540",
+      "count": 2
+    },
+    {
+      "index": 540,
+      "char": "籬",
+      "unicode_id": "U+7C6C",
+      "count": 2
+    },
+    {
+      "index": 541,
+      "char": "椅",
+      "unicode_id": "U+6905",
+      "count": 2
+    },
+    {
+      "index": 542,
+      "char": "褥",
+      "unicode_id": "U+8925",
+      "count": 2
+    },
+    {
+      "index": 543,
+      "char": "鱶",
+      "unicode_id": "U+9C76",
+      "count": 2
+    },
+    {
+      "index": 544,
+      "char": "吃",
+      "unicode_id": "U+5403",
+      "count": 2
+    },
+    {
+      "index": 545,
+      "char": "排",
+      "unicode_id": "U+6392",
+      "count": 2
+    },
+    {
+      "index": 546,
+      "char": "鰣",
+      "unicode_id": "U+9C23",
+      "count": 2
+    },
+    {
+      "index": 547,
+      "char": "撒",
+      "unicode_id": "U+6492",
+      "count": 2
+    },
+    {
+      "index": 548,
+      "char": "茘",
+      "unicode_id": "U+8318",
+      "count": 2
+    },
+    {
+      "index": 549,
+      "char": "夾",
+      "unicode_id": "U+593E",
+      "count": 2
+    },
+    {
+      "index": 550,
+      "char": "査",
+      "unicode_id": "U+67FB",
+      "count": 2
+    },
+    {
+      "index": 551,
+      "char": "簍",
+      "unicode_id": "U+7C0D",
+      "count": 2
+    },
+    {
+      "index": 552,
+      "char": "苅",
+      "unicode_id": "U+82C5",
+      "count": 2
+    },
+    {
+      "index": 553,
+      "char": "貶",
+      "unicode_id": "U+8CB6",
+      "count": 2
+    },
+    {
+      "index": 554,
+      "char": "隆",
+      "unicode_id": "U+F9DC",
+      "count": 2
+    },
+    {
+      "index": 555,
+      "char": "帥",
+      "unicode_id": "U+5E25",
+      "count": 2
+    },
+    {
+      "index": 556,
+      "char": "祚",
+      "unicode_id": "U+795A",
+      "count": 2
+    },
+    {
+      "index": 557,
+      "char": "簒",
+      "unicode_id": "U+7C12",
+      "count": 2
+    },
+    {
+      "index": 558,
+      "char": "謐",
+      "unicode_id": "U+8B10",
+      "count": 2
+    },
+    {
+      "index": 559,
+      "char": "幇",
+      "unicode_id": "U+5E47",
+      "count": 2
+    },
+    {
+      "index": 560,
+      "char": "牒",
+      "unicode_id": "U+7252",
+      "count": 2
+    },
+    {
+      "index": 561,
+      "char": "鹵",
+      "unicode_id": "U+9E75",
+      "count": 2
+    },
+    {
+      "index": 562,
+      "char": "ゴ",
+      "unicode_id": "U+30B4",
+      "count": 2
+    },
+    {
+      "index": 563,
+      "char": "粔",
+      "unicode_id": "U+7C94",
+      "count": 2
+    },
+    {
+      "index": 564,
+      "char": "醸",
+      "unicode_id": "U+91B8",
+      "count": 2
+    },
+    {
+      "index": 565,
+      "char": "朶",
+      "unicode_id": "U+6736",
+      "count": 2
+    },
+    {
+      "index": 566,
+      "char": "梺",
+      "unicode_id": "U+68BA",
+      "count": 2
+    },
+    {
+      "index": 567,
+      "char": "閼",
+      "unicode_id": "U+95BC",
+      "count": 2
+    },
+    {
+      "index": 568,
+      "char": "鬘",
+      "unicode_id": "U+9B18",
+      "count": 2
+    },
+    {
+      "index": 569,
+      "char": "刷",
+      "unicode_id": "U+5237",
+      "count": 2
+    },
+    {
+      "index": 570,
+      "char": "㘴",
+      "unicode_id": "U+3634",
+      "count": 2
+    },
+    {
+      "index": 571,
+      "char": "俘",
+      "unicode_id": "U+4FD8",
+      "count": 2
+    },
+    {
+      "index": 572,
+      "char": "溢",
+      "unicode_id": "U+6EA2",
+      "count": 2
+    },
+    {
+      "index": 573,
+      "char": "欽",
+      "unicode_id": "U+6B3D",
+      "count": 2
+    },
+    {
+      "index": 574,
+      "char": "痒",
+      "unicode_id": "U+75D2",
+      "count": 2
+    },
+    {
+      "index": 575,
+      "char": "蛭",
+      "unicode_id": "U+86ED",
+      "count": 2
+    },
+    {
+      "index": 576,
+      "char": "挊",
+      "unicode_id": "U+630A",
+      "count": 2
+    },
+    {
+      "index": 577,
+      "char": "癈",
+      "unicode_id": "U+7648",
+      "count": 2
+    },
+    {
+      "index": 578,
+      "char": "𤋎",
+      "unicode_id": "U+242CE",
+      "count": 2
+    },
+    {
+      "index": 579,
+      "char": "弦",
+      "unicode_id": "U+5F26",
+      "count": 2
+    },
+    {
+      "index": 580,
+      "char": "ポ",
+      "unicode_id": "U+30DD",
+      "count": 2
+    },
+    {
+      "index": 581,
+      "char": "髱",
+      "unicode_id": "U+9AF1",
+      "count": 2
+    },
+    {
+      "index": 582,
+      "char": "維",
+      "unicode_id": "U+7DAD",
+      "count": 2
+    },
+    {
+      "index": 583,
+      "char": "糒",
+      "unicode_id": "U+7CD2",
+      "count": 2
+    },
+    {
+      "index": 584,
+      "char": "喊",
+      "unicode_id": "U+558A",
+      "count": 2
+    },
+    {
+      "index": 585,
+      "char": "噫",
+      "unicode_id": "U+566B",
+      "count": 2
+    },
+    {
+      "index": 586,
+      "char": "嘻",
+      "unicode_id": "U+563B",
+      "count": 2
+    },
+    {
+      "index": 587,
+      "char": "監",
+      "unicode_id": "U+76E3",
+      "count": 2
+    },
+    {
+      "index": 588,
+      "char": "痕",
+      "unicode_id": "U+75D5",
+      "count": 2
+    },
+    {
+      "index": 589,
+      "char": "渟",
+      "unicode_id": "U+6E1F",
+      "count": 2
+    },
+    {
+      "index": 590,
+      "char": "浥",
+      "unicode_id": "U+6D65",
+      "count": 2
+    },
+    {
+      "index": 591,
+      "char": "闌",
+      "unicode_id": "U+95CC",
+      "count": 2
+    },
+    {
+      "index": 592,
+      "char": "佗",
+      "unicode_id": "U+4F57",
+      "count": 2
+    },
+    {
+      "index": 593,
+      "char": "瓊",
+      "unicode_id": "U+74CA",
+      "count": 2
+    },
+    {
+      "index": 594,
+      "char": "蒡",
+      "unicode_id": "U+84A1",
+      "count": 2
+    },
+    {
+      "index": 595,
+      "char": "筌",
+      "unicode_id": "U+7B4C",
+      "count": 2
+    },
+    {
+      "index": 596,
+      "char": "醭",
+      "unicode_id": "U+91AD",
+      "count": 2
+    },
+    {
+      "index": 597,
+      "char": "峙",
+      "unicode_id": "U+5CD9",
+      "count": 2
+    },
+    {
+      "index": 598,
+      "char": "泔",
+      "unicode_id": "U+6CD4",
+      "count": 2
+    },
+    {
+      "index": 599,
+      "char": "楂",
+      "unicode_id": "U+6942",
+      "count": 2
+    },
+    {
+      "index": 600,
+      "char": "鰈",
+      "unicode_id": "U+9C08",
+      "count": 2
+    },
+    {
+      "index": 601,
+      "char": "蒟",
+      "unicode_id": "U+849F",
+      "count": 2
+    },
+    {
+      "index": 602,
+      "char": "蒻",
+      "unicode_id": "U+84BB",
+      "count": 2
+    },
+    {
+      "index": 603,
+      "char": "佩",
+      "unicode_id": "U+4F69",
+      "count": 2
+    },
+    {
+      "index": 604,
+      "char": "俸",
+      "unicode_id": "U+4FF8",
+      "count": 2
+    },
+    {
+      "index": 605,
+      "char": "援",
+      "unicode_id": "U+63F4",
+      "count": 2
+    },
+    {
+      "index": 606,
+      "char": "躁",
+      "unicode_id": "U+8E81",
+      "count": 2
+    },
+    {
+      "index": 607,
+      "char": "羈",
+      "unicode_id": "U+7F88",
+      "count": 2
+    },
+    {
+      "index": 608,
+      "char": "鼇",
+      "unicode_id": "U+9F07",
+      "count": 2
+    },
+    {
+      "index": 609,
+      "char": "麟",
+      "unicode_id": "U+9E9F",
+      "count": 2
+    },
+    {
+      "index": 610,
+      "char": "茱",
+      "unicode_id": "U+8331",
+      "count": 2
+    },
+    {
+      "index": 611,
+      "char": "萸",
+      "unicode_id": "U+8438",
+      "count": 2
+    },
+    {
+      "index": 612,
+      "char": "矛",
+      "unicode_id": "U+77DB",
+      "count": 2
+    },
+    {
+      "index": 613,
+      "char": "瘟",
+      "unicode_id": "U+761F",
+      "count": 2
+    },
+    {
+      "index": 614,
+      "char": "玲",
+      "unicode_id": "U+73B2",
+      "count": 2
+    },
+    {
+      "index": 615,
+      "char": "瓏",
+      "unicode_id": "U+74CF",
+      "count": 2
+    },
+    {
+      "index": 616,
+      "char": "僵",
+      "unicode_id": "U+50F5",
+      "count": 2
+    },
+    {
+      "index": 617,
+      "char": "闍",
+      "unicode_id": "U+95CD",
+      "count": 2
+    },
+    {
+      "index": 618,
+      "char": "崑",
+      "unicode_id": "U+5D11",
+      "count": 2
+    },
+    {
+      "index": 619,
+      "char": "璧",
+      "unicode_id": "U+74A7",
+      "count": 2
+    },
+    {
+      "index": 620,
+      "char": "畔",
+      "unicode_id": "U+7554",
+      "count": 2
+    },
+    {
+      "index": 621,
+      "char": "胯",
+      "unicode_id": "U+80EF",
+      "count": 2
+    },
+    {
+      "index": 622,
+      "char": "咨",
+      "unicode_id": "U+54A8",
+      "count": 2
+    },
+    {
+      "index": 623,
+      "char": "曠",
+      "unicode_id": "U+66E0",
+      "count": 2
+    },
+    {
+      "index": 624,
+      "char": "剪",
+      "unicode_id": "U+526A",
+      "count": 2
+    },
+    {
+      "index": 625,
+      "char": "滸",
+      "unicode_id": "U+6EF8",
+      "count": 2
+    },
+    {
+      "index": 626,
+      "char": "臉",
+      "unicode_id": "U+81C9",
+      "count": 2
+    },
+    {
+      "index": 627,
+      "char": "啗",
+      "unicode_id": "U+5557",
+      "count": 2
+    },
+    {
+      "index": 628,
+      "char": "繞",
+      "unicode_id": "U+7E5E",
+      "count": 2
+    },
+    {
+      "index": 629,
+      "char": "鈷",
+      "unicode_id": "U+9237",
+      "count": 2
+    },
+    {
+      "index": 630,
+      "char": "顰",
+      "unicode_id": "U+9870",
+      "count": 2
+    },
+    {
+      "index": 631,
+      "char": "嫗",
+      "unicode_id": "U+5AD7",
+      "count": 2
+    },
+    {
+      "index": 632,
+      "char": "潸",
+      "unicode_id": "U+6F78",
+      "count": 2
+    },
+    {
+      "index": 633,
+      "char": "蹤",
+      "unicode_id": "U+8E64",
+      "count": 2
+    },
+    {
+      "index": 634,
+      "char": "裔",
+      "unicode_id": "U+88D4",
+      "count": 2
+    },
+    {
+      "index": 635,
+      "char": "篆",
+      "unicode_id": "U+7BC6",
+      "count": 2
+    },
+    {
+      "index": 636,
+      "char": "愈",
+      "unicode_id": "U+6108",
+      "count": 2
+    },
+    {
+      "index": 637,
+      "char": "臆",
+      "unicode_id": "U+81C6",
+      "count": 2
+    },
+    {
+      "index": 638,
+      "char": "衢",
+      "unicode_id": "U+8862",
+      "count": 2
+    },
+    {
+      "index": 639,
+      "char": "魄",
+      "unicode_id": "U+9B44",
+      "count": 2
+    },
+    {
+      "index": 640,
+      "char": "屯",
+      "unicode_id": "U+5C6F",
+      "count": 2
+    },
+    {
+      "index": 641,
+      "char": "丙",
+      "unicode_id": "U+4E19",
+      "count": 2
+    },
+    {
+      "index": 642,
+      "char": "叛",
+      "unicode_id": "U+53DB",
+      "count": 2
+    },
+    {
+      "index": 643,
+      "char": "蝗",
+      "unicode_id": "U+8757",
+      "count": 2
+    },
+    {
+      "index": 644,
+      "char": "柩",
+      "unicode_id": "U+67E9",
+      "count": 2
+    },
+    {
+      "index": 645,
+      "char": "憩",
+      "unicode_id": "U+61A9",
+      "count": 2
+    },
+    {
+      "index": 646,
+      "char": "酖",
+      "unicode_id": "U+9156",
+      "count": 2
+    },
+    {
+      "index": 647,
+      "char": "豺",
+      "unicode_id": "U+8C7A",
+      "count": 2
+    },
+    {
+      "index": 648,
+      "char": "范",
+      "unicode_id": "U+8303",
+      "count": 2
+    },
+    {
+      "index": 649,
+      "char": "蠡",
+      "unicode_id": "U+8821",
+      "count": 2
+    },
+    {
+      "index": 650,
+      "char": "魑",
+      "unicode_id": "U+9B51",
+      "count": 2
+    },
+    {
+      "index": 651,
+      "char": "涿",
+      "unicode_id": "U+6DBF",
+      "count": 2
+    },
+    {
+      "index": 652,
+      "char": "梼",
+      "unicode_id": "U+68BC",
+      "count": 2
+    },
+    {
+      "index": 653,
+      "char": "楯",
+      "unicode_id": "U+696F",
+      "count": 2
+    },
+    {
+      "index": 654,
+      "char": "歇",
+      "unicode_id": "U+6B47",
+      "count": 2
+    },
+    {
+      "index": 655,
+      "char": "惆",
+      "unicode_id": "U+60C6",
+      "count": 2
+    },
+    {
+      "index": 656,
+      "char": "梳",
+      "unicode_id": "U+68B3",
+      "count": 2
+    },
+    {
+      "index": 657,
+      "char": "鷦",
+      "unicode_id": "U+9DE6",
+      "count": 2
+    },
+    {
+      "index": 658,
+      "char": "鷯",
+      "unicode_id": "U+9DEF",
+      "count": 2
+    },
+    {
+      "index": 659,
+      "char": "弑",
+      "unicode_id": "U+5F11",
+      "count": 2
+    },
+    {
+      "index": 660,
+      "char": "紂",
+      "unicode_id": "U+7D02",
+      "count": 2
+    },
+    {
+      "index": 661,
+      "char": "絮",
+      "unicode_id": "U+7D6E",
+      "count": 2
+    },
+    {
+      "index": 662,
+      "char": "紡",
+      "unicode_id": "U+7D21",
+      "count": 2
+    },
+    {
+      "index": 663,
+      "char": "坑",
+      "unicode_id": "U+5751",
+      "count": 2
+    },
+    {
+      "index": 664,
+      "char": "阜",
+      "unicode_id": "U+961C",
+      "count": 2
+    },
+    {
+      "index": 665,
+      "char": "阪",
+      "unicode_id": "U+962A",
+      "count": 2
+    },
+    {
+      "index": 666,
+      "char": "練",
+      "unicode_id": "U+F996",
+      "count": 2
+    },
+    {
+      "index": 667,
+      "char": "谺",
+      "unicode_id": "U+8C3A",
+      "count": 2
+    },
+    {
+      "index": 668,
+      "char": "煆",
+      "unicode_id": "U+7146",
+      "count": 2
+    },
+    {
+      "index": 669,
+      "char": "桿",
+      "unicode_id": "U+687F",
+      "count": 2
+    },
+    {
+      "index": 670,
+      "char": "僂",
+      "unicode_id": "U+50C2",
+      "count": 2
+    },
+    {
+      "index": 671,
+      "char": "鏃",
+      "unicode_id": "U+93C3",
+      "count": 2
+    },
+    {
+      "index": 672,
+      "char": "晃",
+      "unicode_id": "U+6643",
+      "count": 2
+    },
+    {
+      "index": 673,
+      "char": "瞳",
+      "unicode_id": "U+77B3",
+      "count": 2
+    },
+    {
+      "index": 674,
+      "char": "釵",
+      "unicode_id": "U+91F5",
+      "count": 2
+    },
+    {
+      "index": 675,
+      "char": "蝴",
+      "unicode_id": "U+8774",
+      "count": 2
+    },
+    {
+      "index": 676,
+      "char": "愿",
+      "unicode_id": "U+613F",
+      "count": 2
+    },
+    {
+      "index": 677,
+      "char": "彎",
+      "unicode_id": "U+5F4E",
+      "count": 2
+    },
+    {
+      "index": 678,
+      "char": "戚",
+      "unicode_id": "U+621A",
+      "count": 2
+    },
+    {
+      "index": 679,
+      "char": "愀",
+      "unicode_id": "U+6100",
+      "count": 2
+    },
+    {
+      "index": 680,
+      "char": "遑",
+      "unicode_id": "U+9051",
+      "count": 2
+    },
+    {
+      "index": 681,
+      "char": "爽",
+      "unicode_id": "U+723D",
+      "count": 2
+    },
+    {
+      "index": 682,
+      "char": "徜",
+      "unicode_id": "U+5F9C",
+      "count": 2
+    },
+    {
+      "index": 683,
+      "char": "徉",
+      "unicode_id": "U+5F89",
+      "count": 2
+    },
+    {
+      "index": 684,
+      "char": "勦",
+      "unicode_id": "U+52E6",
+      "count": 2
+    },
+    {
+      "index": 685,
+      "char": "堰",
+      "unicode_id": "U+5830",
+      "count": 2
+    },
+    {
+      "index": 686,
+      "char": "萄",
+      "unicode_id": "U+8404",
+      "count": 2
+    },
+    {
+      "index": 687,
+      "char": "阻",
+      "unicode_id": "U+963B",
+      "count": 2
+    },
+    {
+      "index": 688,
+      "char": "驍",
+      "unicode_id": "U+9A4D",
+      "count": 2
+    },
+    {
+      "index": 689,
+      "char": "税",
+      "unicode_id": "U+7A0E",
+      "count": 2
+    },
+    {
+      "index": 690,
+      "char": "筮",
+      "unicode_id": "U+7B6E",
+      "count": 2
+    },
+    {
+      "index": 691,
+      "char": "潟",
+      "unicode_id": "U+6F5F",
+      "count": 2
+    },
+    {
+      "index": 692,
+      "char": "臓",
+      "unicode_id": "U+81D3",
+      "count": 2
+    },
+    {
+      "index": 693,
+      "char": "襲",
+      "unicode_id": "U+8972",
+      "count": 2
+    },
+    {
+      "index": 694,
+      "char": "襷",
+      "unicode_id": "U+8977",
+      "count": 2
+    },
+    {
+      "index": 695,
+      "char": "銜",
+      "unicode_id": "U+929C",
+      "count": 2
+    },
+    {
+      "index": 696,
+      "char": "拉",
+      "unicode_id": "U+62C9",
+      "count": 2
+    },
+    {
+      "index": 697,
+      "char": "廈",
+      "unicode_id": "U+5EC8",
+      "count": 2
+    },
+    {
+      "index": 698,
+      "char": "拄",
+      "unicode_id": "U+62C4",
+      "count": 2
+    },
+    {
+      "index": 699,
+      "char": "瞼",
+      "unicode_id": "U+77BC",
+      "count": 2
+    },
+    {
+      "index": 700,
+      "char": "偕",
+      "unicode_id": "U+5055",
+      "count": 2
+    },
+    {
+      "index": 701,
+      "char": "宏",
+      "unicode_id": "U+5B8F",
+      "count": 2
+    },
+    {
+      "index": 702,
+      "char": "閧",
+      "unicode_id": "U+95A7",
+      "count": 2
+    },
+    {
+      "index": 703,
+      "char": "悵",
+      "unicode_id": "U+60B5",
+      "count": 2
+    },
+    {
+      "index": 704,
+      "char": "冉",
+      "unicode_id": "U+5189",
+      "count": 2
+    },
+    {
+      "index": 705,
+      "char": "豪",
+      "unicode_id": "U+8C6A",
+      "count": 2
+    },
+    {
+      "index": 706,
+      "char": "傑",
+      "unicode_id": "U+5091",
+      "count": 2
+    },
+    {
+      "index": 707,
+      "char": "㠶",
+      "unicode_id": "U+3836",
+      "count": 2
+    },
+    {
+      "index": 708,
+      "char": "岌",
+      "unicode_id": "U+5C8C",
+      "count": 2
+    },
+    {
+      "index": 709,
+      "char": "錯",
+      "unicode_id": "U+932F",
+      "count": 2
+    },
+    {
+      "index": 710,
+      "char": "黯",
+      "unicode_id": "U+9EEF",
+      "count": 2
+    },
+    {
+      "index": 711,
+      "char": "鳧",
+      "unicode_id": "U+9CE7",
+      "count": 2
+    },
+    {
+      "index": 712,
+      "char": "曼",
+      "unicode_id": "U+66FC",
+      "count": 2
+    },
+    {
+      "index": 713,
+      "char": "闊",
+      "unicode_id": "U+95CA",
+      "count": 2
+    },
+    {
+      "index": 714,
+      "char": "凰",
+      "unicode_id": "U+51F0",
+      "count": 2
+    },
+    {
+      "index": 715,
+      "char": "襠",
+      "unicode_id": "U+8960",
+      "count": 2
+    },
+    {
+      "index": 716,
+      "char": "均",
+      "unicode_id": "U+5747",
+      "count": 2
+    },
+    {
+      "index": 717,
+      "char": "晞",
+      "unicode_id": "U+665E",
+      "count": 2
+    },
+    {
+      "index": 718,
+      "char": "乍",
+      "unicode_id": "U+4E4D",
+      "count": 2
+    },
+    {
+      "index": 719,
+      "char": "鎰",
+      "unicode_id": "U+93B0",
+      "count": 2
+    },
+    {
+      "index": 720,
+      "char": "繍",
+      "unicode_id": "U+7E4D",
+      "count": 2
+    },
+    {
+      "index": 721,
+      "char": "奠",
+      "unicode_id": "U+5960",
+      "count": 2
+    },
+    {
+      "index": 722,
+      "char": "焙",
+      "unicode_id": "U+7119",
+      "count": 2
+    },
+    {
+      "index": 723,
+      "char": "鏤",
+      "unicode_id": "U+93E4",
+      "count": 2
+    },
+    {
+      "index": 724,
+      "char": "精",
+      "unicode_id": "U+FA1D",
+      "count": 2
+    },
+    {
+      "index": 725,
+      "char": "勉",
+      "unicode_id": "U+52C9",
+      "count": 2
+    },
+    {
+      "index": 726,
+      "char": "靖",
+      "unicode_id": "U+9756",
+      "count": 2
+    },
+    {
+      "index": 727,
+      "char": "訝",
+      "unicode_id": "U+8A1D",
+      "count": 2
+    },
+    {
+      "index": 728,
+      "char": "淹",
+      "unicode_id": "U+6DF9",
+      "count": 2
+    },
+    {
+      "index": 729,
+      "char": "澳",
+      "unicode_id": "U+6FB3",
+      "count": 2
+    },
+    {
+      "index": 730,
+      "char": "毆",
+      "unicode_id": "U+6BC6",
+      "count": 2
+    },
+    {
+      "index": 731,
+      "char": "饉",
+      "unicode_id": "U+9949",
+      "count": 2
+    },
+    {
+      "index": 732,
+      "char": "劉",
+      "unicode_id": "U+5289",
+      "count": 2
+    },
+    {
+      "index": 733,
+      "char": "炳",
+      "unicode_id": "U+70B3",
+      "count": 2
+    },
+    {
+      "index": 734,
+      "char": "宋",
+      "unicode_id": "U+5B8B",
+      "count": 2
+    },
+    {
+      "index": 735,
+      "char": "拊",
+      "unicode_id": "U+62CA",
+      "count": 2
+    },
+    {
+      "index": 736,
+      "char": "絅",
+      "unicode_id": "U+7D45",
+      "count": 2
+    },
+    {
+      "index": 737,
+      "char": "憶",
+      "unicode_id": "U+61B6",
+      "count": 2
+    },
+    {
+      "index": 738,
+      "char": "犠",
+      "unicode_id": "U+72A0",
+      "count": 2
+    },
+    {
+      "index": 739,
+      "char": "駟",
+      "unicode_id": "U+99DF",
+      "count": 2
+    },
+    {
+      "index": 740,
+      "char": "緇",
+      "unicode_id": "U+7DC7",
+      "count": 2
+    },
+    {
+      "index": 741,
+      "char": "笆",
+      "unicode_id": "U+7B06",
+      "count": 2
+    },
+    {
+      "index": 742,
+      "char": "誨",
+      "unicode_id": "U+8AA8",
+      "count": 2
+    },
+    {
+      "index": 743,
+      "char": "蕢",
+      "unicode_id": "U+8562",
+      "count": 2
+    },
+    {
+      "index": 744,
+      "char": "苣",
+      "unicode_id": "U+82E3",
+      "count": 2
+    },
+    {
+      "index": 745,
+      "char": "鯒",
+      "unicode_id": "U+9BD2",
+      "count": 2
+    },
+    {
+      "index": 746,
+      "char": "鰩",
+      "unicode_id": "U+9C29",
+      "count": 2
+    },
+    {
+      "index": 747,
+      "char": "芍",
+      "unicode_id": "U+828D",
+      "count": 2
+    },
+    {
+      "index": 748,
+      "char": "鱏",
+      "unicode_id": "U+9C4F",
+      "count": 2
+    },
+    {
+      "index": 749,
+      "char": "磐",
+      "unicode_id": "U+78D0",
+      "count": 2
+    },
+    {
+      "index": 750,
+      "char": "鶆",
+      "unicode_id": "U+9D86",
+      "count": 2
+    },
+    {
+      "index": 751,
+      "char": "鮪",
+      "unicode_id": "U+9BAA",
+      "count": 2
+    },
+    {
+      "index": 752,
+      "char": "鼫",
+      "unicode_id": "U+9F2B",
+      "count": 2
+    },
+    {
+      "index": 753,
+      "char": "髯",
+      "unicode_id": "U+9AEF",
+      "count": 2
+    },
+    {
+      "index": 754,
+      "char": "爹",
+      "unicode_id": "U+7239",
+      "count": 2
+    },
+    {
+      "index": 755,
+      "char": "縑",
+      "unicode_id": "U+7E11",
+      "count": 2
+    },
+    {
+      "index": 756,
+      "char": "菫",
+      "unicode_id": "U+83EB",
+      "count": 2
+    },
+    {
+      "index": 757,
+      "char": "傀",
+      "unicode_id": "U+5080",
+      "count": 2
+    },
+    {
+      "index": 758,
+      "char": "儡",
+      "unicode_id": "U+5121",
+      "count": 2
+    },
+    {
+      "index": 759,
+      "char": "贅",
+      "unicode_id": "U+8D05",
+      "count": 2
+    },
+    {
+      "index": 760,
+      "char": "𤾣",
+      "unicode_id": "U+24FA3",
+      "count": 2
+    },
+    {
+      "index": 761,
+      "char": "ブ",
+      "unicode_id": "U+30D6",
+      "count": 2
+    },
+    {
+      "index": 762,
+      "char": "鎚",
+      "unicode_id": "U+939A",
+      "count": 2
+    },
+    {
+      "index": 763,
+      "char": "杠",
+      "unicode_id": "U+6760",
+      "count": 2
+    },
+    {
+      "index": 764,
+      "char": "鱪",
+      "unicode_id": "U+9C6A",
+      "count": 2
+    },
+    {
+      "index": 765,
+      "char": "泳",
+      "unicode_id": "U+6CF3",
+      "count": 2
+    },
+    {
+      "index": 766,
+      "char": "蟋",
+      "unicode_id": "U+87CB",
+      "count": 2
+    },
+    {
+      "index": 767,
+      "char": "侲",
+      "unicode_id": "U+4FB2",
+      "count": 2
+    },
+    {
+      "index": 768,
+      "char": "菔",
+      "unicode_id": "U+83D4",
+      "count": 2
+    },
+    {
+      "index": 769,
+      "char": "盒",
+      "unicode_id": "U+76D2",
+      "count": 2
+    },
+    {
+      "index": 770,
+      "char": "迂",
+      "unicode_id": "U+8FC2",
+      "count": 2
+    },
+    {
+      "index": 771,
+      "char": "拗",
+      "unicode_id": "U+62D7",
+      "count": 2
+    },
+    {
+      "index": 772,
+      "char": "頷",
+      "unicode_id": "U+9837",
+      "count": 2
+    },
+    {
+      "index": 773,
+      "char": "跌",
+      "unicode_id": "U+8DCC",
+      "count": 2
+    },
+    {
+      "index": 774,
+      "char": "郁",
+      "unicode_id": "U+90C1",
+      "count": 2
+    },
+    {
+      "index": 775,
+      "char": "蠜",
+      "unicode_id": "U+881C",
+      "count": 2
+    },
+    {
+      "index": 776,
+      "char": "腨",
+      "unicode_id": "U+8168",
+      "count": 2
+    },
+    {
+      "index": 777,
+      "char": "袁",
+      "unicode_id": "U+8881",
+      "count": 2
+    },
+    {
+      "index": 778,
+      "char": "剋",
+      "unicode_id": "U+524B",
+      "count": 2
+    },
+    {
+      "index": 779,
+      "char": "猨",
+      "unicode_id": "U+7328",
+      "count": 2
+    },
+    {
+      "index": 780,
+      "char": "駝",
+      "unicode_id": "U+99DD",
+      "count": 2
+    },
+    {
+      "index": 781,
+      "char": "橡",
+      "unicode_id": "U+6A61",
+      "count": 2
+    },
+    {
+      "index": 782,
+      "char": "鰒",
+      "unicode_id": "U+9C12",
+      "count": 2
+    },
+    {
+      "index": 783,
+      "char": "鵐",
+      "unicode_id": "U+9D50",
+      "count": 2
+    },
+    {
+      "index": 784,
+      "char": "睾",
+      "unicode_id": "U+777E",
+      "count": 2
+    },
+    {
+      "index": 785,
+      "char": "轍",
+      "unicode_id": "U+8F4D",
+      "count": 2
+    },
+    {
+      "index": 786,
+      "char": "巷",
+      "unicode_id": "U+5DF7",
+      "count": 2
+    },
+    {
+      "index": 787,
+      "char": "鈔",
+      "unicode_id": "U+9214",
+      "count": 2
+    },
+    {
+      "index": 788,
+      "char": "酴",
+      "unicode_id": "U+9174",
+      "count": 2
+    },
+    {
+      "index": 789,
+      "char": "醪",
+      "unicode_id": "U+91AA",
+      "count": 2
+    },
+    {
+      "index": 790,
+      "char": "菘",
+      "unicode_id": "U+83D8",
+      "count": 2
+    },
+    {
+      "index": 791,
+      "char": "㡣",
+      "unicode_id": "U+3863",
+      "count": 2
+    },
+    {
+      "index": 792,
+      "char": "羞",
+      "unicode_id": "U+7F9E",
+      "count": 2
+    },
+    {
+      "index": 793,
+      "char": "樒",
+      "unicode_id": "U+6A12",
+      "count": 2
+    },
+    {
+      "index": 794,
+      "char": "杼",
+      "unicode_id": "U+677C",
+      "count": 2
+    },
+    {
+      "index": 795,
+      "char": "鏊",
+      "unicode_id": "U+93CA",
+      "count": 2
+    },
+    {
+      "index": 796,
+      "char": "蔞",
+      "unicode_id": "U+851E",
+      "count": 2
+    },
+    {
+      "index": 797,
+      "char": "匜",
+      "unicode_id": "U+531C",
+      "count": 2
+    },
+    {
+      "index": 798,
+      "char": "褁",
+      "unicode_id": "U+8901",
+      "count": 2
+    },
+    {
+      "index": 799,
+      "char": "噀",
+      "unicode_id": "U+5640",
+      "count": 2
+    },
+    {
+      "index": 800,
+      "char": "蝙",
+      "unicode_id": "U+8759",
+      "count": 2
+    },
+    {
+      "index": 801,
+      "char": "蜴",
+      "unicode_id": "U+8734",
+      "count": 2
+    },
+    {
+      "index": 802,
+      "char": "映",
+      "unicode_id": "U+6620",
+      "count": 2
+    },
+    {
+      "index": 803,
+      "char": "荇",
+      "unicode_id": "U+8347",
+      "count": 2
+    },
+    {
+      "index": 804,
+      "char": "鴞",
+      "unicode_id": "U+9D1E",
+      "count": 2
+    },
+    {
+      "index": 805,
+      "char": "秣",
+      "unicode_id": "U+79E3",
+      "count": 2
+    },
+    {
+      "index": 806,
+      "char": "臚",
+      "unicode_id": "U+81DA",
+      "count": 2
+    },
+    {
+      "index": 807,
+      "char": "刎",
+      "unicode_id": "U+520E",
+      "count": 2
+    },
+    {
+      "index": 808,
+      "char": "藩",
+      "unicode_id": "U+85E9",
+      "count": 2
+    },
+    {
+      "index": 809,
+      "char": "阝",
+      "unicode_id": "U+961D",
+      "count": 2
+    },
+    {
+      "index": 810,
+      "char": "俚",
+      "unicode_id": "U+4FDA",
+      "count": 2
+    },
+    {
+      "index": 811,
+      "char": "嬖",
+      "unicode_id": "U+5B16",
+      "count": 2
+    },
+    {
+      "index": 812,
+      "char": "麒",
+      "unicode_id": "U+9E92",
+      "count": 2
+    },
+    {
+      "index": 813,
+      "char": "悍",
+      "unicode_id": "U+608D",
+      "count": 2
+    },
+    {
+      "index": 814,
+      "char": "躱",
+      "unicode_id": "U+8EB1",
+      "count": 2
+    },
+    {
+      "index": 815,
+      "char": "仆",
+      "unicode_id": "U+4EC6",
+      "count": 2
+    },
+    {
+      "index": 816,
+      "char": "愉",
+      "unicode_id": "U+6109",
+      "count": 2
+    },
+    {
+      "index": 817,
+      "char": "㣲",
+      "unicode_id": "U+38F2",
+      "count": 2
+    },
+    {
+      "index": 818,
+      "char": "鴿",
+      "unicode_id": "U+9D3F",
+      "count": 2
+    },
+    {
+      "index": 819,
+      "char": "囚",
+      "unicode_id": "U+56DA",
+      "count": 2
+    },
+    {
+      "index": 820,
+      "char": "狻",
+      "unicode_id": "U+72FB",
+      "count": 2
+    },
+    {
+      "index": 821,
+      "char": "區",
+      "unicode_id": "U+5340",
+      "count": 2
+    },
+    {
+      "index": 822,
+      "char": "遶",
+      "unicode_id": "U+9076",
+      "count": 2
+    },
+    {
+      "index": 823,
+      "char": "辤",
+      "unicode_id": "U+8FA4",
+      "count": 2
+    },
+    {
+      "index": 824,
+      "char": "伱",
+      "unicode_id": "U+4F31",
+      "count": 2
+    },
+    {
+      "index": 825,
+      "char": "冑",
+      "unicode_id": "U+5191",
+      "count": 2
+    },
+    {
+      "index": 826,
+      "char": "髫",
+      "unicode_id": "U+9AEB",
+      "count": 2
+    },
+    {
+      "index": 827,
+      "char": "1",
+      "unicode_id": "U+0031",
+      "count": 2
+    },
+    {
+      "index": 828,
+      "char": "蠕",
+      "unicode_id": "U+8815",
+      "count": 2
+    },
+    {
+      "index": 829,
+      "char": "苺",
+      "unicode_id": "U+82FA",
+      "count": 2
+    },
+    {
+      "index": 830,
+      "char": "馭",
+      "unicode_id": "U+99AD",
+      "count": 2
+    },
+    {
+      "index": 831,
+      "char": "捌",
+      "unicode_id": "U+634C",
+      "count": 2
+    },
+    {
+      "index": 832,
+      "char": "溙",
+      "unicode_id": "U+6E99",
+      "count": 2
+    },
+    {
+      "index": 833,
+      "char": "襴",
+      "unicode_id": "U+8974",
+      "count": 2
+    },
+    {
+      "index": 834,
+      "char": "找",
+      "unicode_id": "U+627E",
+      "count": 2
+    },
+    {
+      "index": 835,
+      "char": "謬",
+      "unicode_id": "U+8B2C",
+      "count": 2
+    },
+    {
+      "index": 836,
+      "char": "琵",
+      "unicode_id": "U+7435",
+      "count": 1
+    },
+    {
+      "index": 837,
+      "char": "琶",
+      "unicode_id": "U+7436",
+      "count": 1
+    },
+    {
+      "index": 838,
+      "char": "糶",
+      "unicode_id": "U+7CF6",
+      "count": 1
+    },
+    {
+      "index": 839,
+      "char": "嬶",
+      "unicode_id": "U+5B36",
+      "count": 1
+    },
+    {
+      "index": 840,
+      "char": "嬲",
+      "unicode_id": "U+5B32",
+      "count": 1
+    },
+    {
+      "index": 841,
+      "char": "詛",
+      "unicode_id": "U+8A5B",
+      "count": 1
+    },
+    {
+      "index": 842,
+      "char": "聢",
+      "unicode_id": "U+8062",
+      "count": 1
+    },
+    {
+      "index": 843,
+      "char": "協",
+      "unicode_id": "U+5354",
+      "count": 1
+    },
+    {
+      "index": 844,
+      "char": "徘",
+      "unicode_id": "U+5F98",
+      "count": 1
+    },
+    {
+      "index": 845,
+      "char": "徊",
+      "unicode_id": "U+5F8A",
+      "count": 1
+    },
+    {
+      "index": 846,
+      "char": "遭",
+      "unicode_id": "U+906D",
+      "count": 1
+    },
+    {
+      "index": 847,
+      "char": "辜",
+      "unicode_id": "U+8F9C",
+      "count": 1
+    },
+    {
+      "index": 848,
+      "char": "痞",
+      "unicode_id": "U+75DE",
+      "count": 1
+    },
+    {
+      "index": 849,
+      "char": "睚",
+      "unicode_id": "U+775A",
+      "count": 1
+    },
+    {
+      "index": 850,
+      "char": "訥",
+      "unicode_id": "U+8A25",
+      "count": 1
+    },
+    {
+      "index": 851,
+      "char": "睜",
+      "unicode_id": "U+775C",
+      "count": 1
+    },
+    {
+      "index": 852,
+      "char": "ー",
+      "unicode_id": "U+30FC",
+      "count": 1
+    },
+    {
+      "index": 853,
+      "char": "鐐",
+      "unicode_id": "U+9410",
+      "count": 1
+    },
+    {
+      "index": 854,
+      "char": "窈",
+      "unicode_id": "U+7A88",
+      "count": 1
+    },
+    {
+      "index": 855,
+      "char": "窕",
+      "unicode_id": "U+7A95",
+      "count": 1
+    },
+    {
+      "index": 856,
+      "char": "踆",
+      "unicode_id": "U+8E06",
+      "count": 1
+    },
+    {
+      "index": 857,
+      "char": "榪",
+      "unicode_id": "U+69AA",
+      "count": 1
+    },
+    {
+      "index": 858,
+      "char": "臑",
+      "unicode_id": "U+81D1",
+      "count": 1
+    },
+    {
+      "index": 859,
+      "char": "喘",
+      "unicode_id": "U+5598",
+      "count": 1
+    },
+    {
+      "index": 860,
+      "char": "眸",
+      "unicode_id": "U+7738",
+      "count": 1
+    },
+    {
+      "index": 861,
+      "char": "赧",
+      "unicode_id": "U+8D67",
+      "count": 1
+    },
+    {
+      "index": 862,
+      "char": "霤",
+      "unicode_id": "U+9724",
+      "count": 1
+    },
+    {
+      "index": 863,
+      "char": "笥",
+      "unicode_id": "U+7B25",
+      "count": 1
+    },
+    {
+      "index": 864,
+      "char": "杙",
+      "unicode_id": "U+6759",
+      "count": 1
+    },
+    {
+      "index": 865,
+      "char": "弗",
+      "unicode_id": "U+5F17",
+      "count": 1
+    },
+    {
+      "index": 866,
+      "char": "オ",
+      "unicode_id": "U+30AA",
+      "count": 1
+    },
+    {
+      "index": 867,
+      "char": "㖧",
+      "unicode_id": "U+35A7",
+      "count": 1
+    },
+    {
+      "index": 868,
+      "char": "慝",
+      "unicode_id": "U+615D",
+      "count": 1
+    },
+    {
+      "index": 869,
+      "char": "吶",
+      "unicode_id": "U+5436",
+      "count": 1
+    },
+    {
+      "index": 870,
+      "char": "颭",
+      "unicode_id": "U+98AD",
+      "count": 1
+    },
+    {
+      "index": 871,
+      "char": "錆",
+      "unicode_id": "U+9306",
+      "count": 1
+    },
+    {
+      "index": 872,
+      "char": "粂",
+      "unicode_id": "U+7C82",
+      "count": 1
+    },
+    {
+      "index": 873,
+      "char": "棍",
+      "unicode_id": "U+68CD",
+      "count": 1
+    },
+    {
+      "index": 874,
+      "char": "喞",
+      "unicode_id": "U+559E",
+      "count": 1
+    },
+    {
+      "index": 875,
+      "char": "瘧",
+      "unicode_id": "U+7627",
+      "count": 1
+    },
+    {
+      "index": 876,
+      "char": "狄",
+      "unicode_id": "U+72C4",
+      "count": 1
+    },
+    {
+      "index": 877,
+      "char": "鍮",
+      "unicode_id": "U+936E",
+      "count": 1
+    },
+    {
+      "index": 878,
+      "char": "隘",
+      "unicode_id": "U+9698",
+      "count": 1
+    },
+    {
+      "index": 879,
+      "char": "喋",
+      "unicode_id": "U+558B",
+      "count": 1
+    },
+    {
+      "index": 880,
+      "char": "矚",
+      "unicode_id": "U+77DA",
+      "count": 1
+    },
+    {
+      "index": 881,
+      "char": "痿",
+      "unicode_id": "U+75FF",
+      "count": 1
+    },
+    {
+      "index": 882,
+      "char": "佇",
+      "unicode_id": "U+4F47",
+      "count": 1
+    },
+    {
+      "index": 883,
+      "char": "戶",
+      "unicode_id": "U+6236",
+      "count": 1
+    },
+    {
+      "index": 884,
+      "char": "賺",
+      "unicode_id": "U+8CFA",
+      "count": 1
+    },
+    {
+      "index": 885,
+      "char": "埵",
+      "unicode_id": "U+57F5",
+      "count": 1
+    },
+    {
+      "index": 886,
+      "char": "砌",
+      "unicode_id": "U+780C",
+      "count": 1
+    },
+    {
+      "index": 887,
+      "char": "羙",
+      "unicode_id": "U+7F99",
+      "count": 1
+    },
+    {
+      "index": 888,
+      "char": "ィ",
+      "unicode_id": "U+30A3",
+      "count": 1
+    },
+    {
+      "index": 889,
+      "char": "艮",
+      "unicode_id": "U+826E",
+      "count": 1
+    },
+    {
+      "index": 890,
+      "char": "䂓",
+      "unicode_id": "U+4093",
+      "count": 1
+    },
+    {
+      "index": 891,
+      "char": "矩",
+      "unicode_id": "U+77E9",
+      "count": 1
+    },
+    {
+      "index": 892,
+      "char": "搏",
+      "unicode_id": "U+640F",
+      "count": 1
+    },
+    {
+      "index": 893,
+      "char": "爬",
+      "unicode_id": "U+722C",
+      "count": 1
+    },
+    {
+      "index": 894,
+      "char": "陌",
+      "unicode_id": "U+964C",
+      "count": 1
+    },
+    {
+      "index": 895,
+      "char": "海",
+      "unicode_id": "U+FA45",
+      "count": 1
+    },
+    {
+      "index": 896,
+      "char": "痢",
+      "unicode_id": "U+75E2",
+      "count": 1
+    },
+    {
+      "index": 897,
+      "char": "蘘",
+      "unicode_id": "U+8618",
+      "count": 1
+    },
+    {
+      "index": 898,
+      "char": "琳",
+      "unicode_id": "U+7433",
+      "count": 1
+    },
+    {
+      "index": 899,
+      "char": "葍",
+      "unicode_id": "U+844D",
+      "count": 1
+    },
+    {
+      "index": 900,
+      "char": "蕾",
+      "unicode_id": "U+857E",
+      "count": 1
+    },
+    {
+      "index": 901,
+      "char": "祀",
+      "unicode_id": "U+7940",
+      "count": 1
+    },
+    {
+      "index": 902,
+      "char": "雎",
+      "unicode_id": "U+96CE",
+      "count": 1
+    },
+    {
+      "index": 903,
+      "char": "啁",
+      "unicode_id": "U+5541",
+      "count": 1
+    },
+    {
+      "index": 904,
+      "char": "蚶",
+      "unicode_id": "U+86B6",
+      "count": 1
+    },
+    {
+      "index": 905,
+      "char": "鬪",
+      "unicode_id": "U+9B2A",
+      "count": 1
+    },
+    {
+      "index": 906,
+      "char": "瘰",
+      "unicode_id": "U+7630",
+      "count": 1
+    },
+    {
+      "index": 907,
+      "char": "榑",
+      "unicode_id": "U+6991",
+      "count": 1
+    },
+    {
+      "index": 908,
+      "char": "薑",
+      "unicode_id": "U+8591",
+      "count": 1
+    },
+    {
+      "index": 909,
+      "char": "叟",
+      "unicode_id": "U+53DF",
+      "count": 1
+    },
+    {
+      "index": 910,
+      "char": "獏",
+      "unicode_id": "U+734F",
+      "count": 1
+    },
+    {
+      "index": 911,
+      "char": "斟",
+      "unicode_id": "U+659F",
+      "count": 1
+    },
+    {
+      "index": 912,
+      "char": "棉",
+      "unicode_id": "U+68C9",
+      "count": 1
+    },
+    {
+      "index": 913,
+      "char": "檻",
+      "unicode_id": "U+6ABB",
+      "count": 1
+    },
+    {
+      "index": 914,
+      "char": "坏",
+      "unicode_id": "U+574F",
+      "count": 1
+    },
+    {
+      "index": 915,
+      "char": "鵺",
+      "unicode_id": "U+9D7A",
+      "count": 1
+    },
+    {
+      "index": 916,
+      "char": "胼",
+      "unicode_id": "U+80FC",
+      "count": 1
+    },
+    {
+      "index": 917,
+      "char": "楜",
+      "unicode_id": "U+695C",
+      "count": 1
+    },
+    {
+      "index": 918,
+      "char": "槹",
+      "unicode_id": "U+69F9",
+      "count": 1
+    },
+    {
+      "index": 919,
+      "char": "祐",
+      "unicode_id": "U+7950",
+      "count": 1
+    },
+    {
+      "index": 920,
+      "char": "縵",
+      "unicode_id": "U+7E35",
+      "count": 1
+    },
+    {
+      "index": 921,
+      "char": "拐",
+      "unicode_id": "U+62D0",
+      "count": 1
+    },
+    {
+      "index": 922,
+      "char": "跼",
+      "unicode_id": "U+8DFC",
+      "count": 1
+    },
+    {
+      "index": 923,
+      "char": "薹",
+      "unicode_id": "U+85B9",
+      "count": 1
+    },
+    {
+      "index": 924,
+      "char": "冴",
+      "unicode_id": "U+51B4",
+      "count": 1
+    },
+    {
+      "index": 925,
+      "char": "蓙",
+      "unicode_id": "U+84D9",
+      "count": 1
+    },
+    {
+      "index": 926,
+      "char": "惺",
+      "unicode_id": "U+60FA",
+      "count": 1
+    },
+    {
+      "index": 927,
+      "char": "頌",
+      "unicode_id": "U+980C",
+      "count": 1
+    },
+    {
+      "index": 928,
+      "char": "－",
+      "unicode_id": "U+FF0D",
+      "count": 1
+    },
+    {
+      "index": 929,
+      "char": "鐃",
+      "unicode_id": "U+9403",
+      "count": 1
+    },
+    {
+      "index": 930,
+      "char": "幟",
+      "unicode_id": "U+5E5F",
+      "count": 1
+    },
+    {
+      "index": 931,
+      "char": "砧",
+      "unicode_id": "U+7827",
+      "count": 1
+    },
+    {
+      "index": 932,
+      "char": "嘯",
+      "unicode_id": "U+562F",
+      "count": 1
+    },
+    {
+      "index": 933,
+      "char": "罠",
+      "unicode_id": "U+7F60",
+      "count": 1
+    },
+    {
+      "index": 934,
+      "char": "峽",
+      "unicode_id": "U+5CFD",
+      "count": 1
+    },
+    {
+      "index": 935,
+      "char": "蕣",
+      "unicode_id": "U+8563",
+      "count": 1
+    },
+    {
+      "index": 936,
+      "char": "壜",
+      "unicode_id": "U+58DC",
+      "count": 1
+    },
+    {
+      "index": 937,
+      "char": "爵",
+      "unicode_id": "U+7235",
+      "count": 1
+    },
+    {
+      "index": 938,
+      "char": "鎔",
+      "unicode_id": "U+9394",
+      "count": 1
+    },
+    {
+      "index": 939,
+      "char": "餃",
+      "unicode_id": "U+9903",
+      "count": 1
+    },
+    {
+      "index": 940,
+      "char": "楡",
+      "unicode_id": "U+6961",
+      "count": 1
+    },
+    {
+      "index": 941,
+      "char": "酩",
+      "unicode_id": "U+9169",
+      "count": 1
+    },
+    {
+      "index": 942,
+      "char": "苵",
+      "unicode_id": "U+82F5",
+      "count": 1
+    },
+    {
+      "index": 943,
+      "char": "航",
+      "unicode_id": "U+822A",
+      "count": 1
+    },
+    {
+      "index": 944,
+      "char": "砲",
+      "unicode_id": "U+7832",
+      "count": 1
+    },
+    {
+      "index": 945,
+      "char": "柤",
+      "unicode_id": "U+67E4",
+      "count": 1
+    },
+    {
+      "index": 946,
+      "char": "茴",
+      "unicode_id": "U+8334",
+      "count": 1
+    },
+    {
+      "index": 947,
+      "char": "捏",
+      "unicode_id": "U+634F",
+      "count": 1
+    },
+    {
+      "index": 948,
+      "char": "潯",
+      "unicode_id": "U+6F6F",
+      "count": 1
+    },
+    {
+      "index": 949,
+      "char": "汾",
+      "unicode_id": "U+6C7E",
+      "count": 1
+    },
+    {
+      "index": 950,
+      "char": "甕",
+      "unicode_id": "U+7515",
+      "count": 1
+    },
+    {
+      "index": 951,
+      "char": "錐",
+      "unicode_id": "U+9310",
+      "count": 1
+    },
+    {
+      "index": 952,
+      "char": "痤",
+      "unicode_id": "U+75E4",
+      "count": 1
+    },
+    {
+      "index": 953,
+      "char": "鳽",
+      "unicode_id": "U+9CFD",
+      "count": 1
+    },
+    {
+      "index": 954,
+      "char": "頊",
+      "unicode_id": "U+980A",
+      "count": 1
+    },
+    {
+      "index": 955,
+      "char": "鉋",
+      "unicode_id": "U+924B",
+      "count": 1
+    },
+    {
+      "index": 956,
+      "char": "䐈",
+      "unicode_id": "U+4408",
+      "count": 1
+    },
+    {
+      "index": 957,
+      "char": "◯",
+      "unicode_id": "U+25EF",
+      "count": 1
+    },
+    {
+      "index": 958,
+      "char": "吁",
+      "unicode_id": "U+5401",
+      "count": 1
+    },
+    {
+      "index": 959,
+      "char": "儉",
+      "unicode_id": "U+5109",
+      "count": 1
+    },
+    {
+      "index": 960,
+      "char": "殷",
+      "unicode_id": "U+6BB7",
+      "count": 1
+    },
+    {
+      "index": 961,
+      "char": "遵",
+      "unicode_id": "U+9075",
+      "count": 1
+    },
+    {
+      "index": 962,
+      "char": "褊",
+      "unicode_id": "U+890A",
+      "count": 1
+    },
+    {
+      "index": 963,
+      "char": "爨",
+      "unicode_id": "U+7228",
+      "count": 1
+    },
+    {
+      "index": 964,
+      "char": "檍",
+      "unicode_id": "U+6A8D",
+      "count": 1
+    },
+    {
+      "index": 965,
+      "char": "蚰",
+      "unicode_id": "U+86B0",
+      "count": 1
+    },
+    {
+      "index": 966,
+      "char": "尢",
+      "unicode_id": "U+5C22",
+      "count": 1
+    },
+    {
+      "index": 967,
+      "char": "櫺",
+      "unicode_id": "U+6AFA",
+      "count": 1
+    },
+    {
+      "index": 968,
+      "char": "淚",
+      "unicode_id": "U+6DDA",
+      "count": 1
+    },
+    {
+      "index": 969,
+      "char": "ペ",
+      "unicode_id": "U+30DA",
+      "count": 1
+    },
+    {
+      "index": 970,
+      "char": "瘖",
+      "unicode_id": "U+7616",
+      "count": 1
+    },
+    {
+      "index": 971,
+      "char": "臙",
+      "unicode_id": "U+81D9",
+      "count": 1
+    },
+    {
+      "index": 972,
+      "char": "儲",
+      "unicode_id": "U+5132",
+      "count": 1
+    },
+    {
+      "index": 973,
+      "char": "𥝐",
+      "unicode_id": "U+25750",
+      "count": 1
+    },
+    {
+      "index": 974,
+      "char": "糫",
+      "unicode_id": "U+7CEB",
+      "count": 1
+    },
+    {
+      "index": 975,
+      "char": "渭",
+      "unicode_id": "U+6E2D",
+      "count": 1
+    },
+    {
+      "index": 976,
+      "char": "裕",
+      "unicode_id": "U+88D5",
+      "count": 1
+    },
+    {
+      "index": 977,
+      "char": "黏",
+      "unicode_id": "U+9ECF",
+      "count": 1
+    },
+    {
+      "index": 978,
+      "char": "餹",
+      "unicode_id": "U+9939",
+      "count": 1
+    },
+    {
+      "index": 979,
+      "char": "亍",
+      "unicode_id": "U+4E8D",
+      "count": 1
+    },
+    {
+      "index": 980,
+      "char": "ピ",
+      "unicode_id": "U+30D4",
+      "count": 1
+    },
+    {
+      "index": 981,
+      "char": "扑",
+      "unicode_id": "U+6251",
+      "count": 1
+    },
+    {
+      "index": 982,
+      "char": "痣",
+      "unicode_id": "U+75E3",
+      "count": 1
+    },
+    {
+      "index": 983,
+      "char": "𦚰",
+      "unicode_id": "U+266B0",
+      "count": 1
+    },
+    {
+      "index": 984,
+      "char": "彷",
+      "unicode_id": "U+5F77",
+      "count": 1
+    },
+    {
+      "index": 985,
+      "char": "彿",
+      "unicode_id": "U+5F7F",
+      "count": 1
+    },
+    {
+      "index": 986,
+      "char": "歹",
+      "unicode_id": "U+6B79",
+      "count": 1
+    },
+    {
+      "index": 987,
+      "char": "弖",
+      "unicode_id": "U+5F16",
+      "count": 1
+    },
+    {
+      "index": 988,
+      "char": "𣇃",
+      "unicode_id": "U+231C3",
+      "count": 1
+    },
+    {
+      "index": 989,
+      "char": "袢",
+      "unicode_id": "U+88A2",
+      "count": 1
+    },
+    {
+      "index": 990,
+      "char": "唾",
+      "unicode_id": "U+553E",
+      "count": 1
+    },
+    {
+      "index": 991,
+      "char": "圃",
+      "unicode_id": "U+5703",
+      "count": 1
+    },
+    {
+      "index": 992,
+      "char": "□",
+      "unicode_id": "U+25A1",
+      "count": 1
+    },
+    {
+      "index": 993,
+      "char": "尠",
+      "unicode_id": "U+5C20",
+      "count": 1
+    },
+    {
+      "index": 994,
+      "char": "鰛",
+      "unicode_id": "U+9C1B",
+      "count": 1
+    },
+    {
+      "index": 995,
+      "char": "樺",
+      "unicode_id": "U+6A3A",
+      "count": 1
+    },
+    {
+      "index": 996,
+      "char": "㚑",
+      "unicode_id": "U+3691",
+      "count": 1
+    },
+    {
+      "index": 997,
+      "char": "鯱",
+      "unicode_id": "U+9BF1",
+      "count": 1
+    },
+    {
+      "index": 998,
+      "char": "槛",
+      "unicode_id": "U+69DB",
+      "count": 1
+    },
+    {
+      "index": 999,
+      "char": "箙",
+      "unicode_id": "U+7B99",
+      "count": 1
+    },
+    {
+      "index": 1000,
+      "char": "𣏐",
+      "unicode_id": "U+233D0",
+      "count": 1
+    },
+    {
+      "index": 1001,
+      "char": "𢳣",
+      "unicode_id": "U+22CE3",
+      "count": 1
+    },
+    {
+      "index": 1002,
+      "char": "褸",
+      "unicode_id": "U+8938",
+      "count": 1
+    },
+    {
+      "index": 1003,
+      "char": "癇",
+      "unicode_id": "U+7647",
+      "count": 1
+    },
+    {
+      "index": 1004,
+      "char": "鱝",
+      "unicode_id": "U+9C5D",
+      "count": 1
+    },
+    {
+      "index": 1005,
+      "char": "邈",
+      "unicode_id": "U+9088",
+      "count": 1
+    },
+    {
+      "index": 1006,
+      "char": "怙",
+      "unicode_id": "U+6019",
+      "count": 1
+    },
+    {
+      "index": 1007,
+      "char": "兀",
+      "unicode_id": "U+5140",
+      "count": 1
+    },
+    {
+      "index": 1008,
+      "char": "卥",
+      "unicode_id": "U+5365",
+      "count": 1
+    },
+    {
+      "index": 1009,
+      "char": "𤹠",
+      "unicode_id": "U+24E60",
+      "count": 1
+    },
+    {
+      "index": 1010,
+      "char": "耦",
+      "unicode_id": "U+8026",
+      "count": 1
+    },
+    {
+      "index": 1011,
+      "char": "𤍽",
+      "unicode_id": "U+2437D",
+      "count": 1
+    },
+    {
+      "index": 1012,
+      "char": "炷",
+      "unicode_id": "U+70B7",
+      "count": 1
+    },
+    {
+      "index": 1013,
+      "char": "箴",
+      "unicode_id": "U+7BB4",
+      "count": 1
+    },
+    {
+      "index": 1014,
+      "char": "萼",
+      "unicode_id": "U+843C",
+      "count": 1
+    },
+    {
+      "index": 1015,
+      "char": "婕",
+      "unicode_id": "U+5A55",
+      "count": 1
+    },
+    {
+      "index": 1016,
+      "char": "妤",
+      "unicode_id": "U+59A4",
+      "count": 1
+    },
+    {
+      "index": 1017,
+      "char": "尹",
+      "unicode_id": "U+5C39",
+      "count": 1
+    },
+    {
+      "index": 1018,
+      "char": "鴆",
+      "unicode_id": "U+9D06",
+      "count": 1
+    },
+    {
+      "index": 1019,
+      "char": "揩",
+      "unicode_id": "U+63E9",
+      "count": 1
+    },
+    {
+      "index": 1020,
+      "char": "疝",
+      "unicode_id": "U+759D",
+      "count": 1
+    },
+    {
+      "index": 1021,
+      "char": "萆",
+      "unicode_id": "U+8406",
+      "count": 1
+    },
+    {
+      "index": 1022,
+      "char": "蓮",
+      "unicode_id": "U+F999",
+      "count": 1
+    },
+    {
+      "index": 1023,
+      "char": "撤",
+      "unicode_id": "U+64A4",
+      "count": 1
+    },
+    {
+      "index": 1024,
+      "char": "芡",
+      "unicode_id": "U+82A1",
+      "count": 1
+    },
+    {
+      "index": 1025,
+      "char": "挌",
+      "unicode_id": "U+630C",
+      "count": 1
+    },
+    {
+      "index": 1026,
+      "char": "ユ",
+      "unicode_id": "U+30E6",
+      "count": 1
+    },
+    {
+      "index": 1027,
+      "char": "餐",
+      "unicode_id": "U+9910",
+      "count": 1
+    },
+    {
+      "index": 1028,
+      "char": "稼",
+      "unicode_id": "U+7A3C",
+      "count": 1
+    },
+    {
+      "index": 1029,
+      "char": "裘",
+      "unicode_id": "U+88D8",
+      "count": 1
+    },
+    {
+      "index": 1030,
+      "char": "衲",
+      "unicode_id": "U+8872",
+      "count": 1
+    },
+    {
+      "index": 1031,
+      "char": "鰥",
+      "unicode_id": "U+9C25",
+      "count": 1
+    },
+    {
+      "index": 1032,
+      "char": "仭",
+      "unicode_id": "U+4EED",
+      "count": 1
+    },
+    {
+      "index": 1033,
+      "char": "咫",
+      "unicode_id": "U+54AB",
+      "count": 1
+    },
+    {
+      "index": 1034,
+      "char": "薜",
+      "unicode_id": "U+859C",
+      "count": 1
+    },
+    {
+      "index": 1035,
+      "char": "宸",
+      "unicode_id": "U+5BB8",
+      "count": 1
+    },
+    {
+      "index": 1036,
+      "char": "藐",
+      "unicode_id": "U+85D0",
+      "count": 1
+    },
+    {
+      "index": 1037,
+      "char": "麋",
+      "unicode_id": "U+9E8B",
+      "count": 1
+    },
+    {
+      "index": 1038,
+      "char": "蘰",
+      "unicode_id": "U+8630",
+      "count": 1
+    },
+    {
+      "index": 1039,
+      "char": "菽",
+      "unicode_id": "U+83FD",
+      "count": 1
+    },
+    {
+      "index": 1040,
+      "char": "驢",
+      "unicode_id": "U+9A62",
+      "count": 1
+    },
+    {
+      "index": 1041,
+      "char": "貿",
+      "unicode_id": "U+8CBF",
+      "count": 1
+    },
+    {
+      "index": 1042,
+      "char": "嗇",
+      "unicode_id": "U+55C7",
+      "count": 1
+    },
+    {
+      "index": 1043,
+      "char": "攬",
+      "unicode_id": "U+652C",
+      "count": 1
+    },
+    {
+      "index": 1044,
+      "char": "朦",
+      "unicode_id": "U+6726",
+      "count": 1
+    },
+    {
+      "index": 1045,
+      "char": "唖",
+      "unicode_id": "U+5516",
+      "count": 1
+    },
+    {
+      "index": 1046,
+      "char": "哢",
+      "unicode_id": "U+54E2",
+      "count": 1
+    },
+    {
+      "index": 1047,
+      "char": "逼",
+      "unicode_id": "U+903C",
+      "count": 1
+    },
+    {
+      "index": 1048,
+      "char": "昂",
+      "unicode_id": "U+6602",
+      "count": 1
+    },
+    {
+      "index": 1049,
+      "char": "踪",
+      "unicode_id": "U+8E2A",
+      "count": 1
+    },
+    {
+      "index": 1050,
+      "char": "鍼",
+      "unicode_id": "U+937C",
+      "count": 1
+    },
+    {
+      "index": 1051,
+      "char": "爛",
+      "unicode_id": "U+721B",
+      "count": 1
+    },
+    {
+      "index": 1052,
+      "char": "杲",
+      "unicode_id": "U+6772",
+      "count": 1
+    },
+    {
+      "index": 1053,
+      "char": "隋",
+      "unicode_id": "U+968B",
+      "count": 1
+    },
+    {
+      "index": 1054,
+      "char": "煬",
+      "unicode_id": "U+716C",
+      "count": 1
+    },
+    {
+      "index": 1055,
+      "char": "麈",
+      "unicode_id": "U+9E88",
+      "count": 1
+    },
+    {
+      "index": 1056,
+      "char": "餬",
+      "unicode_id": "U+992C",
+      "count": 1
+    },
+    {
+      "index": 1057,
+      "char": "杢",
+      "unicode_id": "U+6762",
+      "count": 1
+    },
+    {
+      "index": 1058,
+      "char": "隆",
+      "unicode_id": "U+9686",
+      "count": 1
+    },
+    {
+      "index": 1059,
+      "char": "鐫",
+      "unicode_id": "U+942B",
+      "count": 1
+    },
+    {
+      "index": 1060,
+      "char": "掬",
+      "unicode_id": "U+63AC",
+      "count": 1
+    },
+    {
+      "index": 1061,
+      "char": "頑",
+      "unicode_id": "U+9811",
+      "count": 1
+    },
+    {
+      "index": 1062,
+      "char": "砺",
+      "unicode_id": "U+783A",
+      "count": 1
+    },
+    {
+      "index": 1063,
+      "char": "籟",
+      "unicode_id": "U+7C5F",
+      "count": 1
+    },
+    {
+      "index": 1064,
+      "char": "喝",
+      "unicode_id": "U+559D",
+      "count": 1
+    },
+    {
+      "index": 1065,
+      "char": "刹",
+      "unicode_id": "U+5239",
+      "count": 1
+    },
+    {
+      "index": 1066,
+      "char": "馨",
+      "unicode_id": "U+99A8",
+      "count": 1
+    },
+    {
+      "index": 1067,
+      "char": "偈",
+      "unicode_id": "U+5048",
+      "count": 1
+    },
+    {
+      "index": 1068,
+      "char": "殞",
+      "unicode_id": "U+6B9E",
+      "count": 1
+    },
+    {
+      "index": 1069,
+      "char": "塒",
+      "unicode_id": "U+5852",
+      "count": 1
+    },
+    {
+      "index": 1070,
+      "char": "蹇",
+      "unicode_id": "U+8E47",
+      "count": 1
+    },
+    {
+      "index": 1071,
+      "char": "聡",
+      "unicode_id": "U+8061",
+      "count": 1
+    },
+    {
+      "index": 1072,
+      "char": "刪",
+      "unicode_id": "U+522A",
+      "count": 1
+    },
+    {
+      "index": 1073,
+      "char": "蠱",
+      "unicode_id": "U+8831",
+      "count": 1
+    },
+    {
+      "index": 1074,
+      "char": "妨",
+      "unicode_id": "U+59A8",
+      "count": 1
+    },
+    {
+      "index": 1075,
+      "char": "頴",
+      "unicode_id": "U+9834",
+      "count": 1
+    },
+    {
+      "index": 1076,
+      "char": "賈",
+      "unicode_id": "U+8CC8",
+      "count": 1
+    },
+    {
+      "index": 1077,
+      "char": "韻",
+      "unicode_id": "U+97FB",
+      "count": 1
+    },
+    {
+      "index": 1078,
+      "char": "募",
+      "unicode_id": "U+52DF",
+      "count": 1
+    },
+    {
+      "index": 1079,
+      "char": "箏",
+      "unicode_id": "U+7B8F",
+      "count": 1
+    },
+    {
+      "index": 1080,
+      "char": "蝎",
+      "unicode_id": "U+874E",
+      "count": 1
+    },
+    {
+      "index": 1081,
+      "char": "耄",
+      "unicode_id": "U+8004",
+      "count": 1
+    },
+    {
+      "index": 1082,
+      "char": "狛",
+      "unicode_id": "U+72DB",
+      "count": 1
+    },
+    {
+      "index": 1083,
+      "char": "眛",
+      "unicode_id": "U+771B",
+      "count": 1
+    },
+    {
+      "index": 1084,
+      "char": "湾",
+      "unicode_id": "U+6E7E",
+      "count": 1
+    },
+    {
+      "index": 1085,
+      "char": "潦",
+      "unicode_id": "U+6F66",
+      "count": 1
+    },
+    {
+      "index": 1086,
+      "char": "贏",
+      "unicode_id": "U+8D0F",
+      "count": 1
+    },
+    {
+      "index": 1087,
+      "char": "槁",
+      "unicode_id": "U+69C1",
+      "count": 1
+    },
+    {
+      "index": 1088,
+      "char": "涸",
+      "unicode_id": "U+6DB8",
+      "count": 1
+    },
+    {
+      "index": 1089,
+      "char": "鬩",
+      "unicode_id": "U+9B29",
+      "count": 1
+    },
+    {
+      "index": 1090,
+      "char": "殯",
+      "unicode_id": "U+6BAF",
+      "count": 1
+    },
+    {
+      "index": 1091,
+      "char": "党",
+      "unicode_id": "U+515A",
+      "count": 1
+    },
+    {
+      "index": 1092,
+      "char": "窃",
+      "unicode_id": "U+7A83",
+      "count": 1
+    },
+    {
+      "index": 1093,
+      "char": "迩",
+      "unicode_id": "U+8FE9",
+      "count": 1
+    },
+    {
+      "index": 1094,
+      "char": "寨",
+      "unicode_id": "U+5BE8",
+      "count": 1
+    },
+    {
+      "index": 1095,
+      "char": "諛",
+      "unicode_id": "U+8ADB",
+      "count": 1
+    },
+    {
+      "index": 1096,
+      "char": "嗔",
+      "unicode_id": "U+55D4",
+      "count": 1
+    },
+    {
+      "index": 1097,
+      "char": "甥",
+      "unicode_id": "U+7525",
+      "count": 1
+    },
+    {
+      "index": 1098,
+      "char": "瀑",
+      "unicode_id": "U+7011",
+      "count": 1
+    },
+    {
+      "index": 1099,
+      "char": "簓",
+      "unicode_id": "U+7C13",
+      "count": 1
+    },
+    {
+      "index": 1100,
+      "char": "攀",
+      "unicode_id": "U+6500",
+      "count": 1
+    },
+    {
+      "index": 1101,
+      "char": "泻",
+      "unicode_id": "U+6CFB",
+      "count": 1
+    },
+    {
+      "index": 1102,
+      "char": "諦",
+      "unicode_id": "U+8AE6",
+      "count": 1
+    },
+    {
+      "index": 1103,
+      "char": "恪",
+      "unicode_id": "U+606A",
+      "count": 1
+    },
+    {
+      "index": 1104,
+      "char": "柬",
+      "unicode_id": "U+67EC",
+      "count": 1
+    },
+    {
+      "index": 1105,
+      "char": "蔬",
+      "unicode_id": "U+852C",
+      "count": 1
+    },
+    {
+      "index": 1106,
+      "char": "桾",
+      "unicode_id": "U+687E",
+      "count": 1
+    },
+    {
+      "index": 1107,
+      "char": "笧",
+      "unicode_id": "U+7B27",
+      "count": 1
+    },
+    {
+      "index": 1108,
+      "char": "釧",
+      "unicode_id": "U+91E7",
+      "count": 1
+    },
+    {
+      "index": 1109,
+      "char": "狙",
+      "unicode_id": "U+72D9",
+      "count": 1
+    },
+    {
+      "index": 1110,
+      "char": "盈",
+      "unicode_id": "U+76C8",
+      "count": 1
+    },
+    {
+      "index": 1111,
+      "char": "霏",
+      "unicode_id": "U+970F",
+      "count": 1
+    },
+    {
+      "index": 1112,
+      "char": "蹲",
+      "unicode_id": "U+8E72",
+      "count": 1
+    },
+    {
+      "index": 1113,
+      "char": "驀",
+      "unicode_id": "U+9A40",
+      "count": 1
+    },
+    {
+      "index": 1114,
+      "char": "鋲",
+      "unicode_id": "U+92F2",
+      "count": 1
+    },
+    {
+      "index": 1115,
+      "char": "𣴎",
+      "unicode_id": "U+23D0E",
+      "count": 1
+    },
+    {
+      "index": 1116,
+      "char": "傭",
+      "unicode_id": "U+50AD",
+      "count": 1
+    },
+    {
+      "index": 1117,
+      "char": "狷",
+      "unicode_id": "U+72F7",
+      "count": 1
+    },
+    {
+      "index": 1118,
+      "char": "拷",
+      "unicode_id": "U+62F7",
+      "count": 1
+    },
+    {
+      "index": 1119,
+      "char": "滋",
+      "unicode_id": "U+6ECB",
+      "count": 1
+    },
+    {
+      "index": 1120,
+      "char": "欣",
+      "unicode_id": "U+6B23",
+      "count": 1
+    },
+    {
+      "index": 1121,
+      "char": "徤",
+      "unicode_id": "U+5FA4",
+      "count": 1
+    },
+    {
+      "index": 1122,
+      "char": "蔑",
+      "unicode_id": "U+8511",
+      "count": 1
+    },
+    {
+      "index": 1123,
+      "char": "虧",
+      "unicode_id": "U+8667",
+      "count": 1
+    },
+    {
+      "index": 1124,
+      "char": "呈",
+      "unicode_id": "U+5448",
+      "count": 1
+    },
+    {
+      "index": 1125,
+      "char": "謨",
+      "unicode_id": "U+8B28",
+      "count": 1
+    },
+    {
+      "index": 1126,
+      "char": "禹",
+      "unicode_id": "U+79B9",
+      "count": 1
+    },
+    {
+      "index": 1127,
+      "char": "斂",
+      "unicode_id": "U+6582",
+      "count": 1
+    },
+    {
+      "index": 1128,
+      "char": "鸛",
+      "unicode_id": "U+9E1B",
+      "count": 1
+    },
+    {
+      "index": 1129,
+      "char": "剄",
+      "unicode_id": "U+5244",
+      "count": 1
+    },
+    {
+      "index": 1130,
+      "char": "栲",
+      "unicode_id": "U+6832",
+      "count": 1
+    },
+    {
+      "index": 1131,
+      "char": "距",
+      "unicode_id": "U+8DDD",
+      "count": 1
+    },
+    {
+      "index": 1132,
+      "char": "姻",
+      "unicode_id": "U+59FB",
+      "count": 1
+    },
+    {
+      "index": 1133,
+      "char": "秉",
+      "unicode_id": "U+79C9",
+      "count": 1
+    },
+    {
+      "index": 1134,
+      "char": "縢",
+      "unicode_id": "U+7E22",
+      "count": 1
+    },
+    {
+      "index": 1135,
+      "char": "脔",
+      "unicode_id": "U+8114",
+      "count": 1
+    },
+    {
+      "index": 1136,
+      "char": "鏑",
+      "unicode_id": "U+93D1",
+      "count": 1
+    },
+    {
+      "index": 1137,
+      "char": "孕",
+      "unicode_id": "U+5B55",
+      "count": 1
+    },
+    {
+      "index": 1138,
+      "char": "噴",
+      "unicode_id": "U+5674",
+      "count": 1
+    },
+    {
+      "index": 1139,
+      "char": "袿",
+      "unicode_id": "U+88BF",
+      "count": 1
+    },
+    {
+      "index": 1140,
+      "char": "蹉",
+      "unicode_id": "U+8E49",
+      "count": 1
+    },
+    {
+      "index": 1141,
+      "char": "層",
+      "unicode_id": "U+FA3B",
+      "count": 1
+    },
+    {
+      "index": 1142,
+      "char": "綽",
+      "unicode_id": "U+7DBD",
+      "count": 1
+    },
+    {
+      "index": 1143,
+      "char": "藉",
+      "unicode_id": "U+85C9",
+      "count": 1
+    },
+    {
+      "index": 1144,
+      "char": "賠",
+      "unicode_id": "U+8CE0",
+      "count": 1
+    },
+    {
+      "index": 1145,
+      "char": "贈",
+      "unicode_id": "U+FA65",
+      "count": 1
+    },
+    {
+      "index": 1146,
+      "char": "茫",
+      "unicode_id": "U+832B",
+      "count": 1
+    },
+    {
+      "index": 1147,
+      "char": "惹",
+      "unicode_id": "U+60F9",
+      "count": 1
+    },
+    {
+      "index": 1148,
+      "char": "煽",
+      "unicode_id": "U+717D",
+      "count": 1
+    },
+    {
+      "index": 1149,
+      "char": "哮",
+      "unicode_id": "U+54EE",
+      "count": 1
+    },
+    {
+      "index": 1150,
+      "char": "抦",
+      "unicode_id": "U+62A6",
+      "count": 1
+    },
+    {
+      "index": 1151,
+      "char": "鋭",
+      "unicode_id": "U+92ED",
+      "count": 1
+    },
+    {
+      "index": 1152,
+      "char": "恕",
+      "unicode_id": "U+6055",
+      "count": 1
+    },
+    {
+      "index": 1153,
+      "char": "薙",
+      "unicode_id": "U+8599",
+      "count": 1
+    },
+    {
+      "index": 1154,
+      "char": "肢",
+      "unicode_id": "U+80A2",
+      "count": 1
+    },
+    {
+      "index": 1155,
+      "char": "疇",
+      "unicode_id": "U+7587",
+      "count": 1
+    },
+    {
+      "index": 1156,
+      "char": "犇",
+      "unicode_id": "U+7287",
+      "count": 1
+    },
+    {
+      "index": 1157,
+      "char": "廰",
+      "unicode_id": "U+5EF0",
+      "count": 1
+    },
+    {
+      "index": 1158,
+      "char": "宍",
+      "unicode_id": "U+5B8D",
+      "count": 1
+    },
+    {
+      "index": 1159,
+      "char": "瘞",
+      "unicode_id": "U+761E",
+      "count": 1
+    },
+    {
+      "index": 1160,
+      "char": "覿",
+      "unicode_id": "U+89BF",
+      "count": 1
+    },
+    {
+      "index": 1161,
+      "char": "隊",
+      "unicode_id": "U+968A",
+      "count": 1
+    },
+    {
+      "index": 1162,
+      "char": "縧",
+      "unicode_id": "U+7E27",
+      "count": 1
+    },
+    {
+      "index": 1163,
+      "char": "驃",
+      "unicode_id": "U+9A43",
+      "count": 1
+    },
+    {
+      "index": 1164,
+      "char": "鋒",
+      "unicode_id": "U+92D2",
+      "count": 1
+    },
+    {
+      "index": 1165,
+      "char": "鑽",
+      "unicode_id": "U+947D",
+      "count": 1
+    },
+    {
+      "index": 1166,
+      "char": "旌",
+      "unicode_id": "U+65CC",
+      "count": 1
+    },
+    {
+      "index": 1167,
+      "char": "䏣",
+      "unicode_id": "U+43E3",
+      "count": 1
+    },
+    {
+      "index": 1168,
+      "char": "蔽",
+      "unicode_id": "U+853D",
+      "count": 1
+    },
+    {
+      "index": 1169,
+      "char": "慄",
+      "unicode_id": "U+6144",
+      "count": 1
+    },
+    {
+      "index": 1170,
+      "char": "刅",
+      "unicode_id": "U+5205",
+      "count": 1
+    },
+    {
+      "index": 1171,
+      "char": "壑",
+      "unicode_id": "U+58D1",
+      "count": 1
+    },
+    {
+      "index": 1172,
+      "char": "艡",
+      "unicode_id": "U+8261",
+      "count": 1
+    },
+    {
+      "index": 1173,
+      "char": "烮",
+      "unicode_id": "U+70EE",
+      "count": 1
+    },
+    {
+      "index": 1174,
+      "char": "舵",
+      "unicode_id": "U+8235",
+      "count": 1
+    },
+    {
+      "index": 1175,
+      "char": "艚",
+      "unicode_id": "U+825A",
+      "count": 1
+    },
+    {
+      "index": 1176,
+      "char": "琫",
+      "unicode_id": "U+742B",
+      "count": 1
+    },
+    {
+      "index": 1177,
+      "char": "驩",
+      "unicode_id": "U+9A69",
+      "count": 1
+    },
+    {
+      "index": 1178,
+      "char": "樊",
+      "unicode_id": "U+6A0A",
+      "count": 1
+    },
+    {
+      "index": 1179,
+      "char": "噲",
+      "unicode_id": "U+5672",
+      "count": 1
+    },
+    {
+      "index": 1180,
+      "char": "綻",
+      "unicode_id": "U+7DBB",
+      "count": 1
+    },
+    {
+      "index": 1181,
+      "char": "呀",
+      "unicode_id": "U+5440",
+      "count": 1
+    },
+    {
+      "index": 1182,
+      "char": "燼",
+      "unicode_id": "U+71FC",
+      "count": 1
+    },
+    {
+      "index": 1183,
+      "char": "堆",
+      "unicode_id": "U+5806",
+      "count": 1
+    },
+    {
+      "index": 1184,
+      "char": "黿",
+      "unicode_id": "U+9EFF",
+      "count": 1
+    },
+    {
+      "index": 1185,
+      "char": "蜒",
+      "unicode_id": "U+8712",
+      "count": 1
+    },
+    {
+      "index": 1186,
+      "char": "蜿",
+      "unicode_id": "U+873F",
+      "count": 1
+    },
+    {
+      "index": 1187,
+      "char": "舐",
+      "unicode_id": "U+8210",
+      "count": 1
+    },
+    {
+      "index": 1188,
+      "char": "穹",
+      "unicode_id": "U+7A79",
+      "count": 1
+    },
+    {
+      "index": 1189,
+      "char": "沐",
+      "unicode_id": "U+6C90",
+      "count": 1
+    },
+    {
+      "index": 1190,
+      "char": "粤",
+      "unicode_id": "U+7CA4",
+      "count": 1
+    },
+    {
+      "index": 1191,
+      "char": "匆",
+      "unicode_id": "U+5306",
+      "count": 1
+    },
+    {
+      "index": 1192,
+      "char": "蔘",
+      "unicode_id": "U+8518",
+      "count": 1
+    },
+    {
+      "index": 1193,
+      "char": "凩",
+      "unicode_id": "U+51E9",
+      "count": 1
+    },
+    {
+      "index": 1194,
+      "char": "卩",
+      "unicode_id": "U+5369",
+      "count": 1
+    },
+    {
+      "index": 1195,
+      "char": "捫",
+      "unicode_id": "U+636B",
+      "count": 1
+    },
+    {
+      "index": 1196,
+      "char": "鈬",
+      "unicode_id": "U+922C",
+      "count": 1
+    },
+    {
+      "index": 1197,
+      "char": "琢",
+      "unicode_id": "U+FA4A",
+      "count": 1
+    },
+    {
+      "index": 1198,
+      "char": "楙",
+      "unicode_id": "U+6959",
+      "count": 1
+    },
+    {
+      "index": 1199,
+      "char": "磽",
+      "unicode_id": "U+78FD",
+      "count": 1
+    },
+    {
+      "index": 1200,
+      "char": "棐",
+      "unicode_id": "U+68D0",
+      "count": 1
+    },
+    {
+      "index": 1201,
+      "char": "敖",
+      "unicode_id": "U+6556",
+      "count": 1
+    },
+    {
+      "index": 1202,
+      "char": "拇",
+      "unicode_id": "U+62C7",
+      "count": 1
+    },
+    {
+      "index": 1203,
+      "char": "澡",
+      "unicode_id": "U+6FA1",
+      "count": 1
+    },
+    {
+      "index": 1204,
+      "char": "驫",
+      "unicode_id": "U+9A6B",
+      "count": 1
+    },
+    {
+      "index": 1205,
+      "char": "籆",
+      "unicode_id": "U+7C46",
+      "count": 1
+    },
+    {
+      "index": 1206,
+      "char": "騫",
+      "unicode_id": "U+9A2B",
+      "count": 1
+    },
+    {
+      "index": 1207,
+      "char": "槎",
+      "unicode_id": "U+69CE",
+      "count": 1
+    },
+    {
+      "index": 1208,
+      "char": "崔",
+      "unicode_id": "U+5D14",
+      "count": 1
+    },
+    {
+      "index": 1209,
+      "char": "萓",
+      "unicode_id": "U+8413",
+      "count": 1
+    },
+    {
+      "index": 1210,
+      "char": "崙",
+      "unicode_id": "U+5D19",
+      "count": 1
+    },
+    {
+      "index": 1211,
+      "char": "啻",
+      "unicode_id": "U+557B",
+      "count": 1
+    },
+    {
+      "index": 1212,
+      "char": "濂",
+      "unicode_id": "U+6FC2",
+      "count": 1
+    },
+    {
+      "index": 1213,
+      "char": "闖",
+      "unicode_id": "U+95D6",
+      "count": 1
+    },
+    {
+      "index": 1214,
+      "char": "鄲",
+      "unicode_id": "U+9132",
+      "count": 1
+    },
+    {
+      "index": 1215,
+      "char": "邯",
+      "unicode_id": "U+90AF",
+      "count": 1
+    },
+    {
+      "index": 1216,
+      "char": "嬋",
+      "unicode_id": "U+5B0B",
+      "count": 1
+    },
+    {
+      "index": 1217,
+      "char": "娟",
+      "unicode_id": "U+5A1F",
+      "count": 1
+    },
+    {
+      "index": 1218,
+      "char": "恍",
+      "unicode_id": "U+604D",
+      "count": 1
+    },
+    {
+      "index": 1219,
+      "char": "饑",
+      "unicode_id": "U+9951",
+      "count": 1
+    },
+    {
+      "index": 1220,
+      "char": "衽",
+      "unicode_id": "U+887D",
+      "count": 1
+    },
+    {
+      "index": 1221,
+      "char": "孜",
+      "unicode_id": "U+5B5C",
+      "count": 1
+    },
+    {
+      "index": 1222,
+      "char": "罔",
+      "unicode_id": "U+7F54",
+      "count": 1
+    },
+    {
+      "index": 1223,
+      "char": "桀",
+      "unicode_id": "U+6840",
+      "count": 1
+    },
+    {
+      "index": 1224,
+      "char": "喟",
+      "unicode_id": "U+559F",
+      "count": 1
+    },
+    {
+      "index": 1225,
+      "char": "鏥",
+      "unicode_id": "U+93E5",
+      "count": 1
+    },
+    {
+      "index": 1226,
+      "char": "獬",
+      "unicode_id": "U+736C",
+      "count": 1
+    },
+    {
+      "index": 1227,
+      "char": "罹",
+      "unicode_id": "U+7F79",
+      "count": 1
+    },
+    {
+      "index": 1228,
+      "char": "粲",
+      "unicode_id": "U+7CB2",
+      "count": 1
+    },
+    {
+      "index": 1229,
+      "char": "麌",
+      "unicode_id": "U+9E8C",
+      "count": 1
+    },
+    {
+      "index": 1230,
+      "char": "孁",
+      "unicode_id": "U+5B41",
+      "count": 1
+    },
+    {
+      "index": 1231,
+      "char": "兪",
+      "unicode_id": "U+516A",
+      "count": 1
+    },
+    {
+      "index": 1232,
+      "char": "煥",
+      "unicode_id": "U+7165",
+      "count": 1
+    },
+    {
+      "index": 1233,
+      "char": "愍",
+      "unicode_id": "U+610D",
+      "count": 1
+    },
+    {
+      "index": 1234,
+      "char": "弉",
+      "unicode_id": "U+5F09",
+      "count": 1
+    },
+    {
+      "index": 1235,
+      "char": "漲",
+      "unicode_id": "U+6F32",
+      "count": 1
+    },
+    {
+      "index": 1236,
+      "char": "麕",
+      "unicode_id": "U+9E95",
+      "count": 1
+    },
+    {
+      "index": 1237,
+      "char": "拓",
+      "unicode_id": "U+62D3",
+      "count": 1
+    },
+    {
+      "index": 1238,
+      "char": "攘",
+      "unicode_id": "U+6518",
+      "count": 1
+    },
+    {
+      "index": 1239,
+      "char": "惻",
+      "unicode_id": "U+60FB",
+      "count": 1
+    },
+    {
+      "index": 1240,
+      "char": "墾",
+      "unicode_id": "U+58BE",
+      "count": 1
+    },
+    {
+      "index": 1241,
+      "char": "掲",
+      "unicode_id": "U+63B2",
+      "count": 1
+    },
+    {
+      "index": 1242,
+      "char": "恖",
+      "unicode_id": "U+6056",
+      "count": 1
+    },
+    {
+      "index": 1243,
+      "char": "債",
+      "unicode_id": "U+50B5",
+      "count": 1
+    },
+    {
+      "index": 1244,
+      "char": "訂",
+      "unicode_id": "U+8A02",
+      "count": 1
+    },
+    {
+      "index": 1245,
+      "char": "攷",
+      "unicode_id": "U+6537",
+      "count": 1
+    },
+    {
+      "index": 1246,
+      "char": "敝",
+      "unicode_id": "U+655D",
+      "count": 1
+    },
+    {
+      "index": 1247,
+      "char": "篗",
+      "unicode_id": "U+7BD7",
+      "count": 1
+    },
+    {
+      "index": 1248,
+      "char": "顋",
+      "unicode_id": "U+984B",
+      "count": 1
+    },
+    {
+      "index": 1249,
+      "char": "Ｏ",
+      "unicode_id": "U+FF2F",
+      "count": 1
+    },
+    {
+      "index": 1250,
+      "char": "頡",
+      "unicode_id": "U+9821",
+      "count": 1
+    },
+    {
+      "index": 1251,
+      "char": "薨",
+      "unicode_id": "U+85A8",
+      "count": 1
+    },
+    {
+      "index": 1252,
+      "char": "廩",
+      "unicode_id": "U+5EE9",
+      "count": 1
+    },
+    {
+      "index": 1253,
+      "char": "耘",
+      "unicode_id": "U+8018",
+      "count": 1
+    },
+    {
+      "index": 1254,
+      "char": "樔",
+      "unicode_id": "U+6A14",
+      "count": 1
+    },
+    {
+      "index": 1255,
+      "char": "顱",
+      "unicode_id": "U+9871",
+      "count": 1
+    },
+    {
+      "index": 1256,
+      "char": "抽",
+      "unicode_id": "U+62BD",
+      "count": 1
+    },
+    {
+      "index": 1257,
+      "char": "篷",
+      "unicode_id": "U+7BF7",
+      "count": 1
+    },
+    {
+      "index": 1258,
+      "char": "筐",
+      "unicode_id": "U+7B50",
+      "count": 1
+    },
+    {
+      "index": 1259,
+      "char": "郊",
+      "unicode_id": "U+90CA",
+      "count": 1
+    },
+    {
+      "index": 1260,
+      "char": "惰",
+      "unicode_id": "U+60F0",
+      "count": 1
+    },
+    {
+      "index": 1261,
+      "char": "乂",
+      "unicode_id": "U+4E42",
+      "count": 1
+    },
+    {
+      "index": 1262,
+      "char": "跏",
+      "unicode_id": "U+8DCF",
+      "count": 1
+    },
+    {
+      "index": 1263,
+      "char": "鮦",
+      "unicode_id": "U+9BA6",
+      "count": 1
+    },
+    {
+      "index": 1264,
+      "char": "蝤",
+      "unicode_id": "U+8764",
+      "count": 1
+    },
+    {
+      "index": 1265,
+      "char": "獺",
+      "unicode_id": "U+737A",
+      "count": 1
+    },
+    {
+      "index": 1266,
+      "char": "繊",
+      "unicode_id": "U+7E4A",
+      "count": 1
+    },
+    {
+      "index": 1267,
+      "char": "魦",
+      "unicode_id": "U+9B66",
+      "count": 1
+    },
+    {
+      "index": 1268,
+      "char": "鰔",
+      "unicode_id": "U+9C14",
+      "count": 1
+    },
+    {
+      "index": 1269,
+      "char": "鮗",
+      "unicode_id": "U+9B97",
+      "count": 1
+    },
+    {
+      "index": 1270,
+      "char": "藜",
+      "unicode_id": "U+85DC",
+      "count": 1
+    },
+    {
+      "index": 1271,
+      "char": "薊",
+      "unicode_id": "U+858A",
+      "count": 1
+    },
+    {
+      "index": 1272,
+      "char": "鮲",
+      "unicode_id": "U+9BB2",
+      "count": 1
+    },
+    {
+      "index": 1273,
+      "char": "苓",
+      "unicode_id": "U+82D3",
+      "count": 1
+    },
+    {
+      "index": 1274,
+      "char": "朮",
+      "unicode_id": "U+672E",
+      "count": 1
+    },
+    {
+      "index": 1275,
+      "char": "鸞",
+      "unicode_id": "U+9E1E",
+      "count": 1
+    },
+    {
+      "index": 1276,
+      "char": "艾",
+      "unicode_id": "U+827E",
+      "count": 1
+    },
+    {
+      "index": 1277,
+      "char": "鱆",
+      "unicode_id": "U+9C46",
+      "count": 1
+    },
+    {
+      "index": 1278,
+      "char": "鱚",
+      "unicode_id": "U+9C5A",
+      "count": 1
+    },
+    {
+      "index": 1279,
+      "char": "檗",
+      "unicode_id": "U+6A97",
+      "count": 1
+    },
+    {
+      "index": 1280,
+      "char": "稔",
+      "unicode_id": "U+7A14",
+      "count": 1
+    },
+    {
+      "index": 1281,
+      "char": "榿",
+      "unicode_id": "U+69BF",
+      "count": 1
+    },
+    {
+      "index": 1282,
+      "char": "餲",
+      "unicode_id": "U+9932",
+      "count": 1
+    },
+    {
+      "index": 1283,
+      "char": "櫨",
+      "unicode_id": "U+6AE8",
+      "count": 1
+    },
+    {
+      "index": 1284,
+      "char": "菌",
+      "unicode_id": "U+83CC",
+      "count": 1
+    },
+    {
+      "index": 1285,
+      "char": "疣",
+      "unicode_id": "U+75A3",
+      "count": 1
+    },
+    {
+      "index": 1286,
+      "char": "脯",
+      "unicode_id": "U+812F",
+      "count": 1
+    },
+    {
+      "index": 1287,
+      "char": "皂",
+      "unicode_id": "U+7682",
+      "count": 1
+    },
+    {
+      "index": 1288,
+      "char": "黐",
+      "unicode_id": "U+9ED0",
+      "count": 1
+    },
+    {
+      "index": 1289,
+      "char": "雇",
+      "unicode_id": "U+96C7",
+      "count": 1
+    },
+    {
+      "index": 1290,
+      "char": "橦",
+      "unicode_id": "U+6A66",
+      "count": 1
+    },
+    {
+      "index": 1291,
+      "char": "妣",
+      "unicode_id": "U+59A3",
+      "count": 1
+    },
+    {
+      "index": 1292,
+      "char": "槖",
+      "unicode_id": "U+69D6",
+      "count": 1
+    },
+    {
+      "index": 1293,
+      "char": "蘡",
+      "unicode_id": "U+8621",
+      "count": 1
+    },
+    {
+      "index": 1294,
+      "char": "薁",
+      "unicode_id": "U+8581",
+      "count": 1
+    },
+    {
+      "index": 1295,
+      "char": "郛",
+      "unicode_id": "U+90DB",
+      "count": 1
+    },
+    {
+      "index": 1296,
+      "char": "甀",
+      "unicode_id": "U+7500",
+      "count": 1
+    },
+    {
+      "index": 1297,
+      "char": "幢",
+      "unicode_id": "U+5E62",
+      "count": 1
+    },
+    {
+      "index": 1298,
+      "char": "描",
+      "unicode_id": "U+63CF",
+      "count": 1
+    },
+    {
+      "index": 1299,
+      "char": "蟛",
+      "unicode_id": "U+87DB",
+      "count": 1
+    },
+    {
+      "index": 1300,
+      "char": "螖",
+      "unicode_id": "U+8796",
+      "count": 1
+    },
+    {
+      "index": 1301,
+      "char": "鱺",
+      "unicode_id": "U+9C7A",
+      "count": 1
+    },
+    {
+      "index": 1302,
+      "char": "羚",
+      "unicode_id": "U+7F9A",
+      "count": 1
+    },
+    {
+      "index": 1303,
+      "char": "蜍",
+      "unicode_id": "U+870D",
+      "count": 1
+    },
+    {
+      "index": 1304,
+      "char": "蜈",
+      "unicode_id": "U+8708",
+      "count": 1
+    },
+    {
+      "index": 1305,
+      "char": "蚣",
+      "unicode_id": "U+86A3",
+      "count": 1
+    },
+    {
+      "index": 1306,
+      "char": "豉",
+      "unicode_id": "U+8C49",
+      "count": 1
+    },
+    {
+      "index": 1307,
+      "char": "黎",
+      "unicode_id": "U+9ECE",
+      "count": 1
+    },
+    {
+      "index": 1308,
+      "char": "䕲",
+      "unicode_id": "U+4572",
+      "count": 1
+    },
+    {
+      "index": 1309,
+      "char": "黽",
+      "unicode_id": "U+9EFD",
+      "count": 1
+    },
+    {
+      "index": 1310,
+      "char": "媱",
+      "unicode_id": "U+5AB1",
+      "count": 1
+    },
+    {
+      "index": 1311,
+      "char": "𩷚",
+      "unicode_id": "U+29DDA",
+      "count": 1
+    },
+    {
+      "index": 1312,
+      "char": "鮇",
+      "unicode_id": "U+9B87",
+      "count": 1
+    },
+    {
+      "index": 1313,
+      "char": "鮬",
+      "unicode_id": "U+9BAC",
+      "count": 1
+    },
+    {
+      "index": 1314,
+      "char": "蓍",
+      "unicode_id": "U+84CD",
+      "count": 1
+    },
+    {
+      "index": 1315,
+      "char": "薷",
+      "unicode_id": "U+85B7",
+      "count": 1
+    },
+    {
+      "index": 1316,
+      "char": "菝",
+      "unicode_id": "U+83DD",
+      "count": 1
+    },
+    {
+      "index": 1317,
+      "char": "葜",
+      "unicode_id": "U+845C",
+      "count": 1
+    },
+    {
+      "index": 1318,
+      "char": "囉",
+      "unicode_id": "U+56C9",
+      "count": 1
+    },
+    {
+      "index": 1319,
+      "char": "皹",
+      "unicode_id": "U+76B9",
+      "count": 1
+    },
+    {
+      "index": 1320,
+      "char": "螇",
+      "unicode_id": "U+8787",
+      "count": 1
+    },
+    {
+      "index": 1321,
+      "char": "蚸",
+      "unicode_id": "U+86B8",
+      "count": 1
+    },
+    {
+      "index": 1322,
+      "char": "暄",
+      "unicode_id": "U+6684",
+      "count": 1
+    },
+    {
+      "index": 1323,
+      "char": "剖",
+      "unicode_id": "U+5256",
+      "count": 1
+    },
+    {
+      "index": 1324,
+      "char": "徠",
+      "unicode_id": "U+5FA0",
+      "count": 1
+    },
+    {
+      "index": 1325,
+      "char": "鬒",
+      "unicode_id": "U+9B12",
+      "count": 1
+    },
+    {
+      "index": 1326,
+      "char": "楑",
+      "unicode_id": "U+6951",
+      "count": 1
+    },
+    {
+      "index": 1327,
+      "char": "釿",
+      "unicode_id": "U+91FF",
+      "count": 1
+    },
+    {
+      "index": 1328,
+      "char": "緡",
+      "unicode_id": "U+7DE1",
+      "count": 1
+    },
+    {
+      "index": 1329,
+      "char": "糄",
+      "unicode_id": "U+7CC4",
+      "count": 1
+    },
+    {
+      "index": 1330,
+      "char": "蜩",
+      "unicode_id": "U+8729",
+      "count": 1
+    },
+    {
+      "index": 1331,
+      "char": "蟀",
+      "unicode_id": "U+87C0",
+      "count": 1
+    },
+    {
+      "index": 1332,
+      "char": "莎",
+      "unicode_id": "U+838E",
+      "count": 1
+    },
+    {
+      "index": 1333,
+      "char": "鼴",
+      "unicode_id": "U+9F34",
+      "count": 1
+    },
+    {
+      "index": 1334,
+      "char": "蜾",
+      "unicode_id": "U+873E",
+      "count": 1
+    },
+    {
+      "index": 1335,
+      "char": "蠃",
+      "unicode_id": "U+8803",
+      "count": 1
+    },
+    {
+      "index": 1336,
+      "char": "鴒",
+      "unicode_id": "U+9D12",
+      "count": 1
+    },
+    {
+      "index": 1337,
+      "char": "鶺",
+      "unicode_id": "U+9DBA",
+      "count": 1
+    },
+    {
+      "index": 1338,
+      "char": "茼",
+      "unicode_id": "U+833C",
+      "count": 1
+    },
+    {
+      "index": 1339,
+      "char": "鰕",
+      "unicode_id": "U+9C15",
+      "count": 1
+    },
+    {
+      "index": 1340,
+      "char": "漻",
+      "unicode_id": "U+6F3B",
+      "count": 1
+    },
+    {
+      "index": 1341,
+      "char": "鮥",
+      "unicode_id": "U+9BA5",
+      "count": 1
+    },
+    {
+      "index": 1342,
+      "char": "暹",
+      "unicode_id": "U+66B9",
+      "count": 1
+    },
+    {
+      "index": 1343,
+      "char": "銃",
+      "unicode_id": "U+9283",
+      "count": 1
+    },
+    {
+      "index": 1344,
+      "char": "鱊",
+      "unicode_id": "U+9C4A",
+      "count": 1
+    },
+    {
+      "index": 1345,
+      "char": "簗",
+      "unicode_id": "U+7C17",
+      "count": 1
+    },
+    {
+      "index": 1346,
+      "char": "鱁",
+      "unicode_id": "U+9C41",
+      "count": 1
+    },
+    {
+      "index": 1347,
+      "char": "鰾",
+      "unicode_id": "U+9C3E",
+      "count": 1
+    },
+    {
+      "index": 1348,
+      "char": "𩹵",
+      "unicode_id": "U+29E75",
+      "count": 1
+    },
+    {
+      "index": 1349,
+      "char": "魟",
+      "unicode_id": "U+9B5F",
+      "count": 1
+    },
+    {
+      "index": 1350,
+      "char": "䱡",
+      "unicode_id": "U+4C61",
+      "count": 1
+    },
+    {
+      "index": 1351,
+      "char": "蕺",
+      "unicode_id": "U+857A",
+      "count": 1
+    },
+    {
+      "index": 1352,
+      "char": "蛞",
+      "unicode_id": "U+86DE",
+      "count": 1
+    },
+    {
+      "index": 1353,
+      "char": "蝓",
+      "unicode_id": "U+8753",
+      "count": 1
+    },
+    {
+      "index": 1354,
+      "char": "蝮",
+      "unicode_id": "U+876E",
+      "count": 1
+    },
+    {
+      "index": 1355,
+      "char": "葶",
+      "unicode_id": "U+8476",
+      "count": 1
+    },
+    {
+      "index": 1356,
+      "char": "榊",
+      "unicode_id": "U+698A",
+      "count": 1
+    },
+    {
+      "index": 1357,
+      "char": "㮇",
+      "unicode_id": "U+3B87",
+      "count": 1
+    },
+    {
+      "index": 1358,
+      "char": "踝",
+      "unicode_id": "U+8E1D",
+      "count": 1
+    },
+    {
+      "index": 1359,
+      "char": "籩",
+      "unicode_id": "U+7C69",
+      "count": 1
+    },
+    {
+      "index": 1360,
+      "char": "藿",
+      "unicode_id": "U+85FF",
+      "count": 1
+    },
+    {
+      "index": 1361,
+      "char": "跖",
+      "unicode_id": "U+8DD6",
+      "count": 1
+    },
+    {
+      "index": 1362,
+      "char": "枷",
+      "unicode_id": "U+67B7",
+      "count": 1
+    },
+    {
+      "index": 1363,
+      "char": "渤",
+      "unicode_id": "U+6E24",
+      "count": 1
+    },
+    {
+      "index": 1364,
+      "char": "畚",
+      "unicode_id": "U+755A",
+      "count": 1
+    },
+    {
+      "index": 1365,
+      "char": "蛁",
+      "unicode_id": "U+86C1",
+      "count": 1
+    },
+    {
+      "index": 1366,
+      "char": "蟟",
+      "unicode_id": "U+87DF",
+      "count": 1
+    },
+    {
+      "index": 1367,
+      "char": "欧",
+      "unicode_id": "U+6B27",
+      "count": 1
+    },
+    {
+      "index": 1368,
+      "char": "鶫",
+      "unicode_id": "U+9DAB",
+      "count": 1
+    },
+    {
+      "index": 1369,
+      "char": "グ",
+      "unicode_id": "U+30B0",
+      "count": 1
+    },
+    {
+      "index": 1370,
+      "char": "縻",
+      "unicode_id": "U+7E3B",
+      "count": 1
+    },
+    {
+      "index": 1371,
+      "char": "簟",
+      "unicode_id": "U+7C1F",
+      "count": 1
+    },
+    {
+      "index": 1372,
+      "char": "蔕",
+      "unicode_id": "U+8515",
+      "count": 1
+    },
+    {
+      "index": 1373,
+      "char": "蜊",
+      "unicode_id": "U+870A",
+      "count": 1
+    },
+    {
+      "index": 1374,
+      "char": "艪",
+      "unicode_id": "U+826A",
+      "count": 1
+    },
+    {
+      "index": 1375,
+      "char": "蹈",
+      "unicode_id": "U+8E48",
+      "count": 1
+    },
+    {
+      "index": 1376,
+      "char": "檋",
+      "unicode_id": "U+6A8B",
+      "count": 1
+    },
+    {
+      "index": 1377,
+      "char": "秧",
+      "unicode_id": "U+79E7",
+      "count": 1
+    },
+    {
+      "index": 1378,
+      "char": "鷃",
+      "unicode_id": "U+9DC3",
+      "count": 1
+    },
+    {
+      "index": 1379,
+      "char": "鴽",
+      "unicode_id": "U+9D3D",
+      "count": 1
+    },
+    {
+      "index": 1380,
+      "char": "鮅",
+      "unicode_id": "U+9B85",
+      "count": 1
+    },
+    {
+      "index": 1381,
+      "char": "亮",
+      "unicode_id": "U+4EAE",
+      "count": 1
+    },
+    {
+      "index": 1382,
+      "char": "𩞀",
+      "unicode_id": "U+29780",
+      "count": 1
+    },
+    {
+      "index": 1383,
+      "char": "篼",
+      "unicode_id": "U+7BFC",
+      "count": 1
+    },
+    {
+      "index": 1384,
+      "char": "襌",
+      "unicode_id": "U+894C",
+      "count": 1
+    },
+    {
+      "index": 1385,
+      "char": "屐",
+      "unicode_id": "U+5C50",
+      "count": 1
+    },
+    {
+      "index": 1386,
+      "char": "屩",
+      "unicode_id": "U+5C69",
+      "count": 1
+    },
+    {
+      "index": 1387,
+      "char": "靪",
+      "unicode_id": "U+976A",
+      "count": 1
+    },
+    {
+      "index": 1388,
+      "char": "睢",
+      "unicode_id": "U+7762",
+      "count": 1
+    },
+    {
+      "index": 1389,
+      "char": "鸊",
+      "unicode_id": "U+9E0A",
+      "count": 1
+    },
+    {
+      "index": 1390,
+      "char": "鷉",
+      "unicode_id": "U+9DC9",
+      "count": 1
+    },
+    {
+      "index": 1391,
+      "char": "玖",
+      "unicode_id": "U+7396",
+      "count": 1
+    },
+    {
+      "index": 1392,
+      "char": "ジ",
+      "unicode_id": "U+30B8",
+      "count": 1
+    },
+    {
+      "index": 1393,
+      "char": "鍾",
+      "unicode_id": "U+937E",
+      "count": 1
+    },
+    {
+      "index": 1394,
+      "char": "瀰",
+      "unicode_id": "U+7030",
+      "count": 1
+    },
+    {
+      "index": 1395,
+      "char": "礙",
+      "unicode_id": "U+7919",
+      "count": 1
+    },
+    {
+      "index": 1396,
+      "char": "荼",
+      "unicode_id": "U+837C",
+      "count": 1
+    },
+    {
+      "index": 1397,
+      "char": "蘼",
+      "unicode_id": "U+863C",
+      "count": 1
+    },
+    {
+      "index": 1398,
+      "char": "釄",
+      "unicode_id": "U+91C4",
+      "count": 1
+    },
+    {
+      "index": 1399,
+      "char": "醿",
+      "unicode_id": "U+91BF",
+      "count": 1
+    },
+    {
+      "index": 1400,
+      "char": "廱",
+      "unicode_id": "U+5EF1",
+      "count": 1
+    },
+    {
+      "index": 1401,
+      "char": "䲙",
+      "unicode_id": "U+4C99",
+      "count": 1
+    },
+    {
+      "index": 1402,
+      "char": "鱮",
+      "unicode_id": "U+9C6E",
+      "count": 1
+    },
+    {
+      "index": 1403,
+      "char": "菁",
+      "unicode_id": "U+83C1",
+      "count": 1
+    },
+    {
+      "index": 1404,
+      "char": "榕",
+      "unicode_id": "U+6995",
+      "count": 1
+    },
+    {
+      "index": 1405,
+      "char": "犀",
+      "unicode_id": "U+7280",
+      "count": 1
+    },
+    {
+      "index": 1406,
+      "char": "鯎",
+      "unicode_id": "U+9BCE",
+      "count": 1
+    },
+    {
+      "index": 1407,
+      "char": "斛",
+      "unicode_id": "U+659B",
+      "count": 1
+    },
+    {
+      "index": 1408,
+      "char": "煻",
+      "unicode_id": "U+717B",
+      "count": 1
+    },
+    {
+      "index": 1409,
+      "char": "栃",
+      "unicode_id": "U+6803",
+      "count": 1
+    },
+    {
+      "index": 1410,
+      "char": "媳",
+      "unicode_id": "U+5AB3",
+      "count": 1
+    },
+    {
+      "index": 1411,
+      "char": "薔",
+      "unicode_id": "U+8594",
+      "count": 1
+    },
+    {
+      "index": 1412,
+      "char": "苪",
+      "unicode_id": "U+82EA",
+      "count": 1
+    },
+    {
+      "index": 1413,
+      "char": "宕",
+      "unicode_id": "U+5B95",
+      "count": 1
+    },
+    {
+      "index": 1414,
+      "char": "嗽",
+      "unicode_id": "U+55FD",
+      "count": 1
+    },
+    {
+      "index": 1415,
+      "char": "欬",
+      "unicode_id": "U+6B2C",
+      "count": 1
+    },
+    {
+      "index": 1416,
+      "char": "鬌",
+      "unicode_id": "U+9B0C",
+      "count": 1
+    },
+    {
+      "index": 1417,
+      "char": "韃",
+      "unicode_id": "U+97C3",
+      "count": 1
+    },
+    {
+      "index": 1418,
+      "char": "靼",
+      "unicode_id": "U+977C",
+      "count": 1
+    },
+    {
+      "index": 1419,
+      "char": "尨",
+      "unicode_id": "U+5C28",
+      "count": 1
+    },
+    {
+      "index": 1420,
+      "char": "鱅",
+      "unicode_id": "U+9C45",
+      "count": 1
+    },
+    {
+      "index": 1421,
+      "char": "鯯",
+      "unicode_id": "U+9BEF",
+      "count": 1
+    },
+    {
+      "index": 1422,
+      "char": "躡",
+      "unicode_id": "U+8EA1",
+      "count": 1
+    },
+    {
+      "index": 1423,
+      "char": "爈",
+      "unicode_id": "U+7208",
+      "count": 1
+    },
+    {
+      "index": 1424,
+      "char": "翡",
+      "unicode_id": "U+7FE1",
+      "count": 1
+    },
+    {
+      "index": 1425,
+      "char": "楴",
+      "unicode_id": "U+6974",
+      "count": 1
+    },
+    {
+      "index": 1426,
+      "char": "顙",
+      "unicode_id": "U+9859",
+      "count": 1
+    },
+    {
+      "index": 1427,
+      "char": "栝",
+      "unicode_id": "U+681D",
+      "count": 1
+    },
+    {
+      "index": 1428,
+      "char": "葡",
+      "unicode_id": "U+8461",
+      "count": 1
+    },
+    {
+      "index": 1429,
+      "char": "𥶡",
+      "unicode_id": "U+25DA1",
+      "count": 1
+    },
+    {
+      "index": 1430,
+      "char": "贄",
+      "unicode_id": "U+8D04",
+      "count": 1
+    },
+    {
+      "index": 1431,
+      "char": "糜",
+      "unicode_id": "U+7CDC",
+      "count": 1
+    },
+    {
+      "index": 1432,
+      "char": "蝸",
+      "unicode_id": "U+8778",
+      "count": 1
+    },
+    {
+      "index": 1433,
+      "char": "鷂",
+      "unicode_id": "U+9DC2",
+      "count": 1
+    },
+    {
+      "index": 1434,
+      "char": "筲",
+      "unicode_id": "U+7B72",
+      "count": 1
+    },
+    {
+      "index": 1435,
+      "char": "蝠",
+      "unicode_id": "U+8760",
+      "count": 1
+    },
+    {
+      "index": 1436,
+      "char": "鼺",
+      "unicode_id": "U+9F3A",
+      "count": 1
+    },
+    {
+      "index": 1437,
+      "char": "壒",
+      "unicode_id": "U+58D2",
+      "count": 1
+    },
+    {
+      "index": 1438,
+      "char": "熇",
+      "unicode_id": "U+7187",
+      "count": 1
+    },
+    {
+      "index": 1439,
+      "char": "蚺",
+      "unicode_id": "U+86BA",
+      "count": 1
+    },
+    {
+      "index": 1440,
+      "char": "蜥",
+      "unicode_id": "U+8725",
+      "count": 1
+    },
+    {
+      "index": 1441,
+      "char": "蠮",
+      "unicode_id": "U+882E",
+      "count": 1
+    },
+    {
+      "index": 1442,
+      "char": "螉",
+      "unicode_id": "U+8789",
+      "count": 1
+    },
+    {
+      "index": 1443,
+      "char": "罟",
+      "unicode_id": "U+7F5F",
+      "count": 1
+    },
+    {
+      "index": 1444,
+      "char": "瓮",
+      "unicode_id": "U+74EE",
+      "count": 1
+    },
+    {
+      "index": 1445,
+      "char": "昴",
+      "unicode_id": "U+6634",
+      "count": 1
+    },
+    {
+      "index": 1446,
+      "char": "鬛",
+      "unicode_id": "U+9B1B",
+      "count": 1
+    },
+    {
+      "index": 1447,
+      "char": "蓴",
+      "unicode_id": "U+84F4",
+      "count": 1
+    },
+    {
+      "index": 1448,
+      "char": "莾",
+      "unicode_id": "U+83BE",
+      "count": 1
+    },
+    {
+      "index": 1449,
+      "char": "蜐",
+      "unicode_id": "U+8710",
+      "count": 1
+    },
+    {
+      "index": 1450,
+      "char": "枲",
+      "unicode_id": "U+67B2",
+      "count": 1
+    },
+    {
+      "index": 1451,
+      "char": "蘩",
+      "unicode_id": "U+8629",
+      "count": 1
+    },
+    {
+      "index": 1452,
+      "char": "螫",
+      "unicode_id": "U+87AB",
+      "count": 1
+    },
+    {
+      "index": 1453,
+      "char": "𣉊",
+      "unicode_id": "U+2324A",
+      "count": 1
+    },
+    {
+      "index": 1454,
+      "char": "槳",
+      "unicode_id": "U+69F3",
+      "count": 1
+    },
+    {
+      "index": 1455,
+      "char": "泝",
+      "unicode_id": "U+6CDD",
+      "count": 1
+    },
+    {
+      "index": 1456,
+      "char": "渺",
+      "unicode_id": "U+6E3A",
+      "count": 1
+    },
+    {
+      "index": 1457,
+      "char": "𦒳",
+      "unicode_id": "U+264B3",
+      "count": 1
+    },
+    {
+      "index": 1458,
+      "char": "摹",
+      "unicode_id": "U+6479",
+      "count": 1
+    },
+    {
+      "index": 1459,
+      "char": "祈",
+      "unicode_id": "U+FA4E",
+      "count": 1
+    },
+    {
+      "index": 1460,
+      "char": "益",
+      "unicode_id": "U+FA17",
+      "count": 1
+    },
+    {
+      "index": 1461,
+      "char": "凧",
+      "unicode_id": "U+51E7",
+      "count": 1
+    },
+    {
+      "index": 1462,
+      "char": "㐫",
+      "unicode_id": "U+342B",
+      "count": 1
+    },
+    {
+      "index": 1463,
+      "char": "蛕",
+      "unicode_id": "U+86D5",
+      "count": 1
+    },
+    {
+      "index": 1464,
+      "char": "嫦",
+      "unicode_id": "U+5AE6",
+      "count": 1
+    },
+    {
+      "index": 1465,
+      "char": "窪",
+      "unicode_id": "U+7AAA",
+      "count": 1
+    },
+    {
+      "index": 1466,
+      "char": "㱕",
+      "unicode_id": "U+3C55",
+      "count": 1
+    },
+    {
+      "index": 1467,
+      "char": "繾",
+      "unicode_id": "U+7E7E",
+      "count": 1
+    },
+    {
+      "index": 1468,
+      "char": "佀",
+      "unicode_id": "U+4F40",
+      "count": 1
+    },
+    {
+      "index": 1469,
+      "char": "胭",
+      "unicode_id": "U+80ED",
+      "count": 1
+    },
+    {
+      "index": 1470,
+      "char": "巵",
+      "unicode_id": "U+5DF5",
+      "count": 1
+    },
+    {
+      "index": 1471,
+      "char": "㔺",
+      "unicode_id": "U+353A",
+      "count": 1
+    },
+    {
+      "index": 1472,
+      "char": "囁",
+      "unicode_id": "U+56C1",
+      "count": 1
+    },
+    {
+      "index": 1473,
+      "char": "栫",
+      "unicode_id": "U+682B",
+      "count": 1
+    },
+    {
+      "index": 1474,
+      "char": "瑕",
+      "unicode_id": "U+7455",
+      "count": 1
+    },
+    {
+      "index": 1475,
+      "char": "悠",
+      "unicode_id": "U+60A0",
+      "count": 1
+    },
+    {
+      "index": 1476,
+      "char": "帙",
+      "unicode_id": "U+5E19",
+      "count": 1
+    },
+    {
+      "index": 1477,
+      "char": "租",
+      "unicode_id": "U+79DF",
+      "count": 1
+    },
+    {
+      "index": 1478,
+      "char": "𡈽",
+      "unicode_id": "U+2123D",
+      "count": 1
+    },
+    {
+      "index": 1479,
+      "char": "ザ",
+      "unicode_id": "U+30B6",
+      "count": 1
+    },
+    {
+      "index": 1480,
+      "char": "莽",
+      "unicode_id": "U+83BD",
+      "count": 1
+    },
+    {
+      "index": 1481,
+      "char": "庻",
+      "unicode_id": "U+5EBB",
+      "count": 1
+    },
+    {
+      "index": 1482,
+      "char": "確",
+      "unicode_id": "U+78BA",
+      "count": 1
+    },
+    {
+      "index": 1483,
+      "char": "驥",
+      "unicode_id": "U+9A65",
+      "count": 1
+    },
+    {
+      "index": 1484,
+      "char": "駑",
+      "unicode_id": "U+99D1",
+      "count": 1
+    },
+    {
+      "index": 1485,
+      "char": "芬",
+      "unicode_id": "U+82AC",
+      "count": 1
+    },
+    {
+      "index": 1486,
+      "char": "鵉",
+      "unicode_id": "U+9D49",
+      "count": 1
+    },
+    {
+      "index": 1487,
+      "char": "咋",
+      "unicode_id": "U+548B",
+      "count": 1
+    },
+    {
+      "index": 1488,
+      "char": "蜋",
+      "unicode_id": "U+870B",
+      "count": 1
+    },
+    {
+      "index": 1489,
+      "char": "僮",
+      "unicode_id": "U+50EE",
+      "count": 1
+    },
+    {
+      "index": 1490,
+      "char": "貊",
+      "unicode_id": "U+8C8A",
+      "count": 1
+    },
+    {
+      "index": 1491,
+      "char": "虯",
+      "unicode_id": "U+866F",
+      "count": 1
+    },
+    {
+      "index": 1492,
+      "char": "沿",
+      "unicode_id": "U+6CBF",
+      "count": 1
+    },
+    {
+      "index": 1493,
+      "char": "伉",
+      "unicode_id": "U+4F09",
+      "count": 1
+    },
+    {
+      "index": 1494,
+      "char": "虐",
+      "unicode_id": "U+8650",
+      "count": 1
+    },
+    {
+      "index": 1495,
+      "char": "苛",
+      "unicode_id": "U+82DB",
+      "count": 1
+    },
+    {
+      "index": 1496,
+      "char": "汶",
+      "unicode_id": "U+6C76",
+      "count": 1
+    },
+    {
+      "index": 1497,
+      "char": "騰",
+      "unicode_id": "U+9A30",
+      "count": 1
+    },
+    {
+      "index": 1498,
+      "char": "眩",
+      "unicode_id": "U+7729",
+      "count": 1
+    },
+    {
+      "index": 1499,
+      "char": "倰",
+      "unicode_id": "U+5030",
+      "count": 1
+    },
+    {
+      "index": 1500,
+      "char": "僜",
+      "unicode_id": "U+50DC",
+      "count": 1
+    },
+    {
+      "index": 1501,
+      "char": "捐",
+      "unicode_id": "U+6350",
+      "count": 1
+    },
+    {
+      "index": 1502,
+      "char": "紊",
+      "unicode_id": "U+7D0A",
+      "count": 1
+    },
+    {
+      "index": 1503,
+      "char": "鬨",
+      "unicode_id": "U+9B28",
+      "count": 1
+    },
+    {
+      "index": 1504,
+      "char": "彊",
+      "unicode_id": "U+5F4A",
+      "count": 1
+    },
+    {
+      "index": 1505,
+      "char": "豢",
+      "unicode_id": "U+8C62",
+      "count": 1
+    },
+    {
+      "index": 1506,
+      "char": "迭",
+      "unicode_id": "U+8FED",
+      "count": 1
+    },
+    {
+      "index": 1507,
+      "char": "獰",
+      "unicode_id": "U+7370",
+      "count": 1
+    },
+    {
+      "index": 1508,
+      "char": "狰",
+      "unicode_id": "U+72F0",
+      "count": 1
+    },
+    {
+      "index": 1509,
+      "char": "毯",
+      "unicode_id": "U+6BEF",
+      "count": 1
+    },
+    {
+      "index": 1510,
+      "char": "慣",
+      "unicode_id": "U+6163",
+      "count": 1
+    },
+    {
+      "index": 1511,
+      "char": "捲",
+      "unicode_id": "U+6372",
+      "count": 1
+    },
+    {
+      "index": 1512,
+      "char": "摚",
+      "unicode_id": "U+645A",
+      "count": 1
+    },
+    {
+      "index": 1513,
+      "char": "瞪",
+      "unicode_id": "U+77AA",
+      "count": 1
+    },
+    {
+      "index": 1514,
+      "char": "觴",
+      "unicode_id": "U+89F4",
+      "count": 1
+    },
+    {
+      "index": 1515,
+      "char": "媵",
+      "unicode_id": "U+5AB5",
+      "count": 1
+    },
+    {
+      "index": 1516,
+      "char": "賂",
+      "unicode_id": "U+8CC2",
+      "count": 1
+    },
+    {
+      "index": 1517,
+      "char": "碌",
+      "unicode_id": "U+788C",
+      "count": 1
+    },
+    {
+      "index": 1518,
+      "char": "港",
+      "unicode_id": "U+6E2F",
+      "count": 1
+    },
+    {
+      "index": 1519,
+      "char": "蚩",
+      "unicode_id": "U+86A9",
+      "count": 1
+    },
+    {
+      "index": 1520,
+      "char": "眦",
+      "unicode_id": "U+7726",
+      "count": 1
+    },
+    {
+      "index": 1521,
+      "char": "餮",
+      "unicode_id": "U+992E",
+      "count": 1
+    },
+    {
+      "index": 1522,
+      "char": "饕",
+      "unicode_id": "U+9955",
+      "count": 1
+    },
+    {
+      "index": 1523,
+      "char": "仗",
+      "unicode_id": "U+4ED7",
+      "count": 1
+    },
+    {
+      "index": 1524,
+      "char": "頥",
+      "unicode_id": "U+9825",
+      "count": 1
+    },
+    {
+      "index": 1525,
+      "char": "軈",
+      "unicode_id": "U+8EC8",
+      "count": 1
+    },
+    {
+      "index": 1526,
+      "char": "珪",
+      "unicode_id": "U+73EA",
+      "count": 1
+    },
+    {
+      "index": 1527,
+      "char": "畋",
+      "unicode_id": "U+754B",
+      "count": 1
+    },
+    {
+      "index": 1528,
+      "char": "倏",
+      "unicode_id": "U+500F",
+      "count": 1
+    },
+    {
+      "index": 1529,
+      "char": "愕",
+      "unicode_id": "U+6115",
+      "count": 1
+    },
+    {
+      "index": 1530,
+      "char": "頁",
+      "unicode_id": "U+9801",
+      "count": 1
+    },
+    {
+      "index": 1531,
+      "char": "緊",
+      "unicode_id": "U+7DCA",
+      "count": 1
+    },
+    {
+      "index": 1532,
+      "char": "夭",
+      "unicode_id": "U+592D",
+      "count": 1
+    },
+    {
+      "index": 1533,
+      "char": "孩",
+      "unicode_id": "U+5B69",
+      "count": 1
+    },
+    {
+      "index": 1534,
+      "char": "婪",
+      "unicode_id": "U+5A6A",
+      "count": 1
+    },
+    {
+      "index": 1535,
+      "char": "諜",
+      "unicode_id": "U+8ADC",
+      "count": 1
+    },
+    {
+      "index": 1536,
+      "char": "脆",
+      "unicode_id": "U+8106",
+      "count": 1
+    },
+    {
+      "index": 1537,
+      "char": "离",
+      "unicode_id": "U+79BB",
+      "count": 1
+    },
+    {
+      "index": 1538,
+      "char": "遖",
+      "unicode_id": "U+9056",
+      "count": 1
+    },
+    {
+      "index": 1539,
+      "char": "誼",
+      "unicode_id": "U+8ABC",
+      "count": 1
+    },
+    {
+      "index": 1540,
+      "char": "鶍",
+      "unicode_id": "U+9D8D",
+      "count": 1
+    },
+    {
+      "index": 1541,
+      "char": "撈",
+      "unicode_id": "U+6488",
+      "count": 1
+    },
+    {
+      "index": 1542,
+      "char": "蛥",
+      "unicode_id": "U+86E5",
+      "count": 1
+    },
+    {
+      "index": 1543,
+      "char": "鰲",
+      "unicode_id": "U+9C32",
+      "count": 1
+    },
+    {
+      "index": 1544,
+      "char": "芟",
+      "unicode_id": "U+829F",
+      "count": 1
+    },
+    {
+      "index": 1545,
+      "char": "哩",
+      "unicode_id": "U+54E9",
+      "count": 1
+    },
+    {
+      "index": 1546,
+      "char": "坦",
+      "unicode_id": "U+5766",
+      "count": 1
+    },
+    {
+      "index": 1547,
+      "char": "鬣",
+      "unicode_id": "U+9B23",
+      "count": 1
+    },
+    {
+      "index": 1548,
+      "char": "俺",
+      "unicode_id": "U+4FFA",
+      "count": 1
+    },
+    {
+      "index": 1549,
+      "char": "笏",
+      "unicode_id": "U+7B0F",
+      "count": 1
+    },
+    {
+      "index": 1550,
+      "char": "廪",
+      "unicode_id": "U+5EEA",
+      "count": 1
+    },
+    {
+      "index": 1551,
+      "char": "邨",
+      "unicode_id": "U+90A8",
+      "count": 1
+    },
+    {
+      "index": 1552,
+      "char": "抗",
+      "unicode_id": "U+6297",
+      "count": 1
+    },
+    {
+      "index": 1553,
+      "char": "擴",
+      "unicode_id": "U+64F4",
+      "count": 1
+    },
+    {
+      "index": 1554,
+      "char": "漠",
+      "unicode_id": "U+6F20",
+      "count": 1
+    },
+    {
+      "index": 1555,
+      "char": "趁",
+      "unicode_id": "U+8D81",
+      "count": 1
+    },
+    {
+      "index": 1556,
+      "char": "傲",
+      "unicode_id": "U+50B2",
+      "count": 1
+    },
+    {
+      "index": 1557,
+      "char": "笞",
+      "unicode_id": "U+7B1E",
+      "count": 1
+    },
+    {
+      "index": 1558,
+      "char": "楝",
+      "unicode_id": "U+695D",
+      "count": 1
+    },
+    {
+      "index": 1559,
+      "char": "雋",
+      "unicode_id": "U+96CB",
+      "count": 1
+    },
+    {
+      "index": 1560,
+      "char": "鄭",
+      "unicode_id": "U+912D",
+      "count": 1
+    },
+    {
+      "index": 1561,
+      "char": "逈",
+      "unicode_id": "U+9008",
+      "count": 1
+    },
+    {
+      "index": 1562,
+      "char": "髦",
+      "unicode_id": "U+9AE6",
+      "count": 1
+    },
+    {
+      "index": 1563,
+      "char": "謁",
+      "unicode_id": "U+8B01",
+      "count": 1
+    },
+    {
+      "index": 1564,
+      "char": "醼",
+      "unicode_id": "U+91BC",
+      "count": 1
+    },
+    {
+      "index": 1565,
+      "char": "歛",
+      "unicode_id": "U+6B5B",
+      "count": 1
+    },
+    {
+      "index": 1566,
+      "char": "惇",
+      "unicode_id": "U+60C7",
+      "count": 1
+    },
+    {
+      "index": 1567,
+      "char": "莅",
+      "unicode_id": "U+8385",
+      "count": 1
+    },
+    {
+      "index": 1568,
+      "char": "泄",
+      "unicode_id": "U+6CC4",
+      "count": 1
+    },
+    {
+      "index": 1569,
+      "char": "4",
+      "unicode_id": "U+0034",
+      "count": 1
+    },
+    {
+      "index": 1570,
+      "char": "6",
+      "unicode_id": "U+0036",
+      "count": 1
+    },
+    {
+      "index": 1571,
+      "char": "渣",
+      "unicode_id": "U+6E23",
+      "count": 1
+    },
+    {
+      "index": 1572,
+      "char": "滓",
+      "unicode_id": "U+6ED3",
+      "count": 1
+    },
+    {
+      "index": 1573,
+      "char": "嫵",
+      "unicode_id": "U+5AF5",
+      "count": 1
+    },
+    {
+      "index": 1574,
+      "char": "岱",
+      "unicode_id": "U+5CB1",
+      "count": 1
+    },
+    {
+      "index": 1575,
+      "char": "截",
+      "unicode_id": "U+622A",
+      "count": 1
+    },
+    {
+      "index": 1576,
+      "char": "瞋",
+      "unicode_id": "U+778B",
+      "count": 1
+    },
+    {
+      "index": 1577,
+      "char": "羲",
+      "unicode_id": "U+7FB2",
+      "count": 1
+    },
+    {
+      "index": 1578,
+      "char": "款",
+      "unicode_id": "U+6B3E",
+      "count": 1
+    },
+    {
+      "index": 1579,
+      "char": "贋",
+      "unicode_id": "U+8D0B",
+      "count": 1
+    },
+    {
+      "index": 1580,
+      "char": "鶚",
+      "unicode_id": "U+9D9A",
+      "count": 1
+    },
+    {
+      "index": 1581,
+      "char": "葩",
+      "unicode_id": "U+8469",
+      "count": 1
+    },
+    {
+      "index": 1582,
+      "char": "?",
+      "unicode_id": "U+003F",
+      "count": 1
+    },
+    {
+      "index": 1583,
+      "char": "臻",
+      "unicode_id": "U+81FB",
+      "count": 1
+    },
+    {
+      "index": 1584,
+      "char": "酎",
+      "unicode_id": "U+914E",
+      "count": 1
+    },
+    {
+      "index": 1585,
+      "char": "姒",
+      "unicode_id": "U+59D2",
+      "count": 1
+    },
+    {
+      "index": 1586,
+      "char": "鑛",
+      "unicode_id": "U+945B",
+      "count": 1
+    },
+    {
+      "index": 1587,
+      "char": "捶",
+      "unicode_id": "U+6376",
+      "count": 1
+    },
+    {
+      "index": 1588,
+      "char": "墜",
+      "unicode_id": "U+589C",
+      "count": 1
+    },
+    {
+      "index": 1589,
+      "char": "苻",
+      "unicode_id": "U+82FB",
+      "count": 1
+    },
+    {
+      "index": 1590,
+      "char": "掫",
+      "unicode_id": "U+63AB",
+      "count": 1
+    },
+    {
+      "index": 1591,
+      "char": "个",
+      "unicode_id": "U+4E2A",
+      "count": 1
+    },
+    {
+      "index": 1592,
+      "char": "颪",
+      "unicode_id": "U+98AA",
+      "count": 1
+    },
+    {
+      "index": 1593,
+      "char": "槫",
+      "unicode_id": "U+69EB",
+      "count": 1
+    },
+    {
+      "index": 1594,
+      "char": "夯",
+      "unicode_id": "U+592F",
+      "count": 1
+    },
+    {
+      "index": 1595,
+      "char": "渚",
+      "unicode_id": "U+6E1A",
+      "count": 1
+    },
+    {
+      "index": 1596,
+      "char": "龐",
+      "unicode_id": "U+9F90",
+      "count": 1
+    },
+    {
+      "index": 1597,
+      "char": "詈",
+      "unicode_id": "U+8A48",
+      "count": 1
+    },
+    {
+      "index": 1598,
+      "char": "魼",
+      "unicode_id": "U+9B7C",
+      "count": 1
+    },
+    {
+      "index": 1599,
+      "char": "簔",
+      "unicode_id": "U+7C14",
+      "count": 1
+    },
+    {
+      "index": 1600,
+      "char": "甍",
+      "unicode_id": "U+750D",
+      "count": 1
+    },
+    {
+      "index": 1601,
+      "char": "値",
+      "unicode_id": "U+5024",
+      "count": 1
+    },
+    {
+      "index": 1602,
+      "char": "囿",
+      "unicode_id": "U+56FF",
+      "count": 1
+    },
+    {
+      "index": 1603,
+      "char": "畾",
+      "unicode_id": "U+757E",
+      "count": 1
+    },
+    {
+      "index": 1604,
+      "char": "眇",
+      "unicode_id": "U+7707",
+      "count": 1
+    },
+    {
+      "index": 1605,
+      "char": "楪",
+      "unicode_id": "U+696A",
+      "count": 1
+    },
+    {
+      "index": 1606,
+      "char": "岑",
+      "unicode_id": "U+5C91",
+      "count": 1
+    },
+    {
+      "index": 1607,
+      "char": "轆",
+      "unicode_id": "U+8F46",
+      "count": 1
+    },
+    {
+      "index": 1608,
+      "char": "轤",
+      "unicode_id": "U+8F64",
+      "count": 1
+    },
+    {
+      "index": 1609,
+      "char": "攫",
+      "unicode_id": "U+652B",
+      "count": 1
+    },
+    {
+      "index": 1610,
+      "char": "舒",
+      "unicode_id": "U+8212",
+      "count": 1
+    },
+    {
+      "index": 1611,
+      "char": "盂",
+      "unicode_id": "U+76C2",
+      "count": 1
+    },
+    {
+      "index": 1612,
+      "char": "鴃",
+      "unicode_id": "U+9D03",
+      "count": 1
+    },
+    {
+      "index": 1613,
+      "char": "丱",
+      "unicode_id": "U+4E31",
+      "count": 1
+    },
+    {
+      "index": 1614,
+      "char": "婉",
+      "unicode_id": "U+5A49",
+      "count": 1
+    },
+    {
+      "index": 1615,
+      "char": "㡌",
+      "unicode_id": "U+384C",
+      "count": 1
+    },
+    {
+      "index": 1616,
+      "char": "喻",
+      "unicode_id": "U+55BB",
+      "count": 1
+    },
+    {
+      "index": 1617,
+      "char": "逰",
+      "unicode_id": "U+9030",
+      "count": 1
+    },
+    {
+      "index": 1618,
+      "char": "劄",
+      "unicode_id": "U+5284",
+      "count": 1
+    },
+    {
+      "index": 1619,
+      "char": "裒",
+      "unicode_id": "U+88D2",
+      "count": 1
+    },
+    {
+      "index": 1620,
+      "char": "慫",
+      "unicode_id": "U+616B",
+      "count": 1
+    },
+    {
+      "index": 1621,
+      "char": "慂",
+      "unicode_id": "U+6142",
+      "count": 1
+    },
+    {
+      "index": 1622,
+      "char": "僑",
+      "unicode_id": "U+50D1",
+      "count": 1
+    },
+    {
+      "index": 1623,
+      "char": "飄",
+      "unicode_id": "U+98C4",
+      "count": 1
+    },
+    {
+      "index": 1624,
+      "char": "寞",
+      "unicode_id": "U+5BDE",
+      "count": 1
+    },
+    {
+      "index": 1625,
+      "char": "潑",
+      "unicode_id": "U+6F51",
+      "count": 1
+    }
+  ]
+}

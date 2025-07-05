@@ -3,14 +3,15 @@
 文字コード出現回数カウントスクリプト
 
 data/processed_v2/column_info.csvのunicode_ids列から文字コードの出現回数を数え、
-5回以上出現する文字コードをJSON形式で出力します。
+5回以上と5回未満の文字コードを別々のJSON形式ファイルに出力します。
 
 出力形式:
 {
     "summary": {
         "total_characters": int,
-        "characters_above_threshold": int,
-        "threshold": int
+        "characters_in_category": int,
+        "threshold": int,
+        "category": str
     },
     "characters": [
         {
@@ -65,16 +66,17 @@ def parse_unicode_list(unicode_str: str) -> list[str]:
         return []
 
 
-def count_character_frequencies(csv_path: str, threshold: int = 5) -> dict:
+def count_character_frequencies(csv_path: str, threshold: int = 5) -> tuple[dict, dict]:
     """
     CSVファイルから文字コードの出現回数を数える
 
     Args:
         csv_path: CSVファイルのパス
-        threshold: 出現回数の閾値（この値以上のものを出力）
+        threshold: 出現回数の閾値
 
     Returns:
-        結果を格納した辞書
+        (above_threshold_result, below_threshold_result)のタプル
+        それぞれ結果を格納した辞書
     """
     # CSVファイル読み込み
     print(f"Loading CSV file: {csv_path}")
@@ -107,31 +109,51 @@ def count_character_frequencies(csv_path: str, threshold: int = 5) -> dict:
     print("Counting character frequencies...")
     char_counter = Counter(all_unicode_codes)
 
-    # 閾値以上の文字コードを抽出
-    frequent_chars = [(unicode_id, count) for unicode_id, count in char_counter.items() if count >= threshold]
-    frequent_chars.sort(key=lambda x: x[1], reverse=True)  # 出現回数の降順でソート
+    # 閾値以上と閾値未満の文字コードを分ける
+    above_threshold_chars = [(unicode_id, count) for unicode_id, count in char_counter.items() if count >= threshold]
+    below_threshold_chars = [(unicode_id, count) for unicode_id, count in char_counter.items() if count < threshold]
 
-    # 結果を辞書形式で整理
-    result = {
+    # 出現回数の降順でソート
+    above_threshold_chars.sort(key=lambda x: x[1], reverse=True)
+    below_threshold_chars.sort(key=lambda x: x[1], reverse=True)
+
+    # 閾値以上の結果を辞書形式で整理
+    above_threshold_result = {
         "summary": {
             "total_characters": len(char_counter),
-            "characters_above_threshold": len(frequent_chars),
+            "characters_in_category": len(above_threshold_chars),
             "threshold": threshold,
+            "category": "above_threshold",
         },
         "characters": [
             {"index": idx + 1, "char": convert_unicode_to_char(unicode_id), "unicode_id": unicode_id, "count": count}
-            for idx, (unicode_id, count) in enumerate(frequent_chars)
+            for idx, (unicode_id, count) in enumerate(above_threshold_chars)
         ],
     }
 
-    return result
+    # 閾値未満の結果を辞書形式で整理
+    below_threshold_result = {
+        "summary": {
+            "total_characters": len(char_counter),
+            "characters_in_category": len(below_threshold_chars),
+            "threshold": threshold,
+            "category": "below_threshold",
+        },
+        "characters": [
+            {"index": idx + 1, "char": convert_unicode_to_char(unicode_id), "unicode_id": unicode_id, "count": count}
+            for idx, (unicode_id, count) in enumerate(below_threshold_chars)
+        ],
+    }
+
+    return above_threshold_result, below_threshold_result
 
 
 def main():
     """メイン関数"""
     # パス設定
     csv_path = "data/processed_v2/column_info.csv"
-    output_path = "character_count_results.json"
+    above_threshold_output_path = "character_count_above_threshold.json"
+    below_threshold_output_path = "character_count_below_threshold.json"
     threshold = 5
 
     # CSVファイルの存在確認
@@ -143,32 +165,49 @@ def main():
     print("文字コード出現回数カウントスクリプト")
     print("=" * 50)
     print(f"入力ファイル: {csv_path}")
-    print(f"出力ファイル: {output_path}")
-    print(f"閾値: {threshold}回以上")
+    print(f"出力ファイル（閾値以上）: {above_threshold_output_path}")
+    print(f"出力ファイル（閾値未満）: {below_threshold_output_path}")
+    print(f"閾値: {threshold}回")
     print("=" * 50)
 
     try:
         # 文字コード出現回数をカウント
-        result = count_character_frequencies(csv_path, threshold)
+        above_result, below_result = count_character_frequencies(csv_path, threshold)
 
         # 結果をJSONファイルに出力
-        print(f"\nSaving results to: {output_path}")
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(result, f, ensure_ascii=False, indent=2)
+        print("\nSaving results...")
+
+        # 閾値以上の結果を保存
+        print(f"Saving above threshold results to: {above_threshold_output_path}")
+        with open(above_threshold_output_path, "w", encoding="utf-8") as f:
+            json.dump(above_result, f, ensure_ascii=False, indent=2)
+
+        # 閾値未満の結果を保存
+        print(f"Saving below threshold results to: {below_threshold_output_path}")
+        with open(below_threshold_output_path, "w", encoding="utf-8") as f:
+            json.dump(below_result, f, ensure_ascii=False, indent=2)
 
         # サマリーを表示
         print("\n" + "=" * 50)
         print("実行結果サマリー")
         print("=" * 50)
-        print(f"総文字種数: {result['summary']['total_characters']}")
-        print(f"閾値{threshold}回以上の文字種数: {result['summary']['characters_above_threshold']}")
+        print(f"総文字種数: {above_result['summary']['total_characters']}")
+        print(f"閾値{threshold}回以上の文字種数: {above_result['summary']['characters_in_category']}")
+        print(f"閾値{threshold}回未満の文字種数: {below_result['summary']['characters_in_category']}")
 
-        # 上位10文字を表示
-        print("\n上位10文字:")
-        for i, char_info in enumerate(result["characters"][:10]):
+        # 上位10文字を表示（閾値以上）
+        print(f"\n閾値{threshold}回以上の上位10文字:")
+        for i, char_info in enumerate(above_result["characters"][:10]):
             print(f"  {i + 1:2d}. {char_info['char']}: {char_info['count']:>6d}回")
 
-        print(f"\n詳細結果は {output_path} に保存されました。")
+        # 閾値未満の上位10文字を表示
+        print(f"\n閾値{threshold}回未満の上位10文字:")
+        for i, char_info in enumerate(below_result["characters"][:10]):
+            print(f"  {i + 1:2d}. {char_info['char']}: {char_info['count']:>6d}回")
+
+        print("\n詳細結果は以下のファイルに保存されました:")
+        print(f"  - 閾値以上: {above_threshold_output_path}")
+        print(f"  - 閾値未満: {below_threshold_output_path}")
 
     except Exception as e:
         print(f"Error: {e}")
