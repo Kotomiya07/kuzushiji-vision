@@ -429,6 +429,18 @@ def main():
     parser.add_argument("--gradient_accumulation_steps", type=int, default=None, help="Gradient accumulation steps.")
     parser.add_argument("--auto_find_batch_size", action="store_true", help="Auto find batch size.")
     parser.add_argument("--resume_from_checkpoint", type=str, default=None, help="Resume from checkpoint.")
+    parser.add_argument(
+        "--warmup_steps",
+        type=int,
+        default=0,
+        help="Number of warmup steps for learning rate scheduler. Recommended: 2000 for small models, 5000 for base models.",
+    )
+    parser.add_argument(
+        "--warmup_ratio",
+        type=float,
+        default=0,
+        help="Ratio of total steps to use for warmup (e.g., 0.1 for 10%%). If set, overrides warmup_steps.",
+    )
 
     args = parser.parse_args()
 
@@ -460,10 +472,7 @@ def main():
     # Tokenize the dataset
     def tokenize_function(examples):
         # Tokenize the texts. The tokenizer will automatically add CLS and SEP if configured.
-        tokenized = tokenizer(examples["text"], truncation=True)
-        # Ensure input_ids are of type Long (int64) to avoid dtype mismatch in DataCollator
-        if "input_ids" in tokenized:
-            tokenized["input_ids"] = [torch.tensor(ids, dtype=torch.long).tolist() for ids in tokenized["input_ids"]]
+        tokenized = tokenizer(examples["text"], truncation=True, padding=False)
         return tokenized
 
     tokenized_dataset = dataset.map(tokenize_function, batched=True, remove_columns=["text"])
@@ -496,6 +505,7 @@ def main():
         mlm=True,
         mlm_probability=args.mask_probability,
         return_tensors="pt",  # Ensure proper tensor format
+        pad_to_multiple_of=None,  # Disable padding to multiple
     )
     print(f"Using DataCollatorForLanguageModeling with mask probability: {args.mask_probability}")
 
@@ -506,14 +516,15 @@ def main():
     else:
         output_dir = args.resume_from_checkpoint
         run_name = args.resume_from_checkpoint.split("/")[-1] + "_resume"
+
     # 5. Training Arguments
     training_args = TrainingArguments(
         run_name=run_name,
         output_dir=output_dir,
         overwrite_output_dir=True,
         dataloader_pin_memory=True,
-        dataloader_num_workers=os.cpu_count(),
-        torch_compile=True,
+        dataloader_num_workers=8,
+        torch_compile=True, 
         num_train_epochs=args.num_train_epochs,
         per_device_train_batch_size=args.per_device_train_batch_size if not args.auto_find_batch_size else 512,
         per_device_eval_batch_size=args.per_device_eval_batch_size,
@@ -527,8 +538,11 @@ def main():
         load_best_model_at_end=True,
         metric_for_best_model="eval_f1",
         resume_from_checkpoint=args.resume_from_checkpoint,
-        optim="schedule_free_adamw",  # Schedule-Free Optimizer の指定
-        lr_scheduler_type="constant",
+        optim="adamw_torch",  # Schedule-Free Optimizer の指定
+        adam_beta2=0.9999,
+        lr_scheduler_type="cosine",
+        warmup_steps=args.warmup_steps,
+        warmup_ratio=args.warmup_ratio,
     )
     if args.gradient_accumulation_steps:
         training_args.gradient_accumulation_steps = args.gradient_accumulation_steps
@@ -705,6 +719,31 @@ python train_language_model.py \
     --save_steps 10000 \
     --eval_steps 10000 \
     --logging_steps 100 \
+    --warmup_steps 2000 \
+    --tokenizer_name experiments/kuzushiji_tokenizer_one_char \
+    --model_name KoichiYasuoka/roberta-small-japanese-aozora-char \
+    --dataset_dirs \
+        ndl-minhon-ocrdataset/src/honkoku_oneline_v1 \
+        ndl-minhon-ocrdataset/src/honkoku_oneline_v2 \
+        honkoku_yatanavi/honkoku_oneline \
+        data/oneline \
+        kokubunken_repo/text/azumakagami \
+        kokubunken_repo/text/eirigenji \
+        kokubunken_repo/text/nijuuichidaishuu \
+        kokubunken_repo/text/rekishimonogo
+
+# Alternative: Using warmup_ratio instead of fixed warmup_steps
+uv run python train_language_model.py \
+    --num_train_epochs 10000 \
+    --per_device_train_batch_size 1024 \
+    --per_device_eval_batch_size 2 \
+    --learning_rate 0.0001 \
+    --mask_probability 0.15 \
+    --test_size 0.2 \
+    --save_steps 10000 \
+    --eval_steps 10000 \
+    --logging_steps 1000 \
+    --warmup_ratio 0.1 \
     --tokenizer_name experiments/kuzushiji_tokenizer_one_char \
     --model_name KoichiYasuoka/roberta-small-japanese-aozora-char \
     --dataset_dirs \

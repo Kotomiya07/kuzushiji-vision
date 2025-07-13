@@ -176,6 +176,7 @@ data/column_dataset_f1/
 data/yolo_dataset_oneline/
 data/yolo_dataset_character_detection/
 data/yolo_dataset_character_detection_quadrant/
+data/yolo_dataset_character_detection_multi_grid/
 data/yolo_dataset_page_images_by_book/
 data/visualize/
 data/*.zip

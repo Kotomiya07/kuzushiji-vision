@@ -11,9 +11,9 @@
 - 1つの元画像から14枚の画像を生成（14倍のデータ拡張）
 
 使用例:
-    python scripts/create_quadrant_dataset.py
-    python scripts/create_quadrant_dataset.py --visualize --sample_count 5
-    python scripts/create_quadrant_dataset.py --output_dir data/custom_output
+    python scripts/create_multi_grid_dataset.py
+    python scripts/create_multi_grid_dataset.py --visualize --sample_count 5
+    python scripts/create_multi_grid_dataset.py --output_dir data/custom_output
 """
 
 import argparse
@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 # プロジェクトルートをパスに追加
 sys.path.append(str(Path(__file__).parent.parent))
 
-from src.utils.quadrant_processor import MultiGridProcessor
+from src.utils.multi_grid_processor import MultiGridProcessor
 
 
 def create_dataset_yaml(output_dir: str):
@@ -348,9 +348,9 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 使用例:
-  python scripts/create_quadrant_dataset.py
-  python scripts/create_quadrant_dataset.py --visualize --sample_count 5
-  python scripts/create_quadrant_dataset.py --output_dir data/custom_multi_grid_dataset
+  python scripts/create_multi_grid_dataset.py
+  python scripts/create_multi_grid_dataset.py --visualize --sample_count 5
+  python scripts/create_multi_grid_dataset.py --output_dir data/custom_multi_grid_dataset
         """,
     )
 
@@ -364,8 +364,8 @@ def main():
     parser.add_argument(
         "--output_dir",
         type=str,
-        default="data/yolo_dataset_character_detection_quadrant",
-        help="出力データセットのディレクトリ (デフォルト: data/yolo_dataset_character_detection_quadrant)",
+        default="data/yolo_dataset_character_detection_multi_grid",
+        help="出力データセットのディレクトリ (デフォルト: data/yolo_dataset_character_detection_multi_grid)",
     )
 
     parser.add_argument(
