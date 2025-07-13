@@ -4,14 +4,14 @@ seed: 42 # Global random seed
 model:
   name: "character_detection"
   type: "yolo"
-  backbone: "yolo11n"
+  backbone: "yolo12x"
   input_size: [640, 640]  # 長辺を640にリサイズ（アスペクト比保持）
   num_classes: 1  # 文字位置検出のみ（文字種分類なし）
 
 training:
-  batch_size: -1
+  batch_size: 8
   patience: 15
-  learning_rate: 0.001
+  learning_rate: 0.0001
   optimizer: "adamW"
   weight_decay: 0.0001
   scheduler:
@@ -30,15 +30,15 @@ augmentation:
 
 data:
   # Paths to annotation files
-  train_annotation: "data/column_dataset/train/train_column_info.csv"
-  val_annotation: "data/column_dataset/val/val_column_info.csv"
-  test_annotation: "data/column_dataset/test/test_column_info.csv"
+  train_annotation: "data/yolo_dataset_character_detection_multi_grid/train/train_column_info.csv"
+  val_annotation: "data/yolo_dataset_character_detection_multi_grid/val/val_column_info.csv"
+  test_annotation: "data/yolo_dataset_character_detection_multi_grid/test/test_column_info.csv"
   # Paths to image directories
-  train_image_dir: "data/column_dataset/train/images/"
-  val_image_dir: "data/column_dataset/val/images/"
-  test_image_dir: "data/column_dataset/test/images/"
+  train_image_dir: "data/yolo_dataset_character_detection_multi_grid/train/images/"
+  val_image_dir: "data/yolo_dataset_character_detection_multi_grid/val/images/"
+  test_image_dir: "data/yolo_dataset_character_detection_multi_grid/test/images/"
   # Unicode dictionary for Kuzushiji characters
-  unicode_dict: "data/column_dataset/unicode_to_id.json"
+  unicode_dict: "data/yolo_dataset_character_detection_multi_grid/unicode_to_id.json"
 
 evaluation:
   iou_threshold: 0.5 # IoU threshold for mAP and accuracy calculation

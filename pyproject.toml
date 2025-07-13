@@ -48,6 +48,18 @@ dependencies = [
 readme = "README.md"
 requires-python = ">= 3.10"
 
+[project.optional-dependencies]
+build = ["torch", "setuptools", "packaging"]
+compile = ["flash-attn"]
+
+[tool.uv]
+no-build-isolation-package = ["flash-attn"]
+
+[[tool.uv.dependency-metadata]]
+name = "flash-attn"
+version = "2.7.3"
+requires-dist = ["torch", "einops"]
+
 [dependency-groups]
 dev = [
     "mypy==1.15.0",
@@ -55,9 +67,6 @@ dev = [
     "ruff==0.9.10",
     "selenium>=4.33.0",
     "snakeviz==2.2.2",
-]
-flash-attn = [
-    "flash-attn==2.7.4.post1",
 ]
 
 [build-system]
@@ -93,7 +102,6 @@ torchvision = [
 [tool.ruff]
 # 1行の最大文字数
 line-length = 127
-exclude = [".git", ".ruff_cache", ".venv", ".vscode", "notebooks", "*.ipynb"]
 
 [tool.ruff.lint]
 # チェックするエラーの種類
