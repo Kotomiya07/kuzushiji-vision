@@ -1,0 +1,64 @@
+seed: 42
+
+model:
+  name: "character_detection_rfdetr"
+  type: "rfdetr"
+  size: "nano"  # 利用するRF-DETRモデルサイズ（nano/small/medium/base/large）
+  num_classes: 1
+  resolution: 384
+  params:
+    gradient_checkpointing: false
+    amp: true
+    group_detr: 13
+
+training:
+  batch_size: 2
+  grad_accum_steps: 1
+  learning_rate: 0.0001
+  learning_rate_encoder: 0.00015
+  weight_decay: 0.0001
+  lr_drop: 150
+  ema_decay: 0.993
+  ema_tau: 100
+  checkpoint_interval: 10
+  num_workers: 8
+  device: "cuda"
+  amp: true
+  run_test: true
+  scheduler:
+    warmup_epochs: 5
+    total_epochs: 200
+  early_stopping:
+    enabled: false
+    patience: 20
+    min_delta: 0.001
+    use_ema: true
+  params:
+    drop_path: 0.0
+    dropout: 0.0
+
+augmentation:
+  multi_scale: true
+  expanded_scales: true
+  random_resize_via_padding: false
+  square_resize_div_64: true
+
+data:
+  dataset_dir: "data/coco_character_detection"
+  dataset_file: "roboflow"
+  class_names: ["character"]
+
+experiment:
+  save_dir: "experiments/rfdetr_character_detection/%Y%m%d_%H%M%S"
+  log_dir: "logs"
+  checkpoint_dir: "checkpoints"
+  eval_dir: "evaluation"
+
+wandb:
+  enable: false
+  project: "kuzushiji-character-detection"
+  entity: null
+  name_format: "%Y%m%d_%H%M%S"
+
+tensorboard:
+  enable: true
