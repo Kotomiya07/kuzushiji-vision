@@ -3,7 +3,6 @@
 """
 
 import argparse
-import glob
 import os
 from datetime import datetime
 
@@ -423,7 +422,12 @@ def main():
     parser.add_argument("--per_device_eval_batch_size", type=int, default=4, help="Batch size for evaluation.")
     parser.add_argument("--learning_rate", type=float, default=5e-5, help="Learning rate.")
     parser.add_argument("--mask_probability", type=float, default=0.15, help="Probability of masking tokens.")
-    parser.add_argument("--max_length", type=int, default=None, help="Maximum sequence length for tokenization. If None, uses model_max_length from tokenizer.")
+    parser.add_argument(
+        "--max_length",
+        type=int,
+        default=None,
+        help="Maximum sequence length for tokenization. If None, uses model_max_length from tokenizer.",
+    )
     parser.add_argument("--test_size", type=float, default=0.1, help="Proportion of the dataset to include in the test split.")
     parser.add_argument("--save_steps", type=int, default=500, help="Save checkpoint every X updates steps.")
     parser.add_argument("--eval_steps", type=int, default=500, help="Run evaluation every X updates steps.")
@@ -432,6 +436,15 @@ def main():
     parser.add_argument("--gradient_accumulation_steps", type=int, default=None, help="Gradient accumulation steps.")
     parser.add_argument("--auto_find_batch_size", action="store_true", help="Auto find batch size.")
     parser.add_argument("--resume_from_checkpoint", type=str, default=None, help="Resume from checkpoint.")
+    parser.add_argument(
+        "--torch_compile",
+        action="store_true",
+        help=(
+            "Enable torch.compile in TrainingArguments. Disabled by default because "
+            "KoichiYasuoka/roberta-small-japanese-aozora-char currently triggers CUDA device-side "
+            "asserts under torch.compile."
+        ),
+    )
 
     args = parser.parse_args()
 
@@ -446,15 +459,15 @@ def main():
         dataset = load_dataset(args.dataset_name, args.dataset_config)
     else:
         dataset = load_dataset(args.dataset_name)
-    
+
     # データセットの構造を確認
     print(f"Dataset splits: {list(dataset.keys())}")
     if "train" in dataset:
         print(f"Train split size: {len(dataset['train'])}")
-        if len(dataset['train']) > 0:
+        if len(dataset["train"]) > 0:
             print(f"Train split features: {dataset['train'].features}")
             print(f"Train split example: {dataset['train'][0]}")
-    
+
     # テキストカラム名を自動検出
     text_column = args.text_column
     if text_column is None:
@@ -468,7 +481,7 @@ def main():
                     text_column = col
                     print(f"Using text column: {text_column}")
                     break
-        
+
         if text_column is None:
             # 最初の文字列カラムを使用
             if "train" in dataset and len(dataset["train"]) > 0:
@@ -477,13 +490,13 @@ def main():
                         text_column = col
                         print(f"Using first string column as text: {text_column}")
                         break
-        
+
         if text_column is None:
             raise ValueError(
                 f"Could not detect text column. Available columns: {list(dataset['train'].features.keys()) if 'train' in dataset else 'N/A'}. "
                 f"Please specify --text_column explicitly."
             )
-    
+
     # すべてのスプリットを結合（trainスプリットが存在する場合はそれを使用、なければ全スプリットを結合）
     if "train" in dataset:
         dataset = dataset["train"]
@@ -492,24 +505,36 @@ def main():
         all_splits = list(dataset.keys())
         if len(all_splits) > 1:
             from datasets import concatenate_datasets
+
             dataset = concatenate_datasets([dataset[split] for split in all_splits])
             print(f"Combined {len(all_splits)} splits into one dataset")
         else:
             dataset = dataset[all_splits[0]]
-    
+
     # テキストカラムのみを残す（必要に応じて）
     if text_column != "text":
         # textカラムにリネーム
         dataset = dataset.rename_column(text_column, "text")
         print(f"Renamed column '{text_column}' to 'text'")
-    
+
     print(f"Dataset loaded. Number of examples: {len(dataset)}")
 
     # 3. Model
     print(f"Loading model: {args.model_name}")
     # model = AutoModelForMaskedLM.from_pretrained(args.model_name, attn_implementation="flash_attention_2")
     model = AutoModelForMaskedLM.from_pretrained(args.model_name)
-    
+
+    if args.torch_compile:
+        print(
+            "torch.compile is enabled. Note: KoichiYasuoka/roberta-small-japanese-aozora-char is known to "
+            "hit CUDA device-side asserts under torch.compile on current toolchain."
+        )
+    else:
+        print(
+            "torch.compile is disabled by default to avoid known CUDA device-side asserts with "
+            "KoichiYasuoka/roberta-small-japanese-aozora-char. Pass --torch_compile to override."
+        )
+
     # Determine max_length for tokenization based on model's max_position_embeddings
     max_length = args.max_length
     if max_length is None:
@@ -521,7 +546,9 @@ def main():
         # Ensure user-specified max_length doesn't exceed model's max_position_embeddings
         model_max_pos = model.config.max_position_embeddings
         if max_length > model_max_pos:
-            print(f"Warning: Specified max_length={max_length} exceeds model's max_position_embeddings={model_max_pos}. Using {model_max_pos} instead.")
+            print(
+                f"Warning: Specified max_length={max_length} exceeds model's max_position_embeddings={model_max_pos}. Using {model_max_pos} instead."
+            )
             max_length = model_max_pos
         else:
             print(f"Using specified max_length={max_length} (model's max_position_embeddings={model_max_pos})")
@@ -579,12 +606,12 @@ def main():
         train_dataset = tokenized_dataset
         eval_dataset = None  # Or a small subset if evaluation is still desired during training
         print(f"Using full dataset for training ({len(train_dataset)}). No evaluation set created.")
-    
+
     # RoBERTa models don't use token_type_ids, so ensure the config reflects this
     # Some RoBERTa models have type_vocab_size=1 which can cause issues
-    if hasattr(model.config, 'type_vocab_size') and model.config.type_vocab_size > 1:
+    if hasattr(model.config, "type_vocab_size") and model.config.type_vocab_size > 1:
         print(f"Warning: model.config.type_vocab_size={model.config.type_vocab_size}, but RoBERTa doesn't use token_type_ids")
-    
+
     # Resize token embeddings if we used a custom tokenizer or added tokens to AutoTokenizer
     # This is crucial if the vocab size of the tokenizer is different from the model's original vocab size
     vocab_size_before = model.config.vocab_size
@@ -596,7 +623,7 @@ def main():
         model.resize_token_embeddings(vocab_size_after)
     else:
         print(f"Vocab sizes match ({vocab_size_after}), no resize needed")
-    
+
     # Verify final vocab size
     final_vocab_size = model.config.vocab_size
     print(f"Final model vocab size: {final_vocab_size}")
@@ -606,16 +633,56 @@ def main():
     # Create a custom data collator wrapper to ensure token_type_ids is not included
     # and validate token IDs
     class RoBERTaDataCollator(DataCollatorForLanguageModeling):
-        def __init__(self, *args, vocab_size=None, **kwargs):
+        def __init__(self, *args, vocab_size=None, max_length=None, **kwargs):
             super().__init__(*args, **kwargs)
             self.vocab_size = vocab_size
-        
+            self.max_length = max_length
+
         def __call__(self, features):
+            # Truncate sequences to max_length before padding if specified
+            if self.max_length is not None:
+                for feature in features:
+                    if "input_ids" in feature:
+                        input_ids = feature["input_ids"]
+                        # Handle both list and tensor cases
+                        if isinstance(input_ids, torch.Tensor):
+                            seq_len = input_ids.size(0) if input_ids.dim() > 0 else len(input_ids)
+                        else:
+                            seq_len = len(input_ids)
+
+                        if seq_len > self.max_length:
+                            feature["input_ids"] = input_ids[: self.max_length]
+                            if "attention_mask" in feature:
+                                attention_mask = feature["attention_mask"]
+                                feature["attention_mask"] = attention_mask[: self.max_length]
+
+            # Call parent's __call__ but ensure padding respects max_length
+            # We need to override the padding behavior to use max_length
             batch = super().__call__(features)
+
             # Explicitly remove token_type_ids if it exists (RoBERTa doesn't use it)
             if "token_type_ids" in batch:
                 del batch["token_type_ids"]
-            
+
+            # Truncate sequences to max_length after padding if specified (safety check)
+            # This is critical because DataCollatorForLanguageModeling pads to batch max length
+            if self.max_length is not None:
+                if "input_ids" in batch:
+                    input_ids = batch["input_ids"]
+                    seq_len = input_ids.size(1)
+                    if seq_len > self.max_length:
+                        # Truncate all sequences to max_length
+                        input_ids = input_ids[:, : self.max_length]
+                        batch["input_ids"] = input_ids
+                        if "attention_mask" in batch:
+                            attention_mask = batch["attention_mask"]
+                            attention_mask = attention_mask[:, : self.max_length]
+                            batch["attention_mask"] = attention_mask
+                        if "labels" in batch:
+                            labels = batch["labels"]
+                            labels = labels[:, : self.max_length]
+                            batch["labels"] = labels
+
             # Validate token IDs in the batch
             if self.vocab_size is not None:
                 if "input_ids" in batch:
@@ -625,11 +692,13 @@ def main():
                         invalid_count = invalid_mask.sum().item()
                         invalid_ids = input_ids[invalid_mask].unique().tolist()
                         print(f"Error: Found {invalid_count} invalid token IDs in batch: {invalid_ids[:20]}")
-                        print(f"Vocab size: {self.vocab_size}, Max ID in batch: {input_ids.max().item()}, Min ID: {input_ids.min().item()}")
+                        print(
+                            f"Vocab size: {self.vocab_size}, Max ID in batch: {input_ids.max().item()}, Min ID: {input_ids.min().item()}"
+                        )
                         # Replace invalid IDs with UNK token ID
                         unk_id = self.tokenizer.unk_token_id if self.tokenizer.unk_token_id is not None else 0
                         batch["input_ids"] = torch.where(invalid_mask, unk_id, input_ids)
-                
+
                 if "labels" in batch:
                     labels = batch["labels"]
                     # Labels can be -100 (ignored), but should be valid token IDs otherwise
@@ -638,18 +707,21 @@ def main():
                         invalid_count = valid_label_mask.sum().item()
                         invalid_labels = labels[valid_label_mask].unique().tolist()
                         print(f"Error: Found {invalid_count} invalid label IDs in batch: {invalid_labels[:20]}")
-                        print(f"Vocab size: {self.vocab_size}, Max label in batch: {labels.max().item()}, Min label: {labels.min().item()}")
+                        print(
+                            f"Vocab size: {self.vocab_size}, Max label in batch: {labels.max().item()}, Min label: {labels.min().item()}"
+                        )
                         # Replace invalid labels with -100 (ignore in loss)
                         batch["labels"] = torch.where(valid_label_mask, -100, labels)
-            
+
             return batch
-    
+
     data_collator = RoBERTaDataCollator(
         tokenizer=tokenizer,
         mlm=True,
         mlm_probability=args.mask_probability,
         return_tensors="pt",  # Ensure proper tensor format
         vocab_size=model.config.vocab_size,  # Pass vocab size for validation
+        max_length=max_length,  # Pass max_length to ensure sequences don't exceed model's max_position_embeddings
     )
     print(f"Using RoBERTaDataCollator with mask probability: {args.mask_probability}")
     print(f"Data collator vocab size: {model.config.vocab_size}")
@@ -668,7 +740,7 @@ def main():
         overwrite_output_dir=True,
         dataloader_pin_memory=True,
         dataloader_num_workers=os.cpu_count(),
-        torch_compile=True,
+        torch_compile=args.torch_compile,
         num_train_epochs=args.num_train_epochs,
         per_device_train_batch_size=args.per_device_train_batch_size if not args.auto_find_batch_size else 512,
         per_device_eval_batch_size=args.per_device_eval_batch_size,
@@ -862,7 +934,8 @@ uv run python train_language_model.py \
     --logging_steps 100 \
     --tokenizer_name experiments/kuzushiji_tokenizer_one_char \
     --model_name KoichiYasuoka/roberta-small-japanese-aozora-char \
-    --dataset_name Kotomiya07/honkoku_v1_1
+    --dataset_name Kotomiya07/honkoku_v1_1 \
+    [--torch_compile]
 """
 
 """
