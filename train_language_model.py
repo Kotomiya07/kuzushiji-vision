@@ -10,7 +10,7 @@ from datetime import datetime
 # typingからList, Optionalをインポート
 import numpy as np
 import torch
-from datasets import Dataset
+from datasets import Dataset, load_dataset
 from numpy import dtype, ndarray
 
 # _reconstruct を直接インポート
@@ -395,20 +395,22 @@ def main():
         help="Tokenizer name or path.",
     )
     parser.add_argument(
-        "--dataset_dirs",
-        nargs="+",
-        default=[
-            "ndl-minhon-ocrdataset/src/honkoku_oneline_v1",
-            "ndl-minhon-ocrdataset/src/honkoku_oneline_v2",
-            "honkoku_yatanavi/honkoku_oneline",
-            "data/oneline",
-            # "kokubunken_repo/text"
-            "kokubunken_repo/text/azumakagami",
-            "kokubunken_repo/text/eirigenji",
-            "kokubunken_repo/text/nijuuichidaishuu",
-            "kokubunken_repo/text/rekishimonogo",
-        ],
-        help="Directory containing the text dataset files.",
+        "--dataset_name",
+        type=str,
+        default="Kotomiya07/honkoku_v1_1",
+        help="Hugging Face dataset name or path.",
+    )
+    parser.add_argument(
+        "--dataset_config",
+        type=str,
+        default=None,
+        help="Dataset configuration name (optional).",
+    )
+    parser.add_argument(
+        "--text_column",
+        type=str,
+        default=None,
+        help="Name of the text column in the dataset. If None, will try to detect automatically.",
     )
     parser.add_argument(
         "--output_dir",
@@ -421,6 +423,7 @@ def main():
     parser.add_argument("--per_device_eval_batch_size", type=int, default=4, help="Batch size for evaluation.")
     parser.add_argument("--learning_rate", type=float, default=5e-5, help="Learning rate.")
     parser.add_argument("--mask_probability", type=float, default=0.15, help="Probability of masking tokens.")
+    parser.add_argument("--max_length", type=int, default=None, help="Maximum sequence length for tokenization. If None, uses model_max_length from tokenizer.")
     parser.add_argument("--test_size", type=float, default=0.1, help="Proportion of the dataset to include in the test split.")
     parser.add_argument("--save_steps", type=int, default=500, help="Save checkpoint every X updates steps.")
     parser.add_argument("--eval_steps", type=int, default=500, help="Run evaluation every X updates steps.")
@@ -437,40 +440,136 @@ def main():
 
     tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_name)
     # 2. Load and Preprocess Dataset
-    print(f"Loading dataset from {args.dataset_dirs}")
-    text_files = []
-    # dataset_dirsの各ディレクトリ以下を再帰的に検索
-    for dataset_dir in args.dataset_dirs:
-        text_files_iterator = glob.iglob(os.path.join(dataset_dir, "**/*.txt"), recursive=True)
-        count = 0
-        for text_file in text_files_iterator:
-            text_files.append(text_file)
-            count += 1
-        print(f"Found {count} text files in {dataset_dir}")
+    print(f"Loading Hugging Face dataset: {args.dataset_name}")
+    if args.dataset_config:
+        print(f"Using dataset config: {args.dataset_config}")
+        dataset = load_dataset(args.dataset_name, args.dataset_config)
+    else:
+        dataset = load_dataset(args.dataset_name)
+    
+    # データセットの構造を確認
+    print(f"Dataset splits: {list(dataset.keys())}")
+    if "train" in dataset:
+        print(f"Train split size: {len(dataset['train'])}")
+        if len(dataset['train']) > 0:
+            print(f"Train split features: {dataset['train'].features}")
+            print(f"Train split example: {dataset['train'][0]}")
+    
+    # テキストカラム名を自動検出
+    text_column = args.text_column
+    if text_column is None:
+        # 一般的なテキストカラム名を試す
+        possible_text_columns = ["text", "sentence", "content", "transcription", "honkoku"]
+        if "train" in dataset and len(dataset["train"]) > 0:
+            available_columns = list(dataset["train"].features.keys())
+            print(f"Available columns: {available_columns}")
+            for col in possible_text_columns:
+                if col in available_columns:
+                    text_column = col
+                    print(f"Using text column: {text_column}")
+                    break
+        
+        if text_column is None:
+            # 最初の文字列カラムを使用
+            if "train" in dataset and len(dataset["train"]) > 0:
+                for col in dataset["train"].features.keys():
+                    if dataset["train"].features[col].dtype == "string":
+                        text_column = col
+                        print(f"Using first string column as text: {text_column}")
+                        break
+        
+        if text_column is None:
+            raise ValueError(
+                f"Could not detect text column. Available columns: {list(dataset['train'].features.keys()) if 'train' in dataset else 'N/A'}. "
+                f"Please specify --text_column explicitly."
+            )
+    
+    # すべてのスプリットを結合（trainスプリットが存在する場合はそれを使用、なければ全スプリットを結合）
+    if "train" in dataset:
+        dataset = dataset["train"]
+    else:
+        # 複数のスプリットがある場合は結合
+        all_splits = list(dataset.keys())
+        if len(all_splits) > 1:
+            from datasets import concatenate_datasets
+            dataset = concatenate_datasets([dataset[split] for split in all_splits])
+            print(f"Combined {len(all_splits)} splits into one dataset")
+        else:
+            dataset = dataset[all_splits[0]]
+    
+    # テキストカラムのみを残す（必要に応じて）
+    if text_column != "text":
+        # textカラムにリネーム
+        dataset = dataset.rename_column(text_column, "text")
+        print(f"Renamed column '{text_column}' to 'text'")
+    
+    print(f"Dataset loaded. Number of examples: {len(dataset)}")
 
-    texts = []
-    for file_path in text_files:
-        with open(file_path, encoding="utf-8") as f:
-            texts.append(f.readline().strip())
-
-    # Create Hugging Face Dataset
-    dataset_dict = {"text": texts}
-    dataset = Dataset.from_dict(dataset_dict)
+    # 3. Model
+    print(f"Loading model: {args.model_name}")
+    # model = AutoModelForMaskedLM.from_pretrained(args.model_name, attn_implementation="flash_attention_2")
+    model = AutoModelForMaskedLM.from_pretrained(args.model_name)
+    
+    # Determine max_length for tokenization based on model's max_position_embeddings
+    max_length = args.max_length
+    if max_length is None:
+        # Use model's max_position_embeddings to ensure compatibility
+        model_max_pos = model.config.max_position_embeddings
+        max_length = model_max_pos
+        print(f"Using model's max_position_embeddings={model_max_pos} as max_length")
+    else:
+        # Ensure user-specified max_length doesn't exceed model's max_position_embeddings
+        model_max_pos = model.config.max_position_embeddings
+        if max_length > model_max_pos:
+            print(f"Warning: Specified max_length={max_length} exceeds model's max_position_embeddings={model_max_pos}. Using {model_max_pos} instead.")
+            max_length = model_max_pos
+        else:
+            print(f"Using specified max_length={max_length} (model's max_position_embeddings={model_max_pos})")
 
     # Tokenize the dataset
     def tokenize_function(examples):
         # Tokenize the texts. The tokenizer will automatically add CLS and SEP if configured.
-        tokenized = tokenizer(examples["text"], truncation=True)
+        # RoBERTa does not use token_type_ids, so we explicitly disable it
+        tokenized = tokenizer(
+            examples["text"],
+            truncation=True,
+            max_length=max_length,
+            padding=False,  # Padding will be handled by DataCollator
+            return_token_type_ids=False,  # RoBERTa does not use token_type_ids
+        )
+        # Remove token_type_ids if it exists (safety check)
+        if "token_type_ids" in tokenized:
+            del tokenized["token_type_ids"]
         # Ensure input_ids are of type Long (int64) to avoid dtype mismatch in DataCollator
+        # and validate token IDs are within valid range
         if "input_ids" in tokenized:
-            tokenized["input_ids"] = [torch.tensor(ids, dtype=torch.long).tolist() for ids in tokenized["input_ids"]]
+            vocab_size = len(tokenizer)
+            validated_input_ids = []
+            for ids in tokenized["input_ids"]:
+                # Convert to list and validate
+                ids_list = list(ids)
+                # Check for invalid token IDs
+                invalid_ids = [tid for tid in ids_list if tid < 0 or tid >= vocab_size]
+                if invalid_ids:
+                    print(f"Warning: Found invalid token IDs: {invalid_ids[:10]} (showing first 10)")
+                    print(f"Vocab size: {vocab_size}, Max ID in sequence: {max(ids_list) if ids_list else 'N/A'}")
+                    # Replace invalid IDs with UNK token ID
+                    unk_id = tokenizer.unk_token_id if tokenizer.unk_token_id is not None else 0
+                    ids_list = [unk_id if (tid < 0 or tid >= vocab_size) else tid for tid in ids_list]
+                validated_input_ids.append(ids_list)
+            tokenized["input_ids"] = validated_input_ids
         return tokenized
 
     tokenized_dataset = dataset.map(tokenize_function, batched=True, remove_columns=["text"])
 
     # Set the format to ensure proper tensor types
-    tokenized_dataset.set_format(type="torch", columns=["input_ids", "attention_mask"])
+    # Only include columns that exist and are needed (exclude token_type_ids)
+    available_columns = ["input_ids", "attention_mask"]
+    # Filter to only include columns that actually exist in the dataset
+    columns_to_set = [col for col in available_columns if col in tokenized_dataset.column_names]
+    tokenized_dataset.set_format(type="torch", columns=columns_to_set)
     print(f"Dataset tokenized. Number of examples: {len(tokenized_dataset)}")
+    print(f"Dataset columns: {tokenized_dataset.column_names}")
 
     # Split dataset into train and test
     if args.test_size > 0:
@@ -480,24 +579,80 @@ def main():
         train_dataset = tokenized_dataset
         eval_dataset = None  # Or a small subset if evaluation is still desired during training
         print(f"Using full dataset for training ({len(train_dataset)}). No evaluation set created.")
-
-    # 3. Model
-    print(f"Loading model: {args.model_name}")
-    # model = AutoModelForMaskedLM.from_pretrained(args.model_name, attn_implementation="flash_attention_2")
-    model = AutoModelForMaskedLM.from_pretrained(args.model_name)
+    
+    # RoBERTa models don't use token_type_ids, so ensure the config reflects this
+    # Some RoBERTa models have type_vocab_size=1 which can cause issues
+    if hasattr(model.config, 'type_vocab_size') and model.config.type_vocab_size > 1:
+        print(f"Warning: model.config.type_vocab_size={model.config.type_vocab_size}, but RoBERTa doesn't use token_type_ids")
+    
     # Resize token embeddings if we used a custom tokenizer or added tokens to AutoTokenizer
     # This is crucial if the vocab size of the tokenizer is different from the model's original vocab size
-    model.resize_token_embeddings(len(tokenizer))
+    vocab_size_before = model.config.vocab_size
+    vocab_size_after = len(tokenizer)
+    print(f"Model vocab size before resize: {vocab_size_before}")
+    print(f"Tokenizer vocab size: {vocab_size_after}")
+    if vocab_size_before != vocab_size_after:
+        print(f"Resizing model embeddings from {vocab_size_before} to {vocab_size_after}")
+        model.resize_token_embeddings(vocab_size_after)
+    else:
+        print(f"Vocab sizes match ({vocab_size_after}), no resize needed")
+    
+    # Verify final vocab size
+    final_vocab_size = model.config.vocab_size
+    print(f"Final model vocab size: {final_vocab_size}")
 
     # 4. Data Collator
     # Data collator for MLM. It will handle dynamic masking.
-    data_collator = DataCollatorForLanguageModeling(
+    # Create a custom data collator wrapper to ensure token_type_ids is not included
+    # and validate token IDs
+    class RoBERTaDataCollator(DataCollatorForLanguageModeling):
+        def __init__(self, *args, vocab_size=None, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.vocab_size = vocab_size
+        
+        def __call__(self, features):
+            batch = super().__call__(features)
+            # Explicitly remove token_type_ids if it exists (RoBERTa doesn't use it)
+            if "token_type_ids" in batch:
+                del batch["token_type_ids"]
+            
+            # Validate token IDs in the batch
+            if self.vocab_size is not None:
+                if "input_ids" in batch:
+                    input_ids = batch["input_ids"]
+                    invalid_mask = (input_ids < 0) | (input_ids >= self.vocab_size)
+                    if invalid_mask.any():
+                        invalid_count = invalid_mask.sum().item()
+                        invalid_ids = input_ids[invalid_mask].unique().tolist()
+                        print(f"Error: Found {invalid_count} invalid token IDs in batch: {invalid_ids[:20]}")
+                        print(f"Vocab size: {self.vocab_size}, Max ID in batch: {input_ids.max().item()}, Min ID: {input_ids.min().item()}")
+                        # Replace invalid IDs with UNK token ID
+                        unk_id = self.tokenizer.unk_token_id if self.tokenizer.unk_token_id is not None else 0
+                        batch["input_ids"] = torch.where(invalid_mask, unk_id, input_ids)
+                
+                if "labels" in batch:
+                    labels = batch["labels"]
+                    # Labels can be -100 (ignored), but should be valid token IDs otherwise
+                    valid_label_mask = (labels != -100) & ((labels < 0) | (labels >= self.vocab_size))
+                    if valid_label_mask.any():
+                        invalid_count = valid_label_mask.sum().item()
+                        invalid_labels = labels[valid_label_mask].unique().tolist()
+                        print(f"Error: Found {invalid_count} invalid label IDs in batch: {invalid_labels[:20]}")
+                        print(f"Vocab size: {self.vocab_size}, Max label in batch: {labels.max().item()}, Min label: {labels.min().item()}")
+                        # Replace invalid labels with -100 (ignore in loss)
+                        batch["labels"] = torch.where(valid_label_mask, -100, labels)
+            
+            return batch
+    
+    data_collator = RoBERTaDataCollator(
         tokenizer=tokenizer,
         mlm=True,
         mlm_probability=args.mask_probability,
         return_tensors="pt",  # Ensure proper tensor format
+        vocab_size=model.config.vocab_size,  # Pass vocab size for validation
     )
-    print(f"Using DataCollatorForLanguageModeling with mask probability: {args.mask_probability}")
+    print(f"Using RoBERTaDataCollator with mask probability: {args.mask_probability}")
+    print(f"Data collator vocab size: {model.config.vocab_size}")
 
     if args.resume_from_checkpoint is None:
         output_dir = os.path.join(args.output_dir, args.model_name.split("/")[-1], datetime.now().strftime("%Y%m%d_%H%M%S"))
@@ -695,27 +850,19 @@ if __name__ == "__main__":
 
 # How to run
 """
-python train_language_model.py \
+uv run python train_language_model.py \
     --num_train_epochs 10000 \
     --per_device_train_batch_size 1024 \
     --per_device_eval_batch_size 2 \
     --learning_rate 0.00001 \
-    --mask_probability 0.3 \
+    --mask_probability 0.15 \
     --test_size 0.2 \
     --save_steps 10000 \
     --eval_steps 10000 \
     --logging_steps 100 \
     --tokenizer_name experiments/kuzushiji_tokenizer_one_char \
     --model_name KoichiYasuoka/roberta-small-japanese-aozora-char \
-    --dataset_dirs \
-        ndl-minhon-ocrdataset/src/honkoku_oneline_v1 \
-        ndl-minhon-ocrdataset/src/honkoku_oneline_v2 \
-        honkoku_yatanavi/honkoku_oneline \
-        data/oneline \
-        kokubunken_repo/text/azumakagami \
-        kokubunken_repo/text/eirigenji \
-        kokubunken_repo/text/nijuuichidaishuu \
-        kokubunken_repo/text/rekishimonogo
+    --dataset_name Kotomiya07/honkoku_v1_1
 """
 
 """
