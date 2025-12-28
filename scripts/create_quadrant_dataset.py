@@ -372,8 +372,8 @@ def main():
     parser.add_argument(
         "--tile_overlap",
         type=float,
-        default=0.15,
-        help="タイル間のオーバーラップ率 (0.0-0.5, デフォルト: 0.15 = 15%%)",
+        default=0.10,
+        help="タイル間のオーバーラップ率 (0.0-0.5, デフォルト: 0.10 = 10%%)",
     )
 
     parser.add_argument(
