@@ -214,3 +214,8 @@ kokubunken_repo/
 **/*.zip
 
 tasks.md
+
+unsloth_compiled_cache/
+outputs/
+.serena/
+datasets

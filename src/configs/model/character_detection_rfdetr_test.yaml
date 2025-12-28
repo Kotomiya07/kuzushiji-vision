@@ -1,0 +1,64 @@
+seed: 42
+
+model:
+  name: "character_detection_rfdetr_test"
+  type: "rfdetr"
+  size: "nano"  # テスト用に最小サイズを使用
+  num_classes: 1
+  resolution: 384  # テスト用に小さい解像度
+  params:
+    gradient_checkpointing: false
+    amp: true
+    group_detr: 13
+
+training:
+  batch_size: 2  # テスト用に小さいバッチサイズ
+  grad_accum_steps: 1
+  learning_rate: 0.0001
+  learning_rate_encoder: 0.00015
+  weight_decay: 0.0001
+  lr_drop: 1  # 1エポックなので意味はない
+  ema_decay: 0.993
+  ema_tau: 100
+  checkpoint_interval: 1  # 毎エポック保存
+  num_workers: 4
+  device: "cuda"
+  amp: true
+  run_test: false  # テストデータがないため無効化
+  scheduler:
+    warmup_epochs: 0  # ウォームアップなし
+    total_epochs: 1  # 1エポックのみ
+  early_stopping:
+    enabled: false  # テストでは無効化
+    patience: 20
+    min_delta: 0.001
+    use_ema: true
+  params:
+    drop_path: 0.0
+    dropout: 0.0
+
+augmentation:
+  multi_scale: false  # テストではシンプルに
+  expanded_scales: false
+  random_resize_via_padding: false
+  square_resize_div_64: true
+
+data:
+  dataset_dir: "data/yolo_dataset_character_detection_small_test"  # 小規模テストデータセット
+  dataset_file: "roboflow"  # roboflow形式（COCO JSON使用）
+  class_names: ["character"]
+
+experiment:
+  save_dir: "experiments/rfdetr_character_detection_test/%Y%m%d_%H%M%S"
+  log_dir: "logs"
+  checkpoint_dir: "checkpoints"
+  eval_dir: "evaluation"
+
+wandb:
+  enable: false  # テストでは無効化
+  project: "kuzushiji-character-detection"
+  entity: null
+  name_format: "%Y%m%d_%H%M%S"
+
+tensorboard:
+  enable: true

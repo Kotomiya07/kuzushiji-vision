@@ -26,6 +26,7 @@ from pathlib import Path
 import cv2
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
+import japanize_matplotlib
 
 # プロジェクトルートをパスに追加
 sys.path.append(str(Path(__file__).parent.parent))
@@ -350,31 +351,48 @@ def main():
 使用例:
   python scripts/create_quadrant_dataset.py
   python scripts/create_quadrant_dataset.py --visualize --sample_count 5
-  python scripts/create_quadrant_dataset.py --output_dir data/custom_multi_grid_dataset
+  python scripts/create_quadrant_dataset.py --tile_overlap 0.10
+  python scripts/create_quadrant_dataset.py --no_require_full_bbox  # 部分的なbbox含む（従来動作）
         """,
     )
 
     parser.add_argument(
         "--input_dir",
         type=str,
-        default="data/yolo_dataset_character_detection",
-        help="入力データセットのディレクトリ (デフォルト: data/yolo_dataset_character_detection)",
+        default="datasets/yolo_dataset_character_detection",
+        help="入力データセットのディレクトリ (デフォルト: datasets/yolo_dataset_character_detection)",
     )
 
     parser.add_argument(
         "--output_dir",
         type=str,
-        default="data/yolo_dataset_character_detection_quadrant",
-        help="出力データセットのディレクトリ (デフォルト: data/yolo_dataset_character_detection_quadrant)",
+        default="datasets/yolo_dataset_character_detection_quadrant",
+        help="出力データセットのディレクトリ (デフォルト: datasets/yolo_dataset_character_detection_quadrant)",
     )
 
     parser.add_argument(
-        "--overlap_threshold", type=float, default=0.5, help="バウンディングボックスの重複判定閾値 (デフォルト: 0.5)"
+        "--tile_overlap",
+        type=float,
+        default=0.15,
+        help="タイル間のオーバーラップ率 (0.0-0.5, デフォルト: 0.15 = 15%%)",
+    )
+
+    parser.add_argument(
+        "--no_require_full_bbox",
+        action="store_true",
+        help="部分的に含まれるbboxも対象にする（従来の動作）",
     )
 
     parser.add_argument("--visualize", action="store_true", help="分割結果の可視化を行う")
 
     parser.add_argument("--sample_count", type=int, default=3, help="可視化するサンプル数 (デフォルト: 3)")
+
+    parser.add_argument(
+        "--num_workers",
+        type=int,
+        default=1,
+        help="並列処理のワーカー数 (デフォルト: 1 = シリアル処理)",
+    )
 
     args = parser.parse_args()
 
@@ -383,20 +401,27 @@ def main():
         print(f"エラー: 入力ディレクトリが存在しません: {args.input_dir}")
         sys.exit(1)
 
+    require_full_bbox = not args.no_require_full_bbox
+
     print("元画像+4分割+9分割データセット作成を開始します...")
     print(f"入力ディレクトリ: {args.input_dir}")
     print(f"出力ディレクトリ: {args.output_dir}")
-    print(f"重複判定閾値: {args.overlap_threshold}")
+    print(f"タイルオーバーラップ: {args.tile_overlap:.1%}")
+    print(f"完全包含判定: {'有効' if require_full_bbox else '無効（従来動作）'}")
+    print(f"並列ワーカー数: {args.num_workers}")
     print("※ 1つの元画像から14枚の画像（元画像1枚+4分割4枚+9分割9枚）を生成します")
 
     # プロセッサー初期化
     processor = MultiGridProcessor(
-        input_dir=args.input_dir, output_dir=args.output_dir, overlap_threshold=args.overlap_threshold
+        input_dir=args.input_dir,
+        output_dir=args.output_dir,
+        tile_overlap=args.tile_overlap,
+        require_full_bbox=require_full_bbox,
     )
 
     try:
         # データセット処理の実行
-        stats = processor.process_full_dataset()
+        stats = processor.process_full_dataset(num_workers=args.num_workers)
 
         # 設定ファイルの作成
         create_dataset_yaml(args.output_dir)
@@ -425,3 +450,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -64,10 +64,20 @@ def count_images_and_annotations(dataset_dir: str) -> dict[str, tuple[int, int]]
     return results
 
 
+import argparse
+
+
 def main():
     """メイン関数"""
-    # YOLOデータセットのパス
-    dataset_dir = "/home/ryo/project/kuzushiji-vision-lightning/data/yolo_dataset_character_detection"
+    parser = argparse.ArgumentParser(description="YOLOデータセットの統計情報を表示")
+    parser.add_argument(
+        "--dataset_dir",
+        type=str,
+        default="data/yolo_dataset_character_detection",
+        help="YOLOデータセットのベースディレクトリパス"
+    )
+    args = parser.parse_args()
+    dataset_dir = args.dataset_dir
 
     print("YOLOデータセットの統計情報")
     print("=" * 50)
