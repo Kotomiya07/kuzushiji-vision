@@ -4,8 +4,9 @@
 このモジュールは以下の機能を提供します：
 - 画像の4分割処理（2x2グリッド）
 - 画像の9分割処理（3x3グリッド）
+- オーバーラップ付きタイル分割
 - YOLOアノテーションの座標変換
-- 境界にかかる文字の適切な処理
+- 完全に含まれる文字のみを対象とした処理
 """
 
 import logging
@@ -17,47 +18,105 @@ import numpy as np
 
 
 class MultiGridProcessor:
-    """画像の4分割・9分割とアノテーション変換を行うクラス"""
+    """画像の4分割・9分割とアノテーション変換を行うクラス（オーバーラップ対応）"""
 
-    def __init__(self, input_dir: str, output_dir: str, overlap_threshold: float = 0.5):
+    def __init__(
+        self, 
+        input_dir: str, 
+        output_dir: str, 
+        tile_overlap: float = 0.15,
+        require_full_bbox: bool = True
+    ):
         """
         Args:
             input_dir: 入力データセットのルートディレクトリ
             output_dir: 出力データセットのルートディレクトリ
-            overlap_threshold: バウンディングボックスの重複判定閾値（0.5推奨）
+            tile_overlap: タイル間のオーバーラップ率 (0.0-0.5, デフォルト: 0.15 = 15%)
+            require_full_bbox: Trueの場合、完全にタイル内にあるbboxのみ含める（デフォルト: True）
         """
         self.input_dir = Path(input_dir)
         self.output_dir = Path(output_dir)
-        self.overlap_threshold = overlap_threshold
+        self.tile_overlap = tile_overlap
+        self.require_full_bbox = require_full_bbox
 
-        # 4分割位置の定義（2x2グリッド）
-        self.quadrants = {
-            "top_left": (0, 0, 0.5, 0.5),  # (x1, y1, x2, y2) in normalized coordinates
-            "top_right": (0.5, 0, 1.0, 0.5),
-            "bottom_left": (0, 0.5, 0.5, 1.0),
-            "bottom_right": (0.5, 0.5, 1.0, 1.0),
-        }
-
-        # 9分割位置の定義（3x3グリッド）
-        self.ninegrids = {
-            "top_left": (0, 0, 1/3, 1/3),
-            "top_center": (1/3, 0, 2/3, 1/3),
-            "top_right": (2/3, 0, 1.0, 1/3),
-            "middle_left": (0, 1/3, 1/3, 2/3),
-            "middle_center": (1/3, 1/3, 2/3, 2/3),
-            "middle_right": (2/3, 1/3, 1.0, 2/3),
-            "bottom_left": (0, 2/3, 1/3, 1.0),
-            "bottom_center": (1/3, 2/3, 2/3, 1.0),
-            "bottom_right": (2/3, 2/3, 1.0, 1.0),
-        }
+        # オーバーラップを適用した分割位置を計算
+        self.quadrants = self._calculate_grid_bounds(2, tile_overlap)
+        self.ninegrids = self._calculate_grid_bounds(3, tile_overlap)
 
         # ログ設定
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger(__name__)
 
+    def _calculate_grid_bounds(self, grid_size: int, overlap: float) -> dict[str, tuple[float, float, float, float]]:
+        """
+        オーバーラップを考慮したグリッド境界を計算する
+
+        Args:
+            grid_size: グリッドサイズ（2 = 2x2, 3 = 3x3）
+            overlap: オーバーラップ率（0.0-0.5）
+
+        Returns:
+            Dict[str, tuple]: 位置名と境界座標の辞書
+        """
+        # 各タイルの基本サイズ
+        tile_size = 1.0 / grid_size
+        # オーバーラップ量（各方向に half_overlap ずつ拡張）
+        half_overlap = overlap / 2
+
+        bounds = {}
+        
+        if grid_size == 2:
+            positions = [
+                ("top_left", 0, 0),
+                ("top_right", 1, 0),
+                ("bottom_left", 0, 1),
+                ("bottom_right", 1, 1),
+            ]
+        elif grid_size == 3:
+            positions = [
+                ("top_left", 0, 0),
+                ("top_center", 1, 0),
+                ("top_right", 2, 0),
+                ("middle_left", 0, 1),
+                ("middle_center", 1, 1),
+                ("middle_right", 2, 1),
+                ("bottom_left", 0, 2),
+                ("bottom_center", 1, 2),
+                ("bottom_right", 2, 2),
+            ]
+        else:
+            raise ValueError(f"Unsupported grid size: {grid_size}")
+
+        for name, col, row in positions:
+            # 基本座標
+            x1 = col * tile_size
+            y1 = row * tile_size
+            x2 = (col + 1) * tile_size
+            y2 = (row + 1) * tile_size
+
+            # オーバーラップを適用（エッジではない場合のみ拡張）
+            if col > 0:
+                x1 -= half_overlap
+            if row > 0:
+                y1 -= half_overlap
+            if col < grid_size - 1:
+                x2 += half_overlap
+            if row < grid_size - 1:
+                y2 += half_overlap
+
+            # 境界チェック
+            x1 = max(0.0, x1)
+            y1 = max(0.0, y1)
+            x2 = min(1.0, x2)
+            y2 = min(1.0, y2)
+
+            bounds[name] = (x1, y1, x2, y2)
+
+        return bounds
+
     def split_image(self, image_path: str, grid_type: str = "quad") -> dict[str, np.ndarray]:
         """
-        画像を4分割または9分割する
+        画像を4分割または9分割する（オーバーラップ付き）
 
         Args:
             image_path: 分割する画像のパス
@@ -89,6 +148,68 @@ class MultiGridProcessor:
             split_images[position] = image[py1:py2, px1:px2]
 
         return split_images
+
+    def _is_bbox_fully_inside(
+        self,
+        bbox_x1: float,
+        bbox_y1: float,
+        bbox_x2: float,
+        bbox_y2: float,
+        area_x1: float,
+        area_y1: float,
+        area_x2: float,
+        area_y2: float,
+    ) -> bool:
+        """
+        バウンディングボックスが完全にエリア内にあるか判定
+
+        Args:
+            bbox_x1, bbox_y1, bbox_x2, bbox_y2: バウンディングボックスの座標
+            area_x1, area_y1, area_x2, area_y2: 分割エリアの座標
+
+        Returns:
+            bool: 完全にエリア内にある場合True
+        """
+        return (
+            bbox_x1 >= area_x1 and
+            bbox_y1 >= area_y1 and
+            bbox_x2 <= area_x2 and
+            bbox_y2 <= area_y2
+        )
+
+    def _calculate_overlap(
+        self,
+        bbox_x1: float,
+        bbox_y1: float,
+        bbox_x2: float,
+        bbox_y2: float,
+        area_x1: float,
+        area_y1: float,
+        area_x2: float,
+        area_y2: float,
+    ) -> float:
+        """
+        2つの矩形の重複面積を計算する
+
+        Args:
+            bbox_x1, bbox_y1, bbox_x2, bbox_y2: バウンディングボックスの座標
+            area_x1, area_y1, area_x2, area_y2: 分割エリアの座標
+
+        Returns:
+            float: 重複面積
+        """
+        # 重複する矩形の座標計算
+        overlap_x1 = max(bbox_x1, area_x1)
+        overlap_y1 = max(bbox_y1, area_y1)
+        overlap_x2 = min(bbox_x2, area_x2)
+        overlap_y2 = min(bbox_y2, area_y2)
+
+        # 重複がない場合
+        if overlap_x1 >= overlap_x2 or overlap_y1 >= overlap_y2:
+            return 0.0
+
+        # 重複面積を計算
+        return (overlap_x2 - overlap_x1) * (overlap_y2 - overlap_y1)
 
     def convert_annotations(self, annotation_path: str, grid_position: str, grid_type: str = "quad") -> list[str]:
         """
@@ -142,66 +263,36 @@ class MultiGridProcessor:
                 bbox_x2 = center_x + width / 2
                 bbox_y2 = center_y + height / 2
 
-                # 分割エリアとの重複判定
-                overlap_area = self._calculate_overlap(bbox_x1, bbox_y1, bbox_x2, bbox_y2, area_x1, area_y1, area_x2, area_y2)
+                # 判定: 完全にタイル内にあるか、または重複率で判定
+                if self.require_full_bbox:
+                    # 完全にタイル内にある場合のみ含める
+                    if not self._is_bbox_fully_inside(
+                        bbox_x1, bbox_y1, bbox_x2, bbox_y2,
+                        area_x1, area_y1, area_x2, area_y2
+                    ):
+                        continue
+                else:
+                    # 従来の重複率判定（後方互換性のため）
+                    overlap_area = self._calculate_overlap(
+                        bbox_x1, bbox_y1, bbox_x2, bbox_y2,
+                        area_x1, area_y1, area_x2, area_y2
+                    )
+                    bbox_area = width * height
+                    if bbox_area <= 0 or overlap_area / bbox_area < 0.5:
+                        continue
 
-                # バウンディングボックスの面積
-                bbox_area = width * height
+                # 座標を分割エリア内の相対座標に変換
+                new_center_x = (center_x - area_x1) / area_w
+                new_center_y = (center_y - area_y1) / area_h
+                new_width = width / area_w
+                new_height = height / area_h
 
-                # 重複率が閾値以上の場合のみ含める
-                if overlap_area / bbox_area >= self.overlap_threshold:
-                    # 座標を分割エリア内の相対座標に変換
-                    new_center_x = (center_x - area_x1) / area_w
-                    new_center_y = (center_y - area_y1) / area_h
-                    new_width = width / area_w
-                    new_height = height / area_h
-
-                    # 座標が範囲内に収まるように調整
-                    new_center_x = max(0, min(1, new_center_x))
-                    new_center_y = max(0, min(1, new_center_y))
-                    new_width = min(new_width, 2 * new_center_x, 2 * (1 - new_center_x))
-                    new_height = min(new_height, 2 * new_center_y, 2 * (1 - new_center_y))
-
-                    # 有効なサイズのバウンディングボックスのみ保持
-                    if new_width > 0 and new_height > 0:
-                        converted_line = f"{class_id} {new_center_x:.6f} {new_center_y:.6f} {new_width:.6f} {new_height:.6f}"
-                        converted_annotations.append(converted_line)
+                # 有効なサイズのバウンディングボックスのみ保持
+                if new_width > 0 and new_height > 0:
+                    converted_line = f"{class_id} {new_center_x:.6f} {new_center_y:.6f} {new_width:.6f} {new_height:.6f}"
+                    converted_annotations.append(converted_line)
 
         return converted_annotations
-
-    def _calculate_overlap(
-        self,
-        bbox_x1: float,
-        bbox_y1: float,
-        bbox_x2: float,
-        bbox_y2: float,
-        area_x1: float,
-        area_y1: float,
-        area_x2: float,
-        area_y2: float,
-    ) -> float:
-        """
-        2つの矩形の重複面積を計算する
-
-        Args:
-            bbox_x1, bbox_y1, bbox_x2, bbox_y2: バウンディングボックスの座標
-            area_x1, area_y1, area_x2, area_y2: 分割エリアの座標
-
-        Returns:
-            float: 重複面積
-        """
-        # 重複する矩形の座標計算
-        overlap_x1 = max(bbox_x1, area_x1)
-        overlap_y1 = max(bbox_y1, area_y1)
-        overlap_x2 = min(bbox_x2, area_x2)
-        overlap_y2 = min(bbox_y2, area_y2)
-
-        # 重複がない場合
-        if overlap_x1 >= overlap_x2 or overlap_y1 >= overlap_y2:
-            return 0.0
-
-        # 重複面積を計算
-        return (overlap_x2 - overlap_x1) * (overlap_y2 - overlap_y1)
 
     def process_single_image(
         self, image_path: str, annotation_path: str, output_images_dir: str, output_labels_dir: str
