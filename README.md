@@ -17,14 +17,9 @@
 仮想環境はuvを使用して以下のコマンドを実行することで構築されます。
 
 ```bash
-# dev と flash-attn のグループを抜いて sync　する
-uv sync --no-group dev --no-group flash-attn
+uv sync --extra build
 
-# その後 dev のグループを sync する (実行環境の場合はなくても OK)
-uv sync --group dev
-
-# 最後に flash-attn のグループを sync する
-uv sync --group flash-attn
+uv sync --extra build --extra compile
 ```
 
 ## 言語モデルの事前学習

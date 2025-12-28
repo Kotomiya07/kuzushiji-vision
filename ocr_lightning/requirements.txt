@@ -1,0 +1,6 @@
+torch
+torchvision
+pytorch-lightning
+Pillow
+# opencv-python
+# tensorboard
