@@ -30,15 +30,13 @@ augmentation:
 
 data:
   # Paths to annotation files
-  train_annotation: "data/yolo_dataset_character_detection_multi_grid/train/train_column_info.csv"
-  val_annotation: "data/yolo_dataset_character_detection_multi_grid/val/val_column_info.csv"
-  test_annotation: "data/yolo_dataset_character_detection_multi_grid/test/test_column_info.csv"
+  train_annotation: "datasets/yolo_dataset_character_detection_quadrant/train/train_column_info.csv"
+  val_annotation: "datasets/yolo_dataset_character_detection_quadrant/val/val_column_info.csv"
+  test_annotation: "datasets/yolo_dataset_character_detection_quadrant/test/test_column_info.csv"
   # Paths to image directories
-  train_image_dir: "data/yolo_dataset_character_detection_multi_grid/train/images/"
-  val_image_dir: "data/yolo_dataset_character_detection_multi_grid/val/images/"
-  test_image_dir: "data/yolo_dataset_character_detection_multi_grid/test/images/"
-  # Unicode dictionary for Kuzushiji characters
-  unicode_dict: "data/yolo_dataset_character_detection_multi_grid/unicode_to_id.json"
+  train_image_dir: "datasets/yolo_dataset_character_detection_quadrant/train/images/"
+  val_image_dir: "datasets/yolo_dataset_character_detection_quadrant/val/images/"
+  test_image_dir: "datasets/yolo_dataset_character_detection_quadrant/test/images/"
 
 evaluation:
   iou_threshold: 0.5 # IoU threshold for mAP and accuracy calculation

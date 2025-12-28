@@ -1,4 +1,4 @@
-path: data/yolo_dataset_character_detection_multi_grid  # データセットのルートディレクトリ
+path: datasets/yolo_dataset_character_detection_quadrant  # データセットのルートディレクトリ
 train: train/images  # 訓練画像のディレクトリ
 val: val/images      # 検証画像のディレクトリ
 test: test/images    # テスト画像のディレクトリ
