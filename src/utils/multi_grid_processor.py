@@ -11,6 +11,7 @@
 
 import logging
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import cv2
@@ -378,12 +379,13 @@ class MultiGridProcessor:
 
         return annotation_counts
 
-    def process_dataset_split(self, split_name: str) -> dict[str, int]:
+    def process_dataset_split(self, split_name: str, num_workers: int = 1) -> dict[str, int]:
         """
         データセット分割（train/val/test）を処理する
 
         Args:
             split_name: 分割名 (train, val, test)
+            num_workers: 並列処理のワーカー数 (1の場合はシリアル処理)
 
         Returns:
             Dict[str, int]: 処理統計
@@ -400,40 +402,75 @@ class MultiGridProcessor:
             self.logger.warning(f"画像ディレクトリが存在しません: {input_images_dir}")
             return {"processed_images": 0, "total_annotations": 0}
 
+        # 出力ディレクトリを先に作成（並列処理前に必要）
+        os.makedirs(output_images_dir, exist_ok=True)
+        os.makedirs(output_labels_dir, exist_ok=True)
+
         # 画像ファイルのリスト取得
         image_files = list(input_images_dir.glob("*.jpg")) + list(input_images_dir.glob("*.png"))
 
         processed_images = 0
         total_annotations = 0
+        errors = 0
 
-        for image_path in image_files:
+        def process_single(image_path):
+            """単一画像を処理するヘルパー関数"""
+            annotation_path = input_labels_dir / f"{image_path.stem}.txt"
             try:
-                # 対応するアノテーションファイルのパス
-                annotation_path = input_labels_dir / f"{image_path.stem}.txt"
-
-                # 単一画像の処理
                 annotation_counts = self.process_single_image(
                     str(image_path), str(annotation_path), str(output_images_dir), str(output_labels_dir)
                 )
+                return {"success": True, "annotations": sum(annotation_counts.values())}
+            except Exception as e:
+                return {"success": False, "error": str(e), "path": str(image_path)}
 
-                processed_images += 1
-                total_annotations += sum(annotation_counts.values())
+        if num_workers > 1:
+            # 並列処理
+            self.logger.info(f"{split_name}: {num_workers}ワーカーで並列処理開始...")
+            with ThreadPoolExecutor(max_workers=num_workers) as executor:
+                futures = {executor.submit(process_single, img): img for img in image_files}
+                
+                for future in as_completed(futures):
+                    result = future.result()
+                    if result["success"]:
+                        processed_images += 1
+                        total_annotations += result["annotations"]
+                    else:
+                        errors += 1
+                        self.logger.error(f"画像処理エラー {result['path']}: {result['error']}")
+                    
+                    if (processed_images + errors) % 100 == 0:
+                        self.logger.info(f"{split_name}: {processed_images + errors}/{len(image_files)} 画像処理完了")
+        else:
+            # シリアル処理（従来動作）
+            for image_path in image_files:
+                result = process_single(image_path)
+                if result["success"]:
+                    processed_images += 1
+                    total_annotations += result["annotations"]
+                else:
+                    errors += 1
+                    self.logger.error(f"画像処理エラー {result['path']}: {result['error']}")
 
                 if processed_images % 100 == 0:
                     self.logger.info(f"{split_name}: {processed_images}/{len(image_files)} 画像処理完了")
 
-            except Exception as e:
-                self.logger.error(f"画像処理エラー {image_path}: {e}")
-                continue
-
-        stats = {"processed_images": processed_images, "total_images": len(image_files), "total_annotations": total_annotations}
+        stats = {
+            "processed_images": processed_images, 
+            "total_images": len(image_files), 
+            "total_annotations": total_annotations,
+            "errors": errors
+        }
 
         self.logger.info(f"{split_name} 処理完了: {stats}")
         return stats
 
-    def process_full_dataset(self) -> dict[str, dict[str, int]]:
+    def process_full_dataset(self, num_workers: int = 1) -> dict[str, dict[str, int]]:
         """
         完全なデータセットを処理する
+
+        Args:
+            num_workers: 並列処理のワーカー数 (1の場合はシリアル処理)
 
         Returns:
             Dict[str, Dict[str, int]]: 分割ごとの処理統計
@@ -443,6 +480,7 @@ class MultiGridProcessor:
 
         for split in splits:
             self.logger.info(f"{split} データセットの処理開始...")
-            all_stats[split] = self.process_dataset_split(split)
+            all_stats[split] = self.process_dataset_split(split, num_workers=num_workers)
 
         return all_stats
+
