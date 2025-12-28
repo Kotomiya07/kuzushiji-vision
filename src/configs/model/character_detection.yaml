@@ -37,8 +37,6 @@ data:
   train_image_dir: "datasets/yolo_dataset_character_detection_quadrant/train/images/"
   val_image_dir: "datasets/yolo_dataset_character_detection_quadrant/val/images/"
   test_image_dir: "datasets/yolo_dataset_character_detection_quadrant/test/images/"
-  # Unicode dictionary for Kuzushiji characters
-  unicode_dict: "datasets/yolo_dataset_character_detection_quadrant/unicode_to_id.json"
 
 evaluation:
   iou_threshold: 0.5 # IoU threshold for mAP and accuracy calculation
