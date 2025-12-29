@@ -7,12 +7,11 @@ Ground Truth と Prediction を左右に並べて可視化・保存する
 """
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
-from torchmetrics.detection import MeanAveragePrecision
 from ultralytics import YOLO
 
 
@@ -92,8 +91,9 @@ def compute_iou_matrix(boxes1: np.ndarray, boxes2: np.ndarray) -> np.ndarray:
     return intersection / (union + 1e-6)
 
 
-def compute_image_score(gt_boxes: np.ndarray, pred_boxes: np.ndarray,
-                        pred_scores: np.ndarray, iou_threshold: float = 0.5) -> dict:
+def compute_image_score(
+    gt_boxes: np.ndarray, pred_boxes: np.ndarray, pred_scores: np.ndarray, iou_threshold: float = 0.5
+) -> dict:
     """画像単位のスコアを計算
 
     Args:
@@ -109,16 +109,13 @@ def compute_image_score(gt_boxes: np.ndarray, pred_boxes: np.ndarray,
     n_pred = len(pred_boxes)
 
     if n_gt == 0 and n_pred == 0:
-        return {"precision": 1.0, "recall": 1.0, "f1": 1.0,
-                "n_gt": 0, "n_pred": 0, "tp": 0, "fp": 0, "fn": 0}
+        return {"precision": 1.0, "recall": 1.0, "f1": 1.0, "n_gt": 0, "n_pred": 0, "tp": 0, "fp": 0, "fn": 0}
 
     if n_gt == 0:
-        return {"precision": 0.0, "recall": 1.0, "f1": 0.0,
-                "n_gt": 0, "n_pred": n_pred, "tp": 0, "fp": n_pred, "fn": 0}
+        return {"precision": 0.0, "recall": 1.0, "f1": 0.0, "n_gt": 0, "n_pred": n_pred, "tp": 0, "fp": n_pred, "fn": 0}
 
     if n_pred == 0:
-        return {"precision": 1.0, "recall": 0.0, "f1": 0.0,
-                "n_gt": n_gt, "n_pred": 0, "tp": 0, "fp": 0, "fn": n_gt}
+        return {"precision": 1.0, "recall": 0.0, "f1": 0.0, "n_gt": n_gt, "n_pred": 0, "tp": 0, "fp": 0, "fn": n_gt}
 
     # IoU行列を計算
     iou_matrix = compute_iou_matrix(pred_boxes, gt_boxes)
@@ -153,20 +150,10 @@ def compute_image_score(gt_boxes: np.ndarray, pred_boxes: np.ndarray,
     recall = tp / n_gt if n_gt > 0 else 1.0
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
 
-    return {
-        "precision": precision,
-        "recall": recall,
-        "f1": f1,
-        "n_gt": n_gt,
-        "n_pred": n_pred,
-        "tp": tp,
-        "fp": fp,
-        "fn": fn
-    }
+    return {"precision": precision, "recall": recall, "f1": f1, "n_gt": n_gt, "n_pred": n_pred, "tp": tp, "fp": fp, "fn": fn}
 
 
-def draw_boxes_on_image(image: np.ndarray, boxes: np.ndarray,
-                        color: tuple, label: str) -> np.ndarray:
+def draw_boxes_on_image(image: np.ndarray, boxes: np.ndarray, color: tuple, label: str) -> np.ndarray:
     """画像にバウンディングボックスを描画
 
     Args:
@@ -189,8 +176,7 @@ def draw_boxes_on_image(image: np.ndarray, boxes: np.ndarray,
     return img
 
 
-def create_comparison_image(image_path: Path, gt_boxes: np.ndarray,
-                            pred_boxes: np.ndarray, scores: dict) -> np.ndarray:
+def create_comparison_image(image_path: Path, gt_boxes: np.ndarray, pred_boxes: np.ndarray, scores: dict) -> np.ndarray:
     """Ground TruthとPredictionの比較画像を作成
 
     Args:
@@ -208,18 +194,10 @@ def create_comparison_image(image_path: Path, gt_boxes: np.ndarray,
         raise ValueError(f"Cannot read image: {image_path}")
 
     # Ground Truth画像（緑）
-    gt_image = draw_boxes_on_image(
-        image, gt_boxes,
-        (0, 255, 0),
-        f"GT (n={scores['n_gt']})"
-    )
+    gt_image = draw_boxes_on_image(image, gt_boxes, (0, 255, 0), f"GT (n={scores['n_gt']})")
 
     # Prediction画像（赤）
-    pred_image = draw_boxes_on_image(
-        image, pred_boxes,
-        (0, 0, 255),
-        f"Pred (n={scores['n_pred']})"
-    )
+    pred_image = draw_boxes_on_image(image, pred_boxes, (0, 0, 255), f"Pred (n={scores['n_pred']})")
 
     # 左右に結合
     combined = np.hstack([gt_image, pred_image])
@@ -229,13 +207,14 @@ def create_comparison_image(image_path: Path, gt_boxes: np.ndarray,
     info_height = 60
     info_area = np.ones((info_height, w, 3), dtype=np.uint8) * 255
 
-    info_text = (f"F1: {scores['f1']:.3f} | "
-                 f"Precision: {scores['precision']:.3f} | "
-                 f"Recall: {scores['recall']:.3f} | "
-                 f"TP: {scores['tp']} FP: {scores['fp']} FN: {scores['fn']}")
+    info_text = (
+        f"F1: {scores['f1']:.3f} | "
+        f"Precision: {scores['precision']:.3f} | "
+        f"Recall: {scores['recall']:.3f} | "
+        f"TP: {scores['tp']} FP: {scores['fp']} FN: {scores['fn']}"
+    )
 
-    cv2.putText(info_area, info_text, (10, 40),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
+    cv2.putText(info_area, info_text, (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2)
 
     return np.vstack([combined, info_area])
 
@@ -246,56 +225,23 @@ def main():
         "--model",
         type=str,
         default="experiments/character_detection/yolo12x_14split_new/weights/best.pt",
-        help="学習済みモデルのパス"
+        help="学習済みモデルのパス",
     )
     parser.add_argument(
         "--test-dir",
         type=str,
         default="datasets/yolo_dataset_character_position_detection/test",
-        help="テストデータセットのディレクトリ"
+        help="テストデータセットのディレクトリ",
     )
-    parser.add_argument(
-        "--output-dir",
-        type=str,
-        default="outputs/character_detection",
-        help="出力ディレクトリ"
-    )
-    parser.add_argument(
-        "--conf",
-        type=float,
-        default=0.25,
-        help="信頼度閾値"
-    )
-    parser.add_argument(
-        "--iou",
-        type=float,
-        default=0.7,
-        help="NMSのIoU閾値"
-    )
-    parser.add_argument(
-        "--max-det",
-        type=int,
-        default=1000,
-        help="最大検出数"
-    )
-    parser.add_argument(
-        "--iou-threshold",
-        type=float,
-        default=0.5,
-        help="IoU閾値"
-    )
-    parser.add_argument(
-        "--n-worst",
-        type=int,
-        default=10,
-        help="表示する精度が低い件数"
-    )
-    parser.add_argument(
-        "--device",
-        type=str,
-        default="0",
-        help="使用するデバイス"
-    )
+    parser.add_argument("--output-dir", type=str, default="outputs/character_detection", help="出力ディレクトリ")
+    parser.add_argument("--conf", type=float, default=0.25, help="信頼度閾値")
+    parser.add_argument("--iou", type=float, default=0.7, help="NMSのIoU閾値")
+    parser.add_argument("--max-det", type=int, default=1000, help="最大検出数")
+    parser.add_argument("--iou-threshold", type=float, default=0.5, help="IoU閾値")
+    parser.add_argument("--n-worst", type=int, default=10, help="表示する精度が低い件数")
+    parser.add_argument("--device", type=str, default="0", help="使用するデバイス")
+    parser.add_argument("--batch-size", type=int, default=32, help="バッチサイズ（高速化のため）")
+    parser.add_argument("--workers", type=int, default=8, help="並列読み込みのワーカー数")
     args = parser.parse_args()
 
     # パスの設定
@@ -322,20 +268,16 @@ def main():
     # 各画像の評価結果を格納
     results = []
 
-    print("\n推論を実行中...")
-    for i, image_path in enumerate(image_files):
-        if (i + 1) % 50 == 0:
-            print(f"  {i + 1}/{len(image_files)}")
+    # 画像とラベルを読み込む関数（並列処理用）
+    def load_image_and_label(image_path: Path) -> dict | None:
+        image = cv2.imread(str(image_path))
+        if image is None:
+            return None
+        img_height, img_width = image.shape[:2]
 
         # Ground Truthの読み込み
         label_path = labels_dir / (image_path.stem + ".txt")
         gt_labels = load_yolo_labels(label_path)
-
-        # 画像サイズの取得
-        image = cv2.imread(str(image_path))
-        if image is None:
-            continue
-        img_height, img_width = image.shape[:2]
 
         # GT boxesをxyxy形式に変換
         if len(gt_labels) > 0:
@@ -343,31 +285,68 @@ def main():
         else:
             gt_boxes = np.array([]).reshape(0, 4)
 
-        # 推論
-        pred_results = model.predict(
-            str(image_path),
+        return {
+            "image_path": image_path,
+            "image": image,
+            "img_width": img_width,
+            "img_height": img_height,
+            "gt_boxes": gt_boxes,
+        }
+
+    # 画像情報を並列で事前読み込み
+    print("\n画像を並列読み込み中...")
+    with ThreadPoolExecutor(max_workers=args.workers) as executor:
+        loaded_results = list(executor.map(load_image_and_label, image_files))
+
+    # Noneを除外
+    image_info_list = [r for r in loaded_results if r is not None]
+
+    print(f"有効な画像数: {len(image_info_list)}")
+
+    # バッチ推論を実行
+    print(f"\nバッチ推論を実行中... (batch_size={args.batch_size})")
+    batch_size = args.batch_size
+    n_batches = (len(image_info_list) + batch_size - 1) // batch_size
+
+    for batch_idx in range(n_batches):
+        start_idx = batch_idx * batch_size
+        end_idx = min(start_idx + batch_size, len(image_info_list))
+        batch_info = image_info_list[start_idx:end_idx]
+
+        # バッチの画像データを取得（メモリから）
+        batch_images = [info["image"] for info in batch_info]
+
+        # バッチ推論（画像配列を直接渡す）
+        batch_results = model.predict(
+            batch_images,
             conf=args.conf,
             iou=args.iou,
             max_det=args.max_det,
             device=args.device,
-            verbose=False
-        )[0]
+            verbose=False,
+            batch=batch_size,
+        )
 
-        # 予測結果の取得
-        if len(pred_results.boxes) > 0:
-            pred_boxes = pred_results.boxes.xyxy.cpu().numpy()
-            pred_scores = pred_results.boxes.conf.cpu().numpy()
-        else:
-            pred_boxes = np.array([]).reshape(0, 4)
-            pred_scores = np.array([])
+        # 各画像の結果を処理
+        for info, pred_result in zip(batch_info, batch_results, strict=True):
+            # 予測結果の取得
+            if len(pred_result.boxes) > 0:
+                pred_boxes = pred_result.boxes.xyxy.cpu().numpy()
+                pred_scores = pred_result.boxes.conf.cpu().numpy()
+            else:
+                pred_boxes = np.array([]).reshape(0, 4)
+                pred_scores = np.array([])
 
-        # スコアの計算
-        scores = compute_image_score(gt_boxes, pred_boxes, pred_scores, args.iou_threshold)
-        scores["image_path"] = image_path
-        scores["gt_boxes"] = gt_boxes
-        scores["pred_boxes"] = pred_boxes
+            # スコアの計算
+            scores = compute_image_score(info["gt_boxes"], pred_boxes, pred_scores, args.iou_threshold)
+            scores["image_path"] = info["image_path"]
+            scores["gt_boxes"] = info["gt_boxes"]
+            scores["pred_boxes"] = pred_boxes
 
-        results.append(scores)
+            results.append(scores)
+
+        # 進捗表示
+        print(f"  バッチ {batch_idx + 1}/{n_batches} 完了 ({end_idx}/{len(image_info_list)} 画像)")
 
     # 全体のメトリクス計算
     total_tp = sum(r["tp"] for r in results)
@@ -378,8 +357,11 @@ def main():
 
     overall_precision = total_tp / total_pred if total_pred > 0 else 0
     overall_recall = total_tp / total_gt if total_gt > 0 else 0
-    overall_f1 = 2 * overall_precision * overall_recall / (overall_precision + overall_recall) \
-        if (overall_precision + overall_recall) > 0 else 0
+    overall_f1 = (
+        2 * overall_precision * overall_recall / (overall_precision + overall_recall)
+        if (overall_precision + overall_recall) > 0
+        else 0
+    )
 
     print("\n=== 全体結果 ===")
     print(f"画像数: {len(results)}")
@@ -395,18 +377,15 @@ def main():
 
     # 精度が低い上位N件を保存
     print(f"\n=== 精度が低い{args.n_worst}件を保存中 ===")
-    for i, result in enumerate(results_sorted[:args.n_worst]):
+    for i, result in enumerate(results_sorted[: args.n_worst]):
         image_path = result["image_path"]
         gt_boxes = result["gt_boxes"]
         pred_boxes = result["pred_boxes"]
 
-        print(f"  {i + 1}. {image_path.name} - F1: {result['f1']:.3f} "
-              f"(GT: {result['n_gt']}, Pred: {result['n_pred']})")
+        print(f"  {i + 1}. {image_path.name} - F1: {result['f1']:.3f} (GT: {result['n_gt']}, Pred: {result['n_pred']})")
 
         # 比較画像を作成
-        comparison_img = create_comparison_image(
-            image_path, gt_boxes, pred_boxes, result
-        )
+        comparison_img = create_comparison_image(image_path, gt_boxes, pred_boxes, result)
 
         # 保存
         output_path = output_dir / f"worst_{i + 1:02d}_{image_path.stem}.jpg"
