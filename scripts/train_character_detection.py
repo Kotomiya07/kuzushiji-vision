@@ -5,9 +5,9 @@ from datetime import datetime
 from pathlib import Path
 
 import yaml
-from ultralytics import YOLO
 
 from src.utils.util import EasyDict
+from yolov12.ultralytics import YOLO
 
 
 def get_project_root():
@@ -36,14 +36,31 @@ def main():
     config = EasyDict(config)
 
     # モデルの準備
-    model = YOLO(f"{config.model.backbone}")  # YOLOモデルをロード
+    model = YOLO(f"{config.model.backbone}")  # YAMLまたは.pt/モデル名からYOLOモデルをロード
+
+    # 既存の学習済み重みを「形が合う層だけ」部分ロード（新しく追加したP2/Detect等は初期化のまま）
+    pretrained_weights = getattr(config.model, "pretrained_weights", None)
+    if pretrained_weights:
+        model.load(pretrained_weights)
 
     # モデル構造の調整
     model.model.nc = config.model.num_classes
 
+    # データセット設定（Ultralyticsのdatasets_dir設定に依存しないよう、pathを絶対パスに正規化したYAMLを出力）
+    with open("src/configs/data/character_detection.yaml", encoding="utf-8") as f:
+        data_cfg = yaml.safe_load(f)
+    if isinstance(data_cfg, dict) and "path" in data_cfg:
+        p = Path(str(data_cfg["path"]))
+        if not p.is_absolute():
+            data_cfg["path"] = str(get_project_root() / p)
+
+    resolved_data_yaml = exp_dir / "data_resolved.yaml"
+    with open(resolved_data_yaml, "w", encoding="utf-8") as f:
+        yaml.safe_dump(data_cfg, f, allow_unicode=True)
+
     # 学習の設定
     train_args = {
-        "data": "src/configs/data/character_detection.yaml",
+        "data": str(resolved_data_yaml),
         "epochs": config.training.scheduler.total_epochs,
         "batch": config.training.batch_size,
         "patience": config.training.patience,
@@ -53,7 +70,8 @@ def main():
         "project": "experiments/character_detection",
         "name": timestamp,
         "exist_ok": True,
-        "pretrained": True,
+        # model.load() で任意の.ptを部分ロードする場合は二重ロードを避ける
+        "pretrained": False if pretrained_weights else True,
         "optimizer": config.training.optimizer,
         "lr0": config.training.learning_rate,
         "weight_decay": config.training.weight_decay,

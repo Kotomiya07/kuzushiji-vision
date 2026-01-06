@@ -4,7 +4,6 @@ YOLO推論Webアプリケーション
 FastAPI + htmxを使用したインタラクティブな文字検出推論アプリ
 """
 
-import io
 import shutil
 import time
 import uuid
@@ -86,22 +85,12 @@ async def upload_image(file: UploadFile = File(...)):
     img = Image.open(filepath)
     width, height = img.size
 
-    return {
-        "success": True,
-        "image_id": file_id,
-        "filename": filename,
-        "width": width,
-        "height": height
-    }
+    return {"success": True, "image_id": file_id, "filename": filename, "width": width, "height": height}
 
 
 @app.post("/predict", response_class=HTMLResponse)
 async def predict(
-    request: Request,
-    image_id: str = Form(...),
-    filename: str = Form(...),
-    conf: float = Form(0.25),
-    iou: float = Form(0.7)
+    request: Request, image_id: str = Form(...), filename: str = Form(...), conf: float = Form(0.25), iou: float = Form(0.7)
 ):
     """全体画像で推論"""
     filepath = UPLOAD_DIR / filename
@@ -111,7 +100,7 @@ async def predict(
 
     # モデルで推論
     model = get_model()
-    results = model.predict(str(filepath), conf=conf, iou=iou, verbose=False)[0]
+    results = model.predict(str(filepath), conf=conf, iou=iou, verbose=False, max_det=2000)[0]
 
     # 結果画像を生成
     image = cv2.imread(str(filepath))
@@ -149,7 +138,7 @@ async def predict_region(
     x1: int = Form(...),
     y1: int = Form(...),
     x2: int = Form(...),
-    y2: int = Form(...)
+    y2: int = Form(...),
 ):
     """指定領域で推論"""
     filepath = UPLOAD_DIR / filename
@@ -172,7 +161,7 @@ async def predict_region(
 
     # クロップ画像で推論
     model = get_model()
-    results = model.predict(cropped, conf=conf, iou=iou, verbose=False)[0]
+    results = model.predict(cropped, conf=conf, iou=iou, verbose=False, max_det=2000)[0]
 
     # 結果を描画
     if len(results.boxes) > 0:
@@ -192,7 +181,7 @@ async def predict_region(
 
     # HTMLレスポンス
     html = f"""
-    <div class="result-wrapper" data-count="{n_detections}" data-region="{x2-x1}x{y2-y1}">
+    <div class="result-wrapper" data-count="{n_detections}" data-region="{x2 - x1}x{y2 - y1}">
         <img src="/results/{result_filename}" alt="領域推論結果" class="result-image" />
     </div>
     """
@@ -200,4 +189,5 @@ async def predict_region(
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # NOTE: reload/workers を有効にするには import string (module:app) で渡す必要がある
+    uvicorn.run("scripts.yolo_inference_app:app", host="0.0.0.0", port=8000, reload=True)
