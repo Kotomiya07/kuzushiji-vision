@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLO推論アプリ</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            background: linear-gradient(135deg, var(--primary), #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 1rem;
+            padding: 1rem;
+            min-height: 0;
+        }
+
+        .main-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            min-height: 0;
+        }
+
+        .panel {
+            background: var(--card);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            flex-shrink: 0;
+        }
+
+        .panel-body {
+            flex: 1;
+            padding: 1rem;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .sidebar {
+            background: var(--card);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 0.5rem;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .upload-zone.dragover {
+            border-color: var(--success);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .slider-group {
+            margin-bottom: 0.75rem;
+        }
+
+        .slider-group label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
+            font-size: 0.75rem;
+        }
+
+        .slider-group input[type="range"] {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border);
+            appearance: none;
+        }
+
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.625rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .image-container {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+        }
+
+        .source-image,
+        .result-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 0.5rem;
+        }
+
+        .result-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 0;
+        }
+
+        #selection-canvas {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            cursor: crosshair;
+        }
+
+        .result-info {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .instructions {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .instructions ol {
+            padding-left: 1rem;
+            margin-top: 0.25rem;
+        }
+
+        .placeholder {
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 0.875rem;
+        }
+
+        .htmx-indicator {
+            display: none;
+        }
+
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>🔍 YOLO 文字検出</h1>
+    </header>
+
+    <div class="container">
+        <!-- メインエリア（左：入力画像、右：推論結果） -->
+        <div class="main-area">
+            <!-- 入力画像パネル -->
+            <div class="panel">
+                <div class="panel-header">入力画像（ドラッグで領域選択）</div>
+                <div class="panel-body">
+                    <div class="image-container" id="image-container">
+                        <p class="placeholder" id="upload-placeholder">画像をアップロードしてください</p>
+                        <img id="source-image" class="source-image" src="" alt="アップロード画像" style="display: none;">
+                        <canvas id="selection-canvas" style="display: none;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 推論結果パネル -->
+            <div class="panel">
+                <div class="panel-header" id="result-header">推論結果</div>
+                <div class="panel-body" id="result-area">
+                    <p class="placeholder">推論結果がここに表示されます</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- サイドバー（右端） -->
+        <aside class="sidebar">
+            <!-- 画像アップロード -->
+            <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+                <p>📁 画像をドロップ<br>またはクリック</p>
+            </div>
+            <input type="file" id="file-input" accept="image/*">
+
+            <!-- パラメータスライダー -->
+            <div>
+                <div class="slider-group">
+                    <label>
+                        <span>Confidence</span>
+                        <span id="conf-value">0.25</span>
+                    </label>
+                    <input type="range" id="conf-slider" min="0" max="1" step="0.05" value="0.25">
+                </div>
+
+                <div class="slider-group">
+                    <label>
+                        <span>IoU</span>
+                        <span id="iou-value">0.70</span>
+                    </label>
+                    <input type="range" id="iou-slider" min="0" max="1" step="0.05" value="0.70">
+                </div>
+            </div>
+
+            <!-- 推論ボタン -->
+            <button class="btn" id="predict-btn" disabled onclick="runPrediction()">
+                <span class="htmx-indicator"><span class="spinner"></span></span>
+                推論実行
+            </button>
+
+            <div class="instructions">
+                <strong>使い方:</strong>
+                <ol>
+                    <li>画像をアップロード</li>
+                    <li>パラメータを調整</li>
+                    <li>「推論実行」で全体推論</li>
+                    <li>画像上をドラッグで領域推論</li>
+                </ol>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // 状態管理
+        let imageState = {
+            id: null,
+            filename: null,
+            width: 0,
+            height: 0
+        };
+
+        // 矩形選択状態
+        let selectionState = {
+            isDrawing: false,
+            startX: 0,
+            startY: 0,
+            endX: 0,
+            endY: 0
+        };
+
+        // DOM要素
+        const fileInput = document.getElementById('file-input');
+        const uploadZone = document.getElementById('upload-zone');
+        const uploadPlaceholder = document.getElementById('upload-placeholder');
+        const sourceImage = document.getElementById('source-image');
+        const canvas = document.getElementById('selection-canvas');
+        const ctx = canvas.getContext('2d');
+        const predictBtn = document.getElementById('predict-btn');
+        const confSlider = document.getElementById('conf-slider');
+        const iouSlider = document.getElementById('iou-slider');
+        const confValue = document.getElementById('conf-value');
+        const iouValue = document.getElementById('iou-value');
+
+        // スライダー値更新
+        confSlider.addEventListener('input', () => {
+            confValue.textContent = parseFloat(confSlider.value).toFixed(2);
+        });
+        iouSlider.addEventListener('input', () => {
+            iouValue.textContent = parseFloat(iouSlider.value).toFixed(2);
+        });
+
+        // ドラッグ&ドロップ
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // ファイル選択
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                handleFile(fileInput.files[0]);
+            }
+        });
+
+        // ファイルアップロード処理
+        async function handleFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    imageState = {
+                        id: data.image_id,
+                        filename: data.filename,
+                        width: data.width,
+                        height: data.height
+                    };
+
+                    // 画像表示
+                    sourceImage.src = `/uploads/${data.filename}`;
+                    sourceImage.onload = () => {
+                        uploadPlaceholder.style.display = 'none';
+                        sourceImage.style.display = 'block';
+                        canvas.style.display = 'block';
+                        setupCanvas();
+                        predictBtn.disabled = false;
+
+                        // 自動推論
+                        runPrediction();
+                    };
+                }
+            } catch (error) {
+                console.error('Upload failed:', error);
+            }
+        }
+
+        // キャンバス設定
+        function setupCanvas() {
+            canvas.width = sourceImage.offsetWidth;
+            canvas.height = sourceImage.offsetHeight;
+        }
+
+        // 画像リサイズ時
+        window.addEventListener('resize', () => {
+            if (imageState.id) {
+                setupCanvas();
+            }
+        });
+
+        // マウスイベント
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            selectionState.isDrawing = true;
+            selectionState.startX = e.clientX - rect.left;
+            selectionState.startY = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!selectionState.isDrawing) return;
+
+            const rect = canvas.getBoundingClientRect();
+            selectionState.endX = e.clientX - rect.left;
+            selectionState.endY = e.clientY - rect.top;
+
+            // 描画
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#6366f1';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.strokeRect(
+                selectionState.startX,
+                selectionState.startY,
+                selectionState.endX - selectionState.startX,
+                selectionState.endY - selectionState.startY
+            );
+
+            // 塗りつぶし
+            ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
+            ctx.fillRect(
+                selectionState.startX,
+                selectionState.startY,
+                selectionState.endX - selectionState.startX,
+                selectionState.endY - selectionState.startY
+            );
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            if (!selectionState.isDrawing) return;
+            selectionState.isDrawing = false;
+
+            // 座標計算（画像の実際のサイズに変換）
+            const scaleX = imageState.width / canvas.width;
+            const scaleY = imageState.height / canvas.height;
+
+            const x1 = Math.round(Math.min(selectionState.startX, selectionState.endX) * scaleX);
+            const y1 = Math.round(Math.min(selectionState.startY, selectionState.endY) * scaleY);
+            const x2 = Math.round(Math.max(selectionState.startX, selectionState.endX) * scaleX);
+            const y2 = Math.round(Math.max(selectionState.startY, selectionState.endY) * scaleY);
+
+            // 小さすぎる場合は無視
+            if (x2 - x1 < 20 || y2 - y1 < 20) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                return;
+            }
+
+            // 領域推論実行
+            runRegionPrediction(x1, y1, x2, y2);
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            if (selectionState.isDrawing) {
+                selectionState.isDrawing = false;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        });
+
+        // 全体推論
+        async function runPrediction() {
+            const formData = new FormData();
+            formData.append('image_id', imageState.id);
+            formData.append('filename', imageState.filename);
+            formData.append('conf', confSlider.value);
+            formData.append('iou', iouSlider.value);
+
+            predictBtn.disabled = true;
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                const html = await response.text();
+                document.getElementById('result-area').innerHTML = html;
+                updateResultHeader();
+            } catch (error) {
+                console.error('Prediction failed:', error);
+            } finally {
+                predictBtn.disabled = false;
+            }
+        }
+
+        // 領域推論
+        async function runRegionPrediction(x1, y1, x2, y2) {
+            const formData = new FormData();
+            formData.append('image_id', imageState.id);
+            formData.append('filename', imageState.filename);
+            formData.append('conf', confSlider.value);
+            formData.append('iou', iouSlider.value);
+            formData.append('x1', x1);
+            formData.append('y1', y1);
+            formData.append('x2', x2);
+            formData.append('y2', y2);
+
+            try {
+                const response = await fetch('/predict-region', {
+                    method: 'POST',
+                    body: formData
+                });
+                const html = await response.text();
+                document.getElementById('result-area').innerHTML = html;
+                updateResultHeader();
+
+                // キャンバスクリア
+                setTimeout(() => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }, 300);
+            } catch (error) {
+                console.error('Region prediction failed:', error);
+            }
+        }
+
+        // 結果ヘッダー更新
+        function updateResultHeader() {
+            const wrapper = document.querySelector('.result-wrapper');
+            if (wrapper) {
+                const count = wrapper.dataset.count;
+                const region = wrapper.dataset.region;
+                const header = document.getElementById('result-header');
+                if (region) {
+                    header.textContent = `推論結果 - 検出: ${count}件 (領域: ${region}px)`;
+                } else {
+                    header.textContent = `推論結果 - 検出: ${count}件`;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

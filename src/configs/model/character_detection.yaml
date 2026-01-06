@@ -4,12 +4,16 @@ seed: 42 # Global random seed
 model:
   name: "character_detection"
   type: "yolo"
-  backbone: "yolo12x"
+  # P2-P5検出ヘッドを使う場合はYAMLを直接指定（yolov12/側で編集した head(P2-P5) が反映されます）
+  backbone: "yolov12/ultralytics/cfg/models/v12/yolov12x.yaml"
+  # 既存の学習済み重み(.pt)を「形が合う層だけ」部分ロードしたい場合に指定（新規追加したP2系/Detect等は初期化）
+  # 例: "experiments/character_detection/<run>/weights/best.pt" や "yolo12x.pt"
+  pretrained_weights: null
   input_size: [640, 640]  # 長辺を640にリサイズ（アスペクト比保持）
   num_classes: 1  # 文字位置検出のみ（文字種分類なし）
 
 training:
-  batch_size: 8
+  batch_size: 4
   patience: 15
   learning_rate: 0.0001
   optimizer: "adamW"
@@ -17,7 +21,7 @@ training:
   scheduler:
     type: "cosine"
     warmup_epochs: 10
-    total_epochs: 1000
+    total_epochs: 300
 
 augmentation:
   horizontal_flip: false  # 日本語の文書なので水平方向の反転は不要
