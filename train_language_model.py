@@ -599,9 +599,13 @@ def main():
         if "input_ids" in tokenized:
             vocab_size = len(tokenizer)
             validated_input_ids = []
-            for ids in tokenized["input_ids"]:
+            validated_attention_mask = []
+            for idx, ids in enumerate(tokenized["input_ids"]):
                 # Convert to list and validate
                 ids_list = list(ids)
+                # 明示的にmax_lengthで切り詰め（安全策）
+                if len(ids_list) > max_length:
+                    ids_list = ids_list[:max_length]
                 # Check for invalid token IDs
                 invalid_ids = [tid for tid in ids_list if tid < 0 or tid >= vocab_size]
                 if invalid_ids:
@@ -611,10 +615,36 @@ def main():
                     unk_id = tokenizer.unk_token_id if tokenizer.unk_token_id is not None else 0
                     ids_list = [unk_id if (tid < 0 or tid >= vocab_size) else tid for tid in ids_list]
                 validated_input_ids.append(ids_list)
+                # attention_maskも同様に切り詰め
+                if "attention_mask" in tokenized:
+                    mask = list(tokenized["attention_mask"][idx])
+                    if len(mask) > max_length:
+                        mask = mask[:max_length]
+                    validated_attention_mask.append(mask)
             tokenized["input_ids"] = validated_input_ids
+            if validated_attention_mask:
+                tokenized["attention_mask"] = validated_attention_mask
         return tokenized
 
     tokenized_dataset = dataset.map(tokenize_function, batched=True, remove_columns=["text"])
+
+    # シーケンス長の検証
+    def check_sequence_lengths(dataset, max_len, dataset_name="dataset"):
+        """データセット内のシーケンス長を検証"""
+        over_max = 0
+        max_found = 0
+        for i, example in enumerate(dataset):
+            seq_len = len(example["input_ids"])
+            if seq_len > max_found:
+                max_found = seq_len
+            if seq_len > max_len:
+                over_max += 1
+        if over_max > 0:
+            print(f"Warning: {dataset_name} has {over_max} sequences exceeding max_length={max_len}")
+        print(f"{dataset_name}: max sequence length found = {max_found}, max_length = {max_len}")
+        return over_max == 0
+
+    check_sequence_lengths(tokenized_dataset, max_length, "Full dataset")
 
     # Set the format to ensure proper tensor types
     # Only include columns that exist and are needed (exclude token_type_ids)
@@ -630,6 +660,9 @@ def main():
         split = tokenized_dataset.train_test_split(test_size=args.test_size)
         train_dataset = split["train"]
         eval_dataset = split["test"]
+        # train_test_split後にフォーマットがリセットされるため再設定
+        train_dataset.set_format(type="torch", columns=columns_to_set)
+        eval_dataset.set_format(type="torch", columns=columns_to_set)
         print(f"Dataset split into train ({len(train_dataset)}) and eval ({len(eval_dataset)}) sets.")
     else:
         train_dataset = tokenized_dataset
