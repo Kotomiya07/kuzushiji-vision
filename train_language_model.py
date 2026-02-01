@@ -12,8 +12,11 @@ import torch
 from datasets import Dataset, load_dataset
 from numpy import dtype, ndarray
 
-# _reconstruct を直接インポート
-from numpy.core.multiarray import _reconstruct
+# _reconstruct を直接インポート（NumPy 2.0+ では場所が変わっている）
+try:
+    from numpy.core.multiarray import _reconstruct
+except ImportError:
+    from numpy._core.multiarray import _reconstruct
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from transformers import (
     AutoModelForMaskedLM,
@@ -600,7 +603,9 @@ def main():
 
     # Split dataset into train and test
     if args.test_size > 0:
-        train_dataset, eval_dataset = tokenized_dataset.train_test_split(test_size=args.test_size).values()
+        split = tokenized_dataset.train_test_split(test_size=args.test_size)
+        train_dataset = split["train"]
+        eval_dataset = split["test"]
         print(f"Dataset split into train ({len(train_dataset)}) and eval ({len(eval_dataset)}) sets.")
     else:
         train_dataset = tokenized_dataset
