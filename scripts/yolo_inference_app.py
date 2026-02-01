@@ -27,7 +27,7 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 RESULT_DIR.mkdir(parents=True, exist_ok=True)
 
 # デフォルトモデルパス
-DEFAULT_MODEL = "experiments/character_detection/yolo12x_14split_new/weights/best.pt"
+DEFAULT_MODEL = "experiments/character_detection/yolo12x_14split_p2/weights/best.pt"
 
 app = FastAPI(title="YOLO推論アプリ")
 
