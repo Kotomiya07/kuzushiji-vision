@@ -459,12 +459,21 @@ def main():
 
     # マルチGPU環境でのNCCLエラーを回避するため、単一GPUを使用
     # 分散学習を使用したい場合は torchrun や accelerate launch を使用してください
-    if "CUDA_VISIBLE_DEVICES" not in os.environ and torch.cuda.is_available():
+    if torch.cuda.is_available():
+        # CUDA_VISIBLE_DEVICESが設定されている場合でも、複数GPUならNCCLエラーが発生する
+        # DataParallelではなくDDPを使用するにはtorchrun/accelerateが必要
         gpu_count = torch.cuda.device_count()
         if gpu_count > 1:
-            print(f"Warning: {gpu_count} GPUs detected. Using only GPU 0 to avoid NCCL errors.")
-            print("To use multiple GPUs, set CUDA_VISIBLE_DEVICES or use torchrun/accelerate launch.")
-            os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+            # 環境変数が設定されている場合は最初のGPUのみを使用
+            visible_devices = os.environ.get("CUDA_VISIBLE_DEVICES", "")
+            if visible_devices:
+                first_gpu = visible_devices.split(",")[0]
+                print(f"Warning: {gpu_count} GPUs visible ({visible_devices}). Using only GPU {first_gpu} to avoid NCCL errors.")
+            else:
+                first_gpu = "0"
+                print(f"Warning: {gpu_count} GPUs detected. Using only GPU 0 to avoid NCCL errors.")
+            print("To use multiple GPUs with DDP, use: torchrun --nproc_per_node=N train_language_model.py ...")
+            os.environ["CUDA_VISIBLE_DEVICES"] = first_gpu
 
     # 1. Vocab and Tokenizer
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
