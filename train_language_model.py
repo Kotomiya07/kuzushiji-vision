@@ -448,8 +448,23 @@ def main():
             "asserts under torch.compile."
         ),
     )
+    parser.add_argument(
+        "--dataloader_num_workers",
+        type=int,
+        default=4,
+        help="Number of dataloader workers. Set to 0 to disable multiprocessing.",
+    )
 
     args = parser.parse_args()
+
+    # マルチGPU環境でのNCCLエラーを回避するため、単一GPUを使用
+    # 分散学習を使用したい場合は torchrun や accelerate launch を使用してください
+    if "CUDA_VISIBLE_DEVICES" not in os.environ and torch.cuda.is_available():
+        gpu_count = torch.cuda.device_count()
+        if gpu_count > 1:
+            print(f"Warning: {gpu_count} GPUs detected. Using only GPU 0 to avoid NCCL errors.")
+            print("To use multiple GPUs, set CUDA_VISIBLE_DEVICES or use torchrun/accelerate launch.")
+            os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
     # 1. Vocab and Tokenizer
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
@@ -741,7 +756,7 @@ def main():
     # 5. Training Arguments
     # dataloader_num_workers: 多すぎるとファイルディスクリプタの問題が発生するため制限
     # pin_memory: マルチプロセスとの組み合わせで問題が起きやすいためGPU使用時のみ有効化
-    num_workers = min(4, os.cpu_count() or 1)  # 最大4ワーカーに制限
+    num_workers = min(args.dataloader_num_workers, os.cpu_count() or 1)
     training_args = TrainingArguments(
         run_name=run_name,
         output_dir=output_dir,
