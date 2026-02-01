@@ -739,12 +739,15 @@ def main():
         output_dir = args.resume_from_checkpoint
         run_name = args.resume_from_checkpoint.split("/")[-1] + "_resume"
     # 5. Training Arguments
+    # dataloader_num_workers: 多すぎるとファイルディスクリプタの問題が発生するため制限
+    # pin_memory: マルチプロセスとの組み合わせで問題が起きやすいためGPU使用時のみ有効化
+    num_workers = min(4, os.cpu_count() or 1)  # 最大4ワーカーに制限
     training_args = TrainingArguments(
         run_name=run_name,
         output_dir=output_dir,
         overwrite_output_dir=True,
-        dataloader_pin_memory=True,
-        dataloader_num_workers=os.cpu_count(),
+        dataloader_pin_memory=torch.cuda.is_available(),
+        dataloader_num_workers=num_workers,
         torch_compile=args.torch_compile,
         num_train_epochs=args.num_train_epochs,
         per_device_train_batch_size=args.per_device_train_batch_size if not args.auto_find_batch_size else 512,
