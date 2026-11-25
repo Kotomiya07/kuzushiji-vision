@@ -231,3 +231,5 @@ footer {
   .hero { padding: 32px 0 28px; }
   #abstract p { text-align: left; }
 }
+
+.table-wrap:focus-visible, .bibtex:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
