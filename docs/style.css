@@ -109,8 +109,9 @@ a:hover { color: var(--accent-hover); }
 .btn {
   display: inline-flex;
   align-items: center;
-  height: 40px;
-  padding: 0 16px;
+  min-height: 40px;
+  padding: 8px 16px;
+  line-height: 1.4;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   background: var(--surface);
