@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>K-ViT: A Detection-first Framework for High-Fidelity Kuzushiji Recognition</title>
+  <meta name="description" content="K-ViT: a two-stage detect-then-classify framework for Kuzushiji recognition (YOLOv12x + Metom). ICIAE2026 Best Student Paper Award.">
+  <meta property="og:title" content="K-ViT: A Detection-first Framework for High-Fidelity Kuzushiji Recognition">
+  <meta property="og:description" content="Two-stage detect-then-classify Kuzushiji recognition. F1 0.972 on the CODH Kuzushiji Dataset. ICIAE2026 Best Student Paper Award.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <p class="award" role="note"><span class="award-icon" aria-hidden="true">&#9733;</span> Best Student Paper Award &middot; ICIAE2026</p>
+      <h1>K-ViT: A Detection-first Framework for High-Fidelity Kuzushiji Recognition</h1>
+
+      <ul class="authors">
+        <li>Ryo Ishido<sup>1</sup></li>
+        <li>Satoru Fujita<sup>1</sup></li>
+        <li>Keizo Oyama<sup>2,3</sup></li>
+      </ul>
+      <ul class="affiliations">
+        <li><sup>1</sup>Hosei University</li>
+        <li><sup>2</sup>National Institute of Japanese Literature</li>
+        <li><sup>3</sup>National Institute of Informatics</li>
+      </ul>
+
+      <p class="venue">Proceedings of the 14th IIAE International Conference on Industrial Application Engineering 2026 (ICIAE2026)</p>
+
+      <nav class="links" aria-label="Paper resources">
+        <a class="btn" href="https://www2.ia-engineers.org/iciae2026proc/data/papers/028.pdf">Paper (PDF)</a>
+        <a class="btn" href="https://doi.org/10.12792/iciae2026.028">DOI</a>
+        <a class="btn" href="https://github.com/Kotomiya07/kuzushiji-vision">Code</a>
+        <a class="btn" href="https://codh.rois.ac.jp/char-shape/">Dataset (CODH)</a>
+        <a class="btn" href="https://huggingface.co/SakanaAI/Metom">Metom (Hugging Face)</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="abstract">
+      <h2>Abstract</h2>
+      <p>
+        Automated recognition of Kuzushiji, the cursive script of classical Japanese literature, is crucial for
+        preserving cultural heritage, yet it poses significant challenges due to a large number of character classes,
+        complex cursive forms, and non-grid layouts. While deep learning has advanced Kuzushiji recognition, many
+        state-of-the-art methods rely on brittle, multi-stage pipelines prone to error propagation, or on complex
+        end-to-end models that can be difficult to optimize. To overcome these limitations, this paper proposes K-ViT,
+        a simple and effective two-stage framework that decouples the task into character detection and
+        classification. We first employ a fine-tuned You Only Look Once (YOLO) model to accurately localize individual
+        characters and then classify each detected character using the Metom model, a powerful, pre-trained Vision
+        Transformer (ViT) model specialized for Kuzushiji. Experiments on the comprehensive Kuzushiji Dataset
+        demonstrate that our approach achieves a new state-of-the-art F1 score of 0.972, significantly outperforming
+        existing methods. K-ViT's robust and simple framework is important for digital preservation and downstream
+        applications. It not only paves the way for large-scale analysis of historical documents but also stimulates
+        industrial development in Japan by creating new applications in digital archiving, tourism, and content
+        creation.
+      </p>
+    </section>
+
+    <section id="method">
+      <h2>Method</h2>
+      <p>
+        K-ViT follows a two-stage <strong>detect-then-classify</strong> pipeline that decouples character
+        localization from character recognition.
+      </p>
+      <div class="stages">
+        <div class="stage">
+          <h3><span class="stage-num">Stage 1</span> Character detection</h3>
+          <p>
+            YOLOv12x is fine-tuned to detect individual characters on the page. Training uses image tiling
+            augmentation: each source page is used as a full image and is also divided into 2&times;2 and 3&times;3
+            overlapping tiles, giving 14&times; the training data. Test-time augmentation (TTA) is applied at inference.
+          </p>
+        </div>
+        <div class="stage">
+          <h3><span class="stage-num">Stage 2</span> Character classification</h3>
+          <p>
+            Each detected patch is classified by
+            <a href="https://huggingface.co/SakanaAI/Metom">Metom</a>, a Vision Transformer specialized for
+            Kuzushiji (micro-accuracy 97.22% on its own test set).
+          </p>
+        </div>
+      </div>
+
+      <figure>
+        <img src="assets/fig1_pipeline.png" width="848" height="663" loading="lazy"
+             alt="Diagram of the K-ViT pipeline: a page image is passed to YOLOv12x for character detection, and each detected patch is classified by Metom.">
+        <figcaption><strong>Fig. 1.</strong> Overview of the K-ViT recognition pipeline. Our framework first detects all characters using YOLOv12x and then classifies each detected patch with Metom.</figcaption>
+      </figure>
+
+      <figure>
+        <img src="assets/fig2_tiling.png" width="987" height="526" loading="lazy"
+             alt="Illustration of image tiling: a source page divided into 2x2 and 3x3 overlapping tiles.">
+        <figcaption><strong>Fig. 2.</strong> Image tiling strategy for data augmentation. Each source image is divided into 2x2 and 3x3 overlapping tiles to create a richer training set.</figcaption>
+      </figure>
+    </section>
+
+    <section id="results">
+      <h2>Results</h2>
+
+      <h3>End-to-end character recognition</h3>
+      <p>Character recognition F1 score on the CODH Kuzushiji Dataset (higher is better).</p>
+      <div class="table-wrap">
+        <table>
+          <caption>Comparison of character recognition F1 score with state-of-the-art methods.</caption>
+          <thead>
+            <tr><th scope="col">Method</th><th scope="col">Backbone</th><th scope="col" class="num">F1 &uarr;</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>KuroNet</td><td>Residual U-Net</td><td class="num">F1 0.896</td></tr>
+            <tr><td>Fujita et al.</td><td>CNN+Transformer</td><td class="num">F1 0.865</td></tr>
+            <tr class="ours"><td><strong>K-ViT (ours)</strong></td><td>YOLOv12x+Metom</td><td class="num"><strong>F1 0.972</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Detection-stage ablation</h3>
+      <div class="callout">
+        <p>
+          The full detection model reaches <strong>mAP@50 0.980</strong> on the test set. Removing image tiling or
+          test-time augmentation drops detection performance substantially.
+        </p>
+      </div>
+
+      <h3>Dataset split</h3>
+      <p>
+        Experiments use the <a href="https://codh.rois.ac.jp/char-shape/">CODH Kuzushiji Dataset</a>
+        (DOI: <a href="https://doi.org/10.20676/00000340">10.20676/00000340</a>), split at the book level.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <caption>Statistics of the Kuzushiji Dataset split used for detector fine-tuning.</caption>
+          <thead>
+            <tr><th scope="col">Split</th><th scope="col" class="num"># of Books</th><th scope="col" class="num"># of Images</th><th scope="col" class="num"># of Instances</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Train</td><td class="num">31</td><td class="num">3,693</td><td class="num">684,714</td></tr>
+            <tr><td>Validation</td><td class="num">7</td><td class="num">1,003</td><td class="num">253,151</td></tr>
+            <tr><td>Test</td><td class="num">6</td><td class="num">713</td><td class="num">148,422</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><th scope="row">Total</th><td class="num">44</td><td class="num">5,409</td><td class="num">1,086,287</td></tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <section id="qualitative">
+      <h2>Qualitative result</h2>
+      <figure class="narrow">
+        <img src="assets/fig4_qualitative.jpg" width="685" height="1000" loading="lazy"
+             alt="A historical Kuzushiji document page with red bounding boxes around each detected character and the predicted character label next to each box.">
+        <figcaption><strong>Fig. 4.</strong> Example of successful recognition by K-ViT on a challenging historical document. Our proposed framework accurately localizes characters with bounding boxes (red) and classifies them with the correct labels, demonstrating robust performance even in complex, non-grid layouts. (in RYORI-HIDENSYO)</figcaption>
+      </figure>
+    </section>
+
+    <section id="citation">
+      <h2>Citation</h2>
+<pre class="bibtex"><code>@inproceedings{ishido2026kvit,
+  title={K-ViT: A Detection-first Framework for High-Fidelity Kuzushiji Recognition},
+  author={Ishido, Ryo and Fujita, Satoru and Oyama, Keizo},
+  booktitle={Proceedings of the 14th IIAE International Conference on Industrial Application Engineering 2026 (ICIAE2026)},
+  year={2026},
+  doi={10.12792/iciae2026.028}
+}</code></pre>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>This work was conducted as a collaborative study under the NIJL Project (Research No. K452052428).</p>
+    </div>
+  </footer>
+</body>
+</html>

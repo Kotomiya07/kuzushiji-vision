@@ -1,0 +1,233 @@
+:root {
+  --text: #1f2328;
+  --muted: #57606a;
+  --bg: #ffffff;
+  --bg-alt: #f6f8fa;
+  --border: #d0d7de;
+  --accent: #8b1e3f;
+  --accent-dark: #6a1730;
+  --gold: #b7791f;
+  --gold-bg: #fff8e6;
+  --max: 920px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.container {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+a { color: var(--accent); }
+a:hover { color: var(--accent-dark); }
+
+/* Header */
+.hero {
+  text-align: center;
+  padding: 48px 0 36px;
+  background: linear-gradient(180deg, var(--bg-alt), var(--bg));
+  border-bottom: 1px solid var(--border);
+}
+
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  line-height: 1.25;
+  margin: 16px 0 20px;
+}
+
+.award {
+  display: inline-block;
+  margin: 0;
+  padding: 6px 16px;
+  font-weight: 600;
+  color: var(--gold);
+  background: var(--gold-bg);
+  border: 1px solid #f0d08a;
+  border-radius: 999px;
+}
+
+.award-icon { margin-right: 4px; }
+
+.authors, .affiliations {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 24px;
+}
+
+.authors { font-size: 1.15rem; font-weight: 500; }
+.affiliations { color: var(--muted); font-size: 0.95rem; margin-top: 6px; }
+
+.venue {
+  margin: 16px auto 0;
+  max-width: 680px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: var(--text);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.btn:hover, .btn:focus-visible { background: var(--accent); color: #fff; }
+
+/* Sections */
+main section {
+  padding: 40px 0 8px;
+}
+
+h2 {
+  font-size: 1.6rem;
+  margin: 0 0 16px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--border);
+}
+
+h3 { font-size: 1.15rem; margin: 28px 0 10px; }
+
+#abstract p { text-align: justify; hyphens: auto; }
+
+.stages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.stage {
+  padding: 4px 18px 8px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.stage h3 { margin-top: 14px; }
+
+.stage-num {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 8px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.8rem;
+  vertical-align: middle;
+}
+
+figure {
+  margin: 28px 0;
+  text-align: center;
+}
+
+figure img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+figure.narrow img { max-width: min(100%, 560px); }
+
+figcaption {
+  margin: 10px auto 0;
+  max-width: 760px;
+  font-size: 0.92rem;
+  color: var(--muted);
+  text-align: left;
+}
+
+/* Tables */
+.table-wrap { overflow-x: auto; margin: 12px 0 20px; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.97rem;
+}
+
+caption {
+  caption-side: bottom;
+  padding-top: 8px;
+  font-size: 0.88rem;
+  color: var(--muted);
+  text-align: left;
+}
+
+th, td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+thead th { background: var(--bg-alt); border-bottom: 2px solid var(--border); }
+tfoot th, tfoot td { font-weight: 600; border-top: 2px solid var(--border); border-bottom: none; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.ours td { background: #fbeff3; }
+
+.callout {
+  padding: 4px 18px;
+  border-left: 4px solid var(--accent);
+  background: var(--bg-alt);
+  border-radius: 0 6px 6px 0;
+}
+
+/* Citation */
+.bibtex {
+  margin: 0;
+  padding: 16px;
+  overflow-x: auto;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.bibtex code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+
+/* Footer */
+footer {
+  margin-top: 48px;
+  padding: 24px 0;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  body { font-size: 16px; }
+  .hero { padding: 32px 0 28px; }
+  #abstract p { text-align: left; }
+}
