@@ -89,13 +89,13 @@
         </ol>
 
         <figure>
-          <img src="assets/fig1_pipeline.png" width="848" height="663" loading="lazy"
+          <img src="assets/fig1_pipeline.png" width="1629" height="1183" loading="lazy"
                alt="Diagram of the K-ViT pipeline: a page image is passed to YOLOv12x for character detection, and each detected patch is classified by Metom.">
           <figcaption><strong>Fig. 1.</strong> Overview of the K-ViT recognition pipeline. Our framework first detects all characters using YOLOv12x and then classifies each detected patch with Metom.</figcaption>
         </figure>
 
         <figure>
-          <img src="assets/fig2_tiling.png" width="987" height="526" loading="lazy"
+          <img src="assets/fig2_tiling.png" width="1907" height="956" loading="lazy"
                alt="Illustration of image tiling: a source page divided into 2x2 and 3x3 overlapping tiles.">
           <figcaption><strong>Fig. 2.</strong> Image tiling strategy for data augmentation. Each source image is divided into 2x2 and 3x3 overlapping tiles to create a richer training set.</figcaption>
         </figure>
@@ -158,7 +158,7 @@
       <h2>Qualitative result</h2>
       <div class="section-body">
         <figure class="plate">
-          <img src="assets/fig4_qualitative.jpg" width="685" height="1000" loading="lazy"
+          <img src="assets/fig4_qualitative.jpg" width="1190" height="1736" loading="lazy"
                alt="A historical Kuzushiji document page with red bounding boxes around each detected character and the predicted character label next to each box.">
           <figcaption><strong>Fig. 4.</strong> Example of successful recognition by K-ViT on a challenging historical document. Our proposed framework accurately localizes characters with bounding boxes (red) and classifies them with the correct labels, demonstrating robust performance even in complex, non-grid layouts. (in RYORI-HIDENSYO)</figcaption>
         </figure>
